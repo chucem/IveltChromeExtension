@@ -22,8 +22,15 @@ function previewPost() {
 	document.getElementsByName("preview")[0].click();
 }
 
+function toggleNotification() {
+	const notificationNode = document.getElementById("notification_list_button");
+	if (notificationNode) {
+		notificationNode.click();
+	}
+}
+
 function checkKey(e) {
-	if (e.key == "a" && e.altKey) {
+	if (e.code == "KeyA" && e.altKey) {
 		window.location.href = 'https://www.ivelt.com/forum/search.php?search_id=active_topics';
 	}
 
@@ -33,6 +40,10 @@ function checkKey(e) {
 
 	if (e.code == "KeyV" && e.altKey && post) {
 		previewPost();
+	}
+
+	if (e.code == "KeyN" && e.altKey && post) {
+		toggleNotification();
 	}
 
 	e = e || window.event;
@@ -58,12 +69,6 @@ function checkKey(e) {
 		scrollBottom();
 	}
 }
-
-
-
-const notificationNode = document.getElementById("notification_list_button");
-
-if (notificationNode) notificationNode.accessKey = "n";
 
 let post = (document.getElementsByName("post") || [])[0];
 if (post) {
