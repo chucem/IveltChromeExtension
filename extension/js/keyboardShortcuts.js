@@ -14,8 +14,10 @@ function scrollBottom() {
 	window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' } );
 }
 
-function sendPost() {
-	document.getElementsByName("post")[0].click();
+function sendPost(post) {
+	if (post) {
+		post.click();
+	}
 }
 
 function previewPost() {
@@ -35,7 +37,7 @@ function checkKey(e) {
 	}
 
 	if (e.key == "Enter" && e.ctrlKey && post) {
-		sendPost();
+		sendPost(post);
 	}
 
 	if (e.code == "KeyV" && e.altKey && post) {
@@ -70,8 +72,8 @@ function checkKey(e) {
 	}
 }
 
-let post = (document.getElementsByName("post") || [])[0];
+let post = document.getElementsByName("post")[0] || document.getElementsByName("submit")[0] || false;
 if (post) {
-	post.setAttribute("title", "שיק תגובה (שארטקאט קאנטראל+ענטער)");
+	post.setAttribute("title", "שיק (שארטקאט קאנטראל+ענטער)");
 }
 document.onkeydown = checkKey;
