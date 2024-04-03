@@ -42,7 +42,7 @@ function checkKey(e) {
 		previewPost();
 	}
 
-	if (e.code == "KeyN" && e.altKey && post) {
+	if (e.code == "KeyN" && e.altKey) {
 		toggleNotification();
 	}
 
