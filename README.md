@@ -7,8 +7,11 @@ A browser extension that adds accessibility and usability improvements to איי
 
 ## Features
 * Go to next/previous page by pressing the right/left <kbd>←</kbd><kbd>→</kbd> keyboard keys.
+* Go to up/down by pressing the up/down <kbd>↑</kbd><kbd>↓</kbd> keyboard keys.
 * Submit posts with <kbd>Ctrl</kbd>+<kbd>Enter</kbd> shortcut.
-* Preview posts with <kbd>Alt</kbd>+<kbd>V</kbd> shortcut (works in quick post and full editor).
+* Preview posts with <kbd>Alt</kbd>+<kbd>v</kbd> shortcut (works in quick post and full editor).
+* Go to אקטיווע אשכולות with <kbd>Alt</kbd>+<kbd>a</kbd> shortcut.
+* Popup notifiaciton with <kbd>Alt</kbd>+<kbd>n</kbd> shortcut.
 * Receive inbox notifications even when not on אייוועלט. 
 * New response notifications while on topic pages.
 * New page notification while on topic pages.
