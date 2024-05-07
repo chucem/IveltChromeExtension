@@ -34,12 +34,10 @@
   },
   "options_page": "settings.html",
   "permissions": [
-    "tabs",
     "alarms",
     "cookies",
     "storage",
     "notifications",
-    "webRequest",
     "background",
     "declarativeNetRequestWithHostAccess",
     "declarativeNetRequestFeedback"
