@@ -22,6 +22,20 @@
 
 					window.addEventListener('beforeunload', avoidLosingPost);
 				}
+
+				let notificationLink = document.getElementById('mark_all_notifications');
+				if (notificationLink) {
+					notificationLink = notificationLink.querySelector('a');
+					notificationLink.addEventListener('click', function(event) {
+						let confirmation = confirm('איר זענט זיכער אז איר ווילט פארצייכענען אלע נאטעפיקאציעס ווי געליינט?');
+						if (!confirmation) {
+							event.preventDefault();
+						}
+					});
+				}
+
+				document.getElementById('mark_all_notifications').disabled = !items.warnOnLosingPost;
+
 			}
             
             let e = document.createElement('div');
