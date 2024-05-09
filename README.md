@@ -2,7 +2,7 @@
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/mordechairoth/IveltChromeExtension?label=GitHub%20Release%20Version&style=flat-square&color=42a5f5)](https://github.com/chucem/IveltChromeExtension/releases/latest/) 
 ![Chrome Web Store](https://img.shields.io/chrome-web-store/users/ahidenbhdkloaingggdcijofobjboopi?label=Users&style=flat-square&color=9575cd)
 
-# iVelt Helper
+# iVelt Helper v2
 A browser extension that adds accessibility and usability improvements to אייוועלט.
 
 ## Features
