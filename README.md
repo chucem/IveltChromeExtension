@@ -18,6 +18,8 @@ A browser extension that adds accessibility and usability improvements to איי
 * Quote last reply only, for posts with multiple quotes.
 * Search in thread with Google.
 * Various other fixes and options.
+* Prevent accidental mark all notifications as read, and prevent loosing form
+* Hide your name 
 
 ## Install from Chrome Web Store
 1. Visit the **[Chrome Web Store](https://chromewebstore.google.com/detail/ivelt-helper-v2/ahidenbhdkloaingggdcijofobjboopi)** page
