@@ -1,7 +1,7 @@
 (function(){
 
 	if(chrome.storage){
-		chrome.storage.local.get(['hideUserName', 'warnOnLosingPost',"sefariaLinker",'backgroundSync', 'backgroundSyncPosts'], function(items){
+		chrome.storage.local.get(['hideUserName', 'warnOnLosingPost','backgroundSync', 'backgroundSyncPosts'], function(items){
 			if(items.hideUserName){
 				let userName = document.querySelector('.header-avatar .username');
 				if (userName)
@@ -22,12 +22,26 @@
 
 					window.addEventListener('beforeunload', avoidLosingPost);
 				}
+
+				let notificationLinks = document.querySelectorAll('#mark_all_notifications a, .pagination .mark ');
+				notificationLinks.forEach (link => {
+					// for testing while development
+					// console.log(link);
+					// link.setAttribute('href', 'javascript:void(0);');
+
+					link.addEventListener('click', function(event) {
+						let confirmation = confirm('איר זענט זיכער אז איר ווילט פארצייכענען אלעס ווי געליינט?');
+						if (!confirmation) {
+							event.preventDefault();
+						}
+					});
+				});
+
 			}
             
             let e = document.createElement('div');
             e.style.display = "none";
             e.setAttribute('id', 'iveltHelperSettings');
-            e.setAttribute('data-sefaria-linker',items.sefariaLinker);
             e.setAttribute('data-background-sync',items.backgroundSync);
             e.setAttribute('data-background-sync-posts',items.backgroundSyncPosts);
             document.body.appendChild(e);

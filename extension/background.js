@@ -4,7 +4,6 @@ const defualtPreferences = {
   hideUserName: false,
   getBrowserNotifications: false,
   warnOnLosingPost: true,
-  sefariaLinker: true,
   debugMode: false,
   backgroundSync: true,
   backgroundSyncPosts: 20000,
