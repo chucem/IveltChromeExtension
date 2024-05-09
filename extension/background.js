@@ -4,6 +4,7 @@ const defualtPreferences = {
   hideUserName: false,
   getBrowserNotifications: false,
   warnOnLosingPost: true,
+  sefariaLinker: true,
   debugMode: false,
   backgroundSync: true,
   backgroundSyncPosts: 20000,
@@ -24,13 +25,13 @@ let checkNewNotification = function () {
       let newCount = matches.length == 2 ? matches[1] : "0";
 
       if (newCount !== "0") {
-        chrome.action.setBadgeText({ text: newCount });
+        chrome.browserAction.setBadgeText({ text: newCount });
       } else {
-        chrome.action.setBadgeText({ text: "" });
+        chrome.browserAction.setBadgeText({ text: "" });
       }
 
       // triggere browser notifications
-      chrome.storage.local.get(['getBrowserNotifications'], function(items){
+      chrome.storage.sync.get(['getBrowserNotifications'], function(items){
         if(items.getBrowserNotifications){
           parseAndSendNotifications(data);
         }
@@ -46,25 +47,13 @@ chrome.alarms.onAlarm.addListener((a) => {
 });
 
 chrome.runtime.onInstalled.addListener(() => {
-
-  // migrate settings from sync storage to local storage
-  chrome.storage.sync.get(null, function(items){
-    if(Object.keys(items).length > 0){
-      Object.keys(items).forEach(key => {
-        chrome.storage.local.set({[key]: items[key]});
-        chrome.storage.sync.remove(key);
-        console.log(`migrated ${key}`);
-      });
-    }
-  });
-  
   // set default settings to storage
-  chrome.storage.local.get({
+  chrome.storage.sync.get({
     ...defualtPreferences,
     isFreshInstall: true // needed for initial notifications
   }, function(items){
     if(items && Object.keys(items).length)
-      chrome.storage.local.set(items);
+      chrome.storage.sync.set(items);
 
     alarmToFetch(items.backgroundSync, parseInt(items.backgroundSyncNotif));
   });
@@ -72,7 +61,7 @@ chrome.runtime.onInstalled.addListener(() => {
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if(request.type === 'badgeText'){
-    chrome.action.setBadgeText({ text: request.text });
+    chrome.browserAction.setBadgeText({ text: request.text });
   }
 
   // global method to send a notification
@@ -81,22 +70,28 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   }
 });
 
+chrome.webRequest.onBeforeRequest.addListener(
+  function(details) { return { redirectUrl: 'https://ivelt.com/forum/' }; },
+  {urls: ['*://www.ןהקךא.com/*']},
+  ["blocking"]
+);
+
 chrome.storage.onChanged.addListener((changes, area) => {
   if(area !== 'sync')
     return;
 
   // clean debug logs when turned off
   if(changes.debugMode && changes.debugMode.newValue === false){
-    chrome.storage.local.get(null, items => {
+    chrome.storage.sync.get(null, items => {
       Object.keys(items).forEach(key => {
         if(key.indexOf(debugLogPrefix) === 0)
-          chrome.storage.local.remove(key);
+          chrome.storage.sync.remove(key);
       })
     })
   }
 
   if(changes.backgroundSync || changes.backgroundSyncNotif){
-    chrome.storage.local.get(['backgroundSync', 'backgroundSyncNotif'], items => {
+    chrome.storage.sync.get(['backgroundSync', 'backgroundSyncNotif'], items => {
       alarmToFetch(items.backgroundSync, parseInt(items.backgroundSyncNotif));
     });
   }
@@ -120,7 +115,7 @@ function debugLog(name, valueToPush){
     clearTimeout(debugQueueTimeout);
 
   debugQueueTimeout = setTimeout(() => {
-    chrome.storage.local.get('debugMode', items => {
+    chrome.storage.sync.get('debugMode', items => {
       if(items.debugMode){
         // log all from the queue
         Object.keys(debugQueue).forEach(key => {
@@ -134,11 +129,11 @@ function debugLog(name, valueToPush){
 
 function commitDebugLog(name, values){
   name = debugLogPrefix + name;
-  chrome.storage.local.get(name, ({[name]: item}) => {
+  chrome.storage.sync.get(name, ({[name]: item}) => {
     if(item)
-      chrome.storage.local.set({[name]: item.concat(values)});
+      chrome.storage.sync.set({[name]: item.concat(values)});
     else
-      chrome.storage.local.set({[name]: values});
+      chrome.storage.sync.set({[name]: values});
   })
 }
 

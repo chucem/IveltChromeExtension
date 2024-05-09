@@ -24,12 +24,12 @@ function parseAndSendNotifications(data){
   var unreadElements = getTagContent(data, 'li', 'row bg3');
   var storeOnly = false;
 
-  chrome.storage.local.get(['notificationsSent', 'isFreshInstall'], items => {
+  chrome.storage.sync.get(['notificationsSent', 'isFreshInstall'], items => {
 
     debugLog('isFreshInstall', items.isFreshInstall);
 
     if(items.isFreshInstall){
-      chrome.storage.local.remove('isFreshInstall');
+      chrome.storage.sync.remove('isFreshInstall');
       storeOnly = true;
     }
 
@@ -85,7 +85,7 @@ function parseAndSendNotifications(data){
 
     // save sent items in storage
     // TODO: prune old ids to avoid storage quota errors
-    chrome.storage.local.set({
+    chrome.storage.sync.set({
       'notificationsSent': notificationsSent
     }, () => {
       // dont send the initial batch
