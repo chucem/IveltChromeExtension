@@ -23,18 +23,19 @@
 					window.addEventListener('beforeunload', avoidLosingPost);
 				}
 
-				let notificationLink = document.getElementById('mark_all_notifications');
-				if (notificationLink) {
-					notificationLink = notificationLink.querySelector('a');
-					notificationLink.addEventListener('click', function(event) {
-						let confirmation = confirm('איר זענט זיכער אז איר ווילט פארצייכענען אלע נאטעפיקאציעס ווי געליינט?');
+				let notificationLinks = document.querySelectorAll('#mark_all_notifications a, .pagination .mark ');
+				notificationLinks.forEach (link => {
+					// for testing while development
+					// console.log(link);
+					// link.setAttribute('href', 'javascript:void(0);');
+
+					link.addEventListener('click', function(event) {
+						let confirmation = confirm('איר זענט זיכער אז איר ווילט פארצייכענען אלעס ווי געליינט?');
 						if (!confirmation) {
 							event.preventDefault();
 						}
 					});
-				}
-
-				document.getElementById('mark_all_notifications').disabled = !items.warnOnLosingPost;
+				});
 
 			}
             
