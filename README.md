@@ -1,5 +1,5 @@
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/ahidenbhdkloaingggdcijofobjboopi?label=Chrome%20Web%20Store%20Version&style=flat-square&color=66bb6a)](https://chromewebstore.google.com/detail/ivelt-helper-v2/ahidenbhdkloaingggdcijofobjboopi)
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/mordechairoth/IveltChromeExtension?label=GitHub%20Release%20Version&style=flat-square&color=42a5f5)](https://github.com/chucem/IveltChromeExtension/releases/latest/) 
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/chucem/IveltChromeExtension?label=GitHub%20Release%20Version&style=flat-square&color=42a5f5)](https://github.com/chucem/IveltChromeExtension/releases/latest/) 
 ![Chrome Web Store](https://img.shields.io/chrome-web-store/users/ahidenbhdkloaingggdcijofobjboopi?label=Users&style=flat-square&color=9575cd)
 
 # iVelt Helper v2
