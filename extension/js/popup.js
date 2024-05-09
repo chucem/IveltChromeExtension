@@ -17,14 +17,14 @@ function checkLoginState() {
     }
     function setLogOutState() {
     }
-    getLogOutCookie('http://www.ivelt.com', 'phpbb3_sw7kk_k');
+    getLogOutCookie('http://www.ivelt.com', 'phpbb3_sw7kk_sid');
     document.getElementById('emergency_sign_out').style.display = 'block';
   } else {
     document.getElementById('quick_sign_in').style.display = 'block';
   }
 }
 
-getUserId('http://www.ivelt.com', 'phpbb3_sw7kk_k');
+getUserId('http://www.ivelt.com', 'phpbb3_sw7kk_u');
 
 function open_home_page(){
   chrome.tabs.create({url:'https://www.ivelt.com/forum/'});
@@ -54,7 +54,7 @@ function emergency_sign_out(){
 }
 
 function open_settings(){
-  chrome.tabs.create({url:chrome.extension.getURL('settings.html')});
+  chrome.tabs.create({url:chrome.runtime.getURL('settings.html')});
   window.close();
 }
 

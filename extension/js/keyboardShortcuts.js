@@ -7,28 +7,45 @@ function nextPage() {
 }
 
 function scrollTop() {
-	window.scrollTo(0, 0);
+	window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 function scrollBottom() {
-	window.scrollTo(0, document.body.scrollHeight);
+	window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' } );
 }
 
-function sendPost() {
-	document.getElementsByName("post")[0].click();
+function sendPost(post) {
+	if (post) {
+		post.click();
+	}
 }
 
 function previewPost() {
 	document.getElementsByName("preview")[0].click();
 }
 
+function toggleNotification() {
+	const notificationNode = document.getElementById("notification_list_button");
+	if (notificationNode) {
+		notificationNode.click();
+	}
+}
+
 function checkKey(e) {
+	if (e.code == "KeyA" && e.altKey) {
+		window.location.href = 'https://www.ivelt.com/forum/search.php?search_id=active_topics';
+	}
+
 	if (e.key == "Enter" && e.ctrlKey && post) {
-		sendPost();
+		sendPost(post);
 	}
 
 	if (e.code == "KeyV" && e.altKey && post) {
 		previewPost();
+	}
+
+	if (e.code == "KeyN" && e.altKey) {
+		toggleNotification();
 	}
 
 	e = e || window.event;
@@ -49,20 +66,14 @@ function checkKey(e) {
 			console.log("attempted to go before first page");
 		}
 	} else if (e.key == "ArrowUp") {
-		//scrollTop();
+		scrollTop();
 	} else if (e.key == "ArrowDown") {
-		//scrollBottom();
+		scrollBottom();
 	}
 }
 
-document.querySelector(".icon.fa-file-o.fa-fw.icon-blue").parentElement.accessKey = "a";
-
-const notificationNode = document.getElementById("notification_list_button");
-
-if (notificationNode) notificationNode.accessKey = "n";
-
-let post = (document.getElementsByName("post") || [])[0];
+let post = document.getElementsByName("post")[0] || document.getElementsByName("submit")[0] || false;
 if (post) {
-	post.setAttribute("title", "שיק תגובה (שארטקאט קאנטראל+ענטער)");
+	post.setAttribute("title", "שיק (שארטקאט קאנטראל+ענטער)");
 }
 document.onkeydown = checkKey;
