@@ -1,15 +1,7 @@
 (function(){
 
 	if(chrome.storage){
-		chrome.storage.local.get(['hideUserName', 'warnOnLosingPost','backgroundSync', 'backgroundSyncPosts'], function(items){
-			if(items.hideUserName){
-				let userName = document.querySelector('.header-avatar .username');
-				if (userName)
-					userName.innerText = 'הא?';
-				let avatar = document.querySelector('.header-avatar .avatar');
-				if (avatar)
-					avatar.style.display = "none";
-			}
+		chrome.storage.local.get(['warnOnLosingPost','backgroundSync', 'backgroundSyncPosts'], function(items){
 
 			if(items.warnOnLosingPost){
 				var form = document.querySelector('form[id="qr_postform"]') || document.querySelector('form[id="postform"]');

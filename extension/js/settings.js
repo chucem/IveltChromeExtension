@@ -1,5 +1,4 @@
 const preferencesOptions = [
-	'hideUserName',
 	'getBrowserNotifications',
 	'warnOnLosingPost',
 	'backgroundSync',
