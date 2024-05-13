@@ -43,12 +43,12 @@ function addBtn(){
         }
         needUpdating = true
         btn.querySelectorAll('li.hidden:not(.responsive-menu)').forEach(b => {
-            if (b.getAttribute('class') == "hidden"){
+            if (b.getAttribute('class') === "hidden"){
                 b.removeAttribute('class')
             }
         })
 
-        let contentElement = btn.parentElement.getElementsByClassName("content").item(0)
+ //       let contentElement = btn.parentElement.getElementsByClassName("content").item(0)
         let id = btn.parentElement.getAttribute("id") || ""
         let strippedId = id.replace("post_content", "")
         strippedId = strippedId.replace("pr", "")
@@ -64,7 +64,7 @@ function addBtn(){
         let responsiveMenu = btn.getElementsByClassName('responsive-menu').item(0);
         try {
             btn.removeChild(btn.getElementsByClassName('responsive-menu').item(0))
-        }catch (e) {
+        } catch (e) {
 
         }
     });
@@ -86,15 +86,14 @@ function addSimpleButton(btn, href, customClass, title, text, onclick){
 
 function getQuoteURL(btn){
 
-    try{
+    try {
         let quoteButton = btn.querySelector('i.icon.fa-quote-left.fa-fw');
         let quoteUrl = quoteButton.parentElement;
             if (!quoteUrl){
                 return null;
             }
-            let href = quoteUrl.getAttribute('href');
-            return href;
-    }catch (e){
+            return  quoteUrl.getAttribute('href');
+    } catch (e) {
 
     }
 
@@ -145,7 +144,7 @@ function addDefaultPage(){
 }
 
 function getPostLink(postID){
-    return `https://www.IVELT.com/forum/viewtopic.php?p=${postID}#p${postID}`;
+    return `https://www.ivelt.com/forum/viewtopic.php?p=${postID}#p${postID}`;
 }
 
 function copyQuoteParse(post_id){
@@ -158,41 +157,37 @@ function copyQuoteParse(post_id){
 }
 
 function getPostDetails(post_id, prefix = 'p'){
-    var usernameE = document.querySelector(`#${prefix}${post_id} .username`)
+    let usernameE = document.querySelector(`#${prefix}${post_id} .username`);
     if (!usernameE){
-       var usernameE = document.querySelector(`#p${prefix}${post_id} .username-coloured`)
+       usernameE = document.querySelector(`#p${prefix}${post_id} .username-coloured`)
     }
-    var username = ""
+    let username = "";
     if(usernameE){
        username = usernameE.innerText
     }
 
-    var idE = document.querySelector(`#${prefix}${post_id} .username`);
-    if (!idE){
-       var usernameE = document.querySelector(`#p${prefix}${post_id} .username-coloured`)
-    }
-    var usernameLink = ""
+    const idE = document.querySelector(`#${prefix}${post_id} .username`);
+    let usernameLink = "";
     let id =""
     if(idE){
        usernameLink = idE.href;
        id = usernameLink.split("u=")[1];
     }
-    var tsE = document.querySelector(`#${prefix}${post_id} time`)
+    let tsE = document.querySelector(`#${prefix}${post_id} time`);
+    let postTime;
     if (!tsE){
-        var tsE = document.querySelector(`#${prefix}${post_id} [href='#postingbox']`).getAttribute('onclick')
+        tsE = document.querySelector(`#${prefix}${post_id} [href='#postingbox']`).getAttribute('onclick');
         if(tsE)
-            var time = tsE.match('(?<=time:)(.*)(?=,user)')[0];
-    }else{
-        var ts = Date.parse(tsE.dateTime)
-        var time = ts / 1000
+            postTime = tsE.match('(?<=time:)(.*)(?=,user)')[0];
+    } else {
+        const ts = Date.parse(tsE.dateTime);
+        postTime = ts / 1000
     }
-
-
 
     return {
         "username":username,
         "id":id,
-        "time":time
+        "time":postTime
     };
 }
 
@@ -251,7 +246,6 @@ function mozWrapApp(txtarea, open, close) {
 	txtarea.focus();
 	txtarea.scrollTop = scrollTop;
 
-	return;
 }
 
 addBtn();
