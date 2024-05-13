@@ -22,6 +22,7 @@
         "*://*.yiddishworld.com/*",
         "*://*.198.153.76.147/*"
       ],
+	  "css":["css/appcss.css"],
       "js": [
         "js/settingsHandler.js",
         "js/contentScript.js",
@@ -66,6 +67,7 @@
         "js/newResponseNotification.js",
         "js/addGoogleSearch.js",
         "js/pageEnhancements.js",
+		"js/addTopicButtons.js",
          "js/settingsHandler.js"
       ],
       "matches": [

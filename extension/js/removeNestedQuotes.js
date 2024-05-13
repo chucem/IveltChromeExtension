@@ -61,3 +61,20 @@ function lastaddquote(post_id, username) {
 
 	return;
 }
+
+function copyQuote(url, post_id){
+    let post_url = getPostLink(post_id)
+    fetch(url).then(
+        response => {
+			return response.text();
+		}).then( data =>{
+			var parser = new DOMParser();
+			var doc = parser.parseFromString(data, "text/html");
+			var res = doc.querySelector("#message-box #message").innerText
+            if (url.toString().includes("posting.php")){
+                res = `${res} [url=${post_url}]מקור[/url]`
+            }
+            navigator.clipboard.writeText(res)
+        }
+    )
+}

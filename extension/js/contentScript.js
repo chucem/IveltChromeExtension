@@ -4,6 +4,7 @@ let scripts = [
   "js/addQuoteLastOnlyButton.js",
   "js/newResponseNotification.js",
   "js/pageEnhancements.js",
+  "js/addTopicButtons.js",
   "js/addGoogleSearch.js"
 ];
 
