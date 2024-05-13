@@ -23,7 +23,7 @@
 					window.addEventListener('beforeunload', avoidLosingPost);
 				}
 
-				let notificationLinks = document.querySelectorAll('#mark_all_notifications a, .pagination .mark ');
+				let notificationLinks = document.querySelectorAll('#mark_all_notifications a, .pagination a[href*="mark="].mark');
 				notificationLinks.forEach (link => {
 					// for testing while development
 					// console.log(link);
