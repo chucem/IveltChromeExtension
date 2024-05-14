@@ -1,4 +1,4 @@
-function createButton(reference, customClass, title, text, onclick, itext="") {
+function createButton(reference, customClass, title, text, onclick) {
     let li = document.createElement('li');
     let a = document.createElement('a');
     let span = document.createElement('span');
@@ -17,7 +17,7 @@ function createButton(reference, customClass, title, text, onclick, itext="") {
     a.style.background = '#ebeadd';
     i.setAttribute('class', `icon ${customClass} fa-fw`);
     i.setAttribute('aria-hidden', 'true');
-    i.innerText = itext;
+    // i.innerText = itext;
     span.innerText = text;
     a.appendChild(i);
     a.appendChild(span);
@@ -93,8 +93,8 @@ function addBtn(){
     }
 }
 
-function addSimpleButton(btn, href, customClass, title, text, onclick, itext=""){
-    let button = createButton(href, customClass, title, text, onclick, itext);
+function addSimpleButton(btn, href, customClass, title, text, onclick){
+    let button = createButton(href, customClass, title, text, onclick);
 
     let quoteLi = getQuoteElm(btn).parentElement;
     if (quoteLi){
@@ -139,8 +139,8 @@ function addQuoteLastButton(btn, isPosting) {
         return;
     }
 
-    addSimpleButton(btn, `${quoteElm.getAttribute('href')}&last=true`, 'fa-quote-left last', 'ציטיר בלויז די לעצטע תגובה', 'ציטיר לעצטע',
-        isPosting? `last${quoteElm.getAttribute('onclick')}`: null, '1');
+    addSimpleButton(btn, `${quoteElm.getAttribute('href')}&last=true`, 'fa-minus last', 'ציטיר בלויז די לעצטע תגובה', 'ציטיר לעצטע',
+        isPosting? `last${quoteElm.getAttribute('onclick')}`: null);
 }
 
 
@@ -221,9 +221,9 @@ function ping_user(post_id){
         let PostDetails = getPostDetails(post_id)
         let text = `[quote="${PostDetails.username}" user_id=${PostDetails.id} time=${PostDetails.time} post_id=${post_id}]\n[/quote]`
 
-        if (document.getElementById("iveltHelperSettings").getAttribute("data-always-copy-topic")){
+        if (document.getElementById("iveltHelperSettings").getAttribute("data-always-copy-topic") == "true"){
             navigator.clipboard.writeText(text)
-            iveltNotify("קאפירט צום קליפבאוירד")
+            iveltNotify("קאפירט צום קליפבארד")
         } else {
             addText(text)
         }
@@ -333,7 +333,7 @@ function copyQuote(url, post_id){
                 res = `${res} [url=${post_url}]מקור[/url]`
             }
             navigator.clipboard.writeText(res)
-            iveltNotify("קאפירט צום קליפבאוירד")
+            iveltNotify("קאפירט צום קליפבארד")
         }
     )
 }
