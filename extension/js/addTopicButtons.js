@@ -276,10 +276,8 @@ function hasNestedQuotes(text) {
         return false;
     }
     let secondQ = text.indexOf("[quote", firstQ + 1);
-    if (secondQ === -1) {
-        return false;
-    }
-    return true;
+    return secondQ !== -1;
+
 }
 
 function removeNestedQuotes(text) {
@@ -300,9 +298,7 @@ function removeNestedQuotes(text) {
 function lastaddquote(post_id, username) {
     let messageName= 'message_' + post_id;
     let theSelection = '';
-    let divArea = false;
-
-    divArea = document.getElementById(messageName);
+    let divArea = document.getElementById(messageName);
 
     if (divArea.innerHTML) {
         theSelection = divArea.innerHTML.replace(/<br>/ig, '\n');
@@ -322,7 +318,6 @@ function lastaddquote(post_id, username) {
         insert_text(removeNestedQuotes(text));
     }
 
-    return;
 }
 
 function copyQuote(url, post_id){
