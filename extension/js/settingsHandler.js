@@ -1,7 +1,7 @@
 (function(){
 
 	if(chrome.storage){
-		chrome.storage.local.get(['hideUserName', 'warnOnLosingPost','backgroundSync', 'backgroundSyncPosts'], function(items){
+		chrome.storage.local.get(['alwaysCopyTopic', 'hideUserName', 'warnOnLosingPost','backgroundSync', 'backgroundSyncPosts'], function(items){
 			if(items.hideUserName){
 				let userName = document.querySelector('.header-avatar .username');
 				if (userName)
@@ -44,7 +44,8 @@
             e.setAttribute('id', 'iveltHelperSettings');
             e.setAttribute('data-background-sync',items.backgroundSync);
             e.setAttribute('data-background-sync-posts',items.backgroundSyncPosts);
-            document.body.appendChild(e);
+			e.setAttribute('data-always-copy-topic',items.alwaysCopyTopic);
+			document.body.appendChild(e);
 		});
 	}
 

@@ -209,15 +209,17 @@ function ping_user(post_id){
         let PostDetails = getPostDetails(post_id,"pr")
         let text = `[quote="${PostDetails.username}" user_id=${PostDetails.id} time=${PostDetails.time} post_id=${post_id}]\n[/quote]`
         insert_text(text)
-    }else{
+    } else {
         let PostDetails = getPostDetails(post_id)
         let text = `[quote="${PostDetails.username}" user_id=${PostDetails.id} time=${PostDetails.time} post_id=${post_id}]\n[/quote]`
 
-        try {
+        if (document.getElementById("iveltHelperSettings").getAttribute("data-always-copy-topic")){
+            navigator.clipboard.writeText(text)
+            iveltNotify("קאפירט צום קליפבאוירד")
+        } else {
             addText(text)
-        }catch (exception_var) {
-			  navigator.clipboard.writeText(text)
         }
+
     }
 }
 
@@ -328,7 +330,7 @@ function copyQuote(url, post_id){
                 res = `${res} [url=${post_url}]מקור[/url]`
             }
             navigator.clipboard.writeText(res)
-            iveltNotify("Copied To clipboard")
+            iveltNotify("קאפירט צום קליפבאוירד")
         }
     )
 }
