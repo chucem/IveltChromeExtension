@@ -12,8 +12,9 @@ function createButton(reference, customClass, title, text, onclick, itext="") {
         a.setAttribute('onClick', onclick)
     }
     a.setAttribute('class', 'button button-icon-only custom-btn ');
-    a.setAttribute('style', "width:18px;color:black;text-align:center;user-select:none;");
+    // a.setAttribute('style', "width:18px;color:black;text-align:center;user-select:none;");
     a.setAttribute('title',title );
+    a.style.background = '#ebeadd';
     i.setAttribute('class', `icon ${customClass} fa-fw`);
     i.setAttribute('aria-hidden', 'true');
     i.innerText = itext;
@@ -58,6 +59,8 @@ function addBtn(){
                 b.removeAttribute('class')
             }
         })
+
+        addUnderlineForQuoteBtn(btn);
 
        let contentElement = btn.parentElement.getElementsByClassName("content").item(0)
         let id = btn.parentElement.getAttribute("id") || ""
@@ -113,6 +116,11 @@ function getQuoteElm(btn){
 
     return null;
 
+}
+
+function addUnderlineForQuoteBtn(btn) {
+    let sourceURL = getQuoteElm(btn);
+    sourceURL.style.background = '#ebeadd';
 }
 
 function addCopyQuoteButton(btn, postID){
@@ -338,12 +346,13 @@ function copyQuote(url, post_id){
 function iveltNotify(message){
 
     let fadeTarget = document.querySelector('#ivelt-notify');
-    if (!fadeTarget){
+    if (!fadeTarget) {
         fadeTarget = document.createElement('div');
         fadeTarget.id = 'ivelt-notify';
         fadeTarget.style.position = "fixed";
         fadeTarget.style.top = "30%";
         fadeTarget.style.left = "50%";
+        fadeTarget.style.zIndex = "9999"; // Keep this on top
         fadeTarget.style.background = "#eee";
         fadeTarget.style.textAlign = "center";
         fadeTarget.style.padding = "5px 25px 7px 25px";
