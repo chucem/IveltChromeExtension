@@ -1,4 +1,4 @@
-function createButton(reference, customClass, title, text, onclick) {
+function createButton(reference, customClass, title, text, onclick, itext="") {
     let li = document.createElement('li');
     let a = document.createElement('a');
     let span = document.createElement('span');
@@ -17,7 +17,9 @@ function createButton(reference, customClass, title, text, onclick) {
     a.style.background = '#ebeadd';
     i.setAttribute('class', `icon ${customClass} fa-fw`);
     i.setAttribute('aria-hidden', 'true');
-    // i.innerText = itext;
+    i.style.width = "auto";
+    i.style.minWidth = "18px"
+    i.innerText = itext;
     span.innerText = text;
     a.appendChild(i);
     a.appendChild(span);
@@ -93,8 +95,8 @@ function addBtn(){
     }
 }
 
-function addSimpleButton(btn, href, customClass, title, text, onclick){
-    let button = createButton(href, customClass, title, text, onclick);
+function addSimpleButton(btn, href, customClass, title, text, onclick, itext=""){
+    let button = createButton(href, customClass, title, text, onclick, itext);
 
     let quoteLi = getQuoteElm(btn).parentElement;
     if (quoteLi){
@@ -139,8 +141,8 @@ function addQuoteLastButton(btn, isPosting) {
         return;
     }
 
-    addSimpleButton(btn, `${quoteElm.getAttribute('href')}&last=true`, 'fa-minus last', 'ציטיר בלויז די לעצטע תגובה', 'ציטיר לעצטע',
-        isPosting? `last${quoteElm.getAttribute('onclick')}`: null);
+    addSimpleButton(btn, `${quoteElm.getAttribute('href')}&last=true`, 'fa-quote-left last', 'ציטיר בלויז די לעצטע תגובה', 'ציטיר לעצטע',
+        isPosting? `last${quoteElm.getAttribute('onclick')}`: null, '1');
 }
 
 
