@@ -12,9 +12,13 @@ function createButton(reference, customClass, title, text, onclick, itext="") {
         a.setAttribute('onClick', onclick)
     }
     a.setAttribute('class', 'button button-icon-only custom-btn ');
+    // a.setAttribute('style', "width:18px;color:black;text-align:center;user-select:none;");
     a.setAttribute('title',title );
+    a.style.background = '#ebeadd';
     i.setAttribute('class', `icon ${customClass} fa-fw`);
     i.setAttribute('aria-hidden', 'true');
+    i.style.width = "auto";
+    i.style.minWidth = "18px"
     i.innerText = itext;
     span.innerText = text;
     a.appendChild(i);
@@ -27,12 +31,22 @@ function createButton(reference, customClass, title, text, onclick, itext="") {
 function getPMHref(id) {
     let pm_button = document.querySelector(`#profile${id.replace("post_content", "")} .pm-icon`)
     if (pm_button){
-        return pm_button.parentElement.getAttribute("href")
+        return pm_button.parentElement;
     }
     return null;
 }
 
 function addBtn(){
+    let onlyLastQuote = window.location.href.includes("last=true");
+    if (onlyLastQuote) {
+        let messageArea = document.querySelector("#message");
+        let text = messageArea.innerHTML;
+        if (hasNestedQuotes(text)) {
+            text = removeNestedQuotes(text);
+            messageArea.innerHTML = text;
+        }
+    }
+
     let btns = document.querySelectorAll('.post-buttons');
     let isPosting = (window.location.href.includes("posting.php"));
     var needUpdating = false;
@@ -48,7 +62,9 @@ function addBtn(){
             }
         })
 
- //       let contentElement = btn.parentElement.getElementsByClassName("content").item(0)
+        addUnderlineForQuoteBtn(btn);
+
+       let contentElement = btn.parentElement.getElementsByClassName("content").item(0)
         let id = btn.parentElement.getAttribute("id") || ""
         let strippedId = id.replace("post_content", "")
         strippedId = strippedId.replace("pr", "")
@@ -57,11 +73,11 @@ function addBtn(){
         }
         let pingOnClick = `ping_user(${strippedId})`
         addSimpleButton(btn, null, 'fa-at', 'דערמאן תגובה', 'דערמאן תגובה', pingOnClick)
-        // if (contentElement.innerHTML.includes("blockquote")) {
-            // addQuoteLastButton(btn, isPosting);
-        // }
+        if (contentElement.innerHTML.includes("blockquote")) {
+            addQuoteLastButton(btn, isPosting);
+        }
 
-        let responsiveMenu = btn.getElementsByClassName('responsive-menu').item(0);
+        // let responsiveMenu = btn.getElementsByClassName('responsive-menu').item(0);
         try {
             btn.removeChild(btn.getElementsByClassName('responsive-menu').item(0))
         } catch (e) {
@@ -79,49 +95,55 @@ function addBtn(){
     }
 }
 
-function addSimpleButton(btn, href, customClass, title, text, onclick){
-    let button = createButton(href, customClass, title, text, onclick);
-    btn.appendChild(button.li);
-}
+function addSimpleButton(btn, href, customClass, title, text, onclick, itext=""){
+    let button = createButton(href, customClass, title, text, onclick, itext);
 
-function getQuoteURL(btn){
-
-    try {
-        let quoteButton = btn.querySelector('i.icon.fa-quote-left.fa-fw');
-        let quoteUrl = quoteButton.parentElement;
-            if (!quoteUrl){
-                return null;
-            }
-            return  quoteUrl.getAttribute('href');
-    } catch (e) {
-
+    let quoteLi = getQuoteElm(btn).parentElement;
+    if (quoteLi){
+        quoteLi.parentNode.insertBefore(button.li, quoteLi.nextSibling)
     }
 
 }
+
+function getQuoteElm(btn){
+
+    const quoteButton = btn.querySelector('i.icon.fa-quote-left.fa-fw');
+
+    if (quoteButton){
+        const quoteUrl = quoteButton.parentElement;
+        if (quoteUrl){
+                return quoteUrl;
+        }
+    }
+
+    return null;
+
+}
+
+function addUnderlineForQuoteBtn(btn) {
+    let sourceURL = getQuoteElm(btn);
+    sourceURL.style.background = '#ebeadd';
+}
+
 function addCopyQuoteButton(btn, postID){
-    let href = getPMHref(postID) || getQuoteURL(btn)
-    if (!href){
-        addSimpleButton(btn, null, 'fa-copy', 'ציטיר אין אנדערע אשכול', 'ציטיר אין אנדערע אשכול', `copyQuoteParse("${postID}")`)
+    let sourceURL = getPMHref(postID) || getQuoteElm(btn)
+    addSimpleButton(btn, null, 'fa-copy', 'ציטיר אין אנדערע אשכול', 'ציטיר אין אנדערע אשכול',
+        sourceURL?
+            `copyQuote("${sourceURL.getAttribute("href")}", "${postID}")`:
+            `copyQuoteParse("${postID}")`
+    )
+}
+
+function addQuoteLastButton(btn, isPosting) {
+
+    let quoteElm = getQuoteElm(btn)
+    if (!quoteElm){
         return;
     }
-    addSimpleButton(btn, null, 'fa-copy', 'ציטיר אין אנדערע אשכול', 'ציטיר אין אנדערע אשכול', `copyQuote("${href}", "${postID}")`)
+
+    addSimpleButton(btn, `${quoteElm.getAttribute('href')}&last=true`, 'fa-quote-left last', 'ציטיר בלויז די לעצטע תגובה', 'ציטיר לעצטע',
+        isPosting? `last${quoteElm.getAttribute('onclick')}`: null, '1');
 }
-// function addQuoteLastButton(btn, isPosting) {
-
-    // let href = getQuoteURL(btn)
-    // if (!href){
-
-        // return;
-    // }
-    // var onclick = null;
-    // if (isPosting){
-       // onclick = "last" + btn.querySelector('i.icon.fa-quote-left.fa-fw').parentElement.getAttribute('onclick');
-// //       button.a.setAttribute("onclick", "last" + onclick);
-    // }
-    // let button = createButton(href + '&last=true', 'fa-quote-left last', 'ציטיר בלויז די לעצטע תגובה', 'ציטיר לעצטע', onclick, '1');
-
-    // btn.appendChild(button.li);
-// }
 
 
 function addDefaultPage(){
@@ -197,15 +219,17 @@ function ping_user(post_id){
         let PostDetails = getPostDetails(post_id,"pr")
         let text = `[quote="${PostDetails.username}" user_id=${PostDetails.id} time=${PostDetails.time} post_id=${post_id}]\n[/quote]`
         insert_text(text)
-    }else{
+    } else {
         let PostDetails = getPostDetails(post_id)
         let text = `[quote="${PostDetails.username}" user_id=${PostDetails.id} time=${PostDetails.time} post_id=${post_id}]\n[/quote]`
 
-        try {
+        if (document.getElementById("iveltHelperSettings").getAttribute("data-always-copy-topic") == "true"){
+            navigator.clipboard.writeText(text)
+            iveltNotify("קאפירט צום קליפבאורד")
+        } else {
             addText(text)
-        }catch (exception_var) {
-			  navigator.clipboard.writeText(text)
         }
+
     }
 }
 
@@ -247,6 +271,109 @@ function mozWrapApp(txtarea, open, close) {
 	txtarea.scrollTop = scrollTop;
 
 }
+
+function hasNestedQuotes(text) {
+    let firstQ = text.indexOf("[quote");
+    if (firstQ === -1) {
+        return false;
+    }
+    let secondQ = text.indexOf("[quote", firstQ + 1);
+    return secondQ !== -1;
+
+}
+
+function removeNestedQuotes(text) {
+    let nestedQuote = text.substring(
+        text.lastIndexOf('[quote'),
+        text.indexOf("[/quote]", text.lastIndexOf('[quote')) + 9
+    );
+    let modifiedText = text.replace(nestedQuote, "");
+
+    if (hasNestedQuotes(modifiedText)) {
+        return removeNestedQuotes(modifiedText);
+    }
+
+    return modifiedText;
+}
+
+
+function lastaddquote(post_id, username) {
+    let messageName= 'message_' + post_id;
+    let theSelection = '';
+    let divArea = document.getElementById(messageName);
+
+    if (divArea.innerHTML) {
+        theSelection = divArea.innerHTML.replace(/<br>/ig, '\n');
+        theSelection = theSelection.replace(/<br\/>/ig, '\n');
+        theSelection = theSelection.replace(/&lt\;/ig, '<');
+        theSelection = theSelection.replace(/&gt\;/ig, '>');
+        theSelection = theSelection.replace(/&amp\;/ig, '&');
+        theSelection = theSelection.replace(/&nbsp\;/ig, ' ');
+    }  else if (divArea.textContent) {
+        theSelection = divArea.textContent;
+    } else if (divArea.firstChild.nodeValue) {
+        theSelection = divArea.firstChild.nodeValue;
+    }
+
+    if (theSelection) {
+        let text = '[quote="' + username + '"]' + theSelection + '[/quote]'
+        insert_text(removeNestedQuotes(text));
+    }
+
+}
+
+function copyQuote(url, post_id){
+    let post_url = getPostLink(post_id)
+    fetch(url).then(
+        response => {
+            return response.text();
+        }).then( data =>{
+            var parser = new DOMParser();
+            var doc = parser.parseFromString(data, "text/html");
+            var res = doc.querySelector("#message-box #message").innerText
+            if (url.toString().includes("posting.php")){
+                res = `${res} [url=${post_url}]מקור[/url]`
+            }
+            navigator.clipboard.writeText(res)
+            iveltNotify("קאפירט צום קליפבאורד")
+        }
+    )
+}
+
+function iveltNotify(message){
+
+    let fadeTarget = document.querySelector('#ivelt-notify');
+    if (!fadeTarget) {
+        fadeTarget = document.createElement('div');
+        fadeTarget.id = 'ivelt-notify';
+        fadeTarget.style.position = "fixed";
+        fadeTarget.style.top = "30%";
+        fadeTarget.style.left = "50%";
+        fadeTarget.style.zIndex = "9999"; // Keep this on top
+        fadeTarget.style.background = "#eee";
+        fadeTarget.style.textAlign = "center";
+        fadeTarget.style.padding = "5px 25px 7px 25px";
+        fadeTarget.style.transform = "translateX(-50%)";
+        fadeTarget.style.borderLeft = "2px solid #999";
+        fadeTarget.style.borderRight = "2px solid #999";
+        fadeTarget.style.borderBottom = "2px solid #999";
+        fadeTarget.style.borderBottomLeftRadius = "4px";
+        fadeTarget.style.borderBottomRightRadius = "4px";
+        fadeTarget.style.transition = "opacity 0.75s linear";
+        fadeTarget.style.fontSize = "1rem";
+
+        const container = document.querySelector('#page-body')
+        container.insertBefore(fadeTarget, container.firstChild);
+    }
+
+    fadeTarget.style.opacity = "1";
+    fadeTarget.innerHTML = message ;
+    setTimeout(function() {
+        fadeTarget.style.opacity = "0";
+    }, 1500);
+}
+
+
 
 addBtn();
 

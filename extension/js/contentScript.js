@@ -1,7 +1,5 @@
 let scripts = [
   "js/keyboardShortcuts.js",
-  "js/removeNestedQuotes.js",
-  "js/addQuoteLastOnlyButton.js",
   "js/newResponseNotification.js",
   "js/pageEnhancements.js",
   "js/addTopicButtons.js",

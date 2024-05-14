@@ -5,7 +5,9 @@ const preferencesOptions = [
 	'backgroundSync',
 	'backgroundSyncPosts',
 	'backgroundSyncNotif',
-	'debugMode'];
+	'debugMode',
+	"alwaysCopyTopic"
+];
 
 // Listen to settings changes
 function startListeners(){

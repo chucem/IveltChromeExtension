@@ -2,6 +2,7 @@ const notificationUrl = "http://www.ivelt.com/forum/ucp.php?i=ucp_notifications"
 
 const defualtPreferences = {
   hideUserName: false,
+  alwaysCopyTopic: false,
   getBrowserNotifications: false,
   warnOnLosingPost: true,
   debugMode: false,
