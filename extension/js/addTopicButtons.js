@@ -225,7 +225,7 @@ function ping_user(post_id){
 
         if (document.getElementById("iveltHelperSettings").getAttribute("data-always-copy-topic") == "true"){
             navigator.clipboard.writeText(text)
-            iveltNotify("קאפירט צום קליפבארד")
+            iveltNotify("קאפירט צום קליפבאורד")
         } else {
             addText(text)
         }
@@ -335,7 +335,7 @@ function copyQuote(url, post_id){
                 res = `${res} [url=${post_url}]מקור[/url]`
             }
             navigator.clipboard.writeText(res)
-            iveltNotify("קאפירט צום קליפבארד")
+            iveltNotify("קאפירט צום קליפבאורד")
         }
     )
 }
