@@ -27,6 +27,7 @@ function previewPost() {
 function toggleNotification() {
 	const notificationNode = document.getElementById("notification_list_button");
 	if (notificationNode) {
+		notificationNode.scrollIntoView({ behavior: "smooth", block: "start" })
 		notificationNode.click();
 	}
 }
