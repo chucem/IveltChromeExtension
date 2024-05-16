@@ -181,19 +181,15 @@ function copyQuoteParse(post_id){
 function getPostDetails(post_id, prefix = 'p'){
     let usernameE = document.querySelector(`#${prefix}${post_id} .username`);
     if (!usernameE){
-       usernameE = document.querySelector(`#p${prefix}${post_id} .username-coloured`)
+		usernameE = document.querySelector(`#${prefix}${post_id} .username-coloured`)
     }
     let username = "";
-    if(usernameE){
-       username = usernameE.innerText
-    }
-
-    const idE = document.querySelector(`#${prefix}${post_id} .username`);
-    let usernameLink = "";
+	let usernameLink = "";
     let id =""
-    if(idE){
-       usernameLink = idE.href;
-       id = usernameLink.split("u=")[1];
+    if(usernameE){
+		username = usernameE.innerText
+		usernameLink = usernameE.href;
+		id = usernameLink.split("u=")[1];
     }
     let tsE = document.querySelector(`#${prefix}${post_id} time`);
     let postTime;
