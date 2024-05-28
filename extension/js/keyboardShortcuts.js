@@ -32,6 +32,15 @@ function toggleNotification() {
 	}
 }
 
+function nextNotification() {
+	Array.from(document.querySelectorAll("li.bg2 .notification-block")).some(node => {
+		if (node.querySelector('strong').innerText === 'תגובה') {
+			window.location.href = node.dataset.realUrl
+			return true;
+		}
+	});
+}
+
 function checkKey(e) {
 	if (e.code == "KeyA" && e.altKey) {
 		window.location.href = 'https://www.ivelt.com/forum/search.php?search_id=active_topics';
@@ -47,6 +56,10 @@ function checkKey(e) {
 
 	if (e.code == "KeyN" && e.altKey) {
 		toggleNotification();
+	}
+
+	if (e.code == "KeyM" && e.altKey) {
+		nextNotification();
 	}
 
 	e = e || window.event;
@@ -78,3 +91,4 @@ if (post) {
 	post.setAttribute("title", "שיק (שארטקאט קאנטראל+ענטער)");
 }
 document.onkeydown = checkKey;
+

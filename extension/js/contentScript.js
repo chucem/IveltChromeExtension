@@ -1,4 +1,5 @@
 let scripts = [
+  "js/print.js",
   "js/keyboardShortcuts.js",
   "js/newResponseNotification.js",
   "js/pageEnhancements.js",
