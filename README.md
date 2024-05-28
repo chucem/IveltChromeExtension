@@ -20,7 +20,8 @@ A browser extension that adds accessibility and usability improvements to איי
 * Search in thread with Google.
 * Various other fixes and options.
 * Prevent accidental mark all notifications as read, and prevent loosing form
-* add option to hide notifications that are read on notifications page
+* Option to hide notifications that are read on notifications page
+* Print multiple pages, forked from: https://bookmarkify.it/47839
 
 ## Install from Chrome Web Store
 1. Visit the **[Chrome Web Store](https://chromewebstore.google.com/detail/ivelt-helper-v2/ahidenbhdkloaingggdcijofobjboopi)** page
