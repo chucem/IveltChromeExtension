@@ -2,7 +2,6 @@ const preferencesOptions = [
 	'hideUserName',
 	'getBrowserNotifications',
 	'warnOnLosingPost',
-	'printAll',
 	'backgroundSync',
 	'backgroundSyncPosts',
 	'backgroundSyncNotif',
