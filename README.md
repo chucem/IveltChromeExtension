@@ -11,7 +11,8 @@ A browser extension that adds accessibility and usability improvements to איי
 * Submit posts with <kbd>Ctrl</kbd>+<kbd>Enter</kbd> shortcut.
 * Preview posts with <kbd>Alt</kbd>+<kbd>v</kbd> shortcut (works in quick post and full editor).
 * Go to אקטיווע אשכולות with <kbd>Alt</kbd>+<kbd>a</kbd> shortcut.
-* Popup notifiaciton with <kbd>Alt</kbd>+<kbd>n</kbd> shortcut.
+* Popup notification with <kbd>Alt</kbd>+<kbd>n</kbd> shortcut.
+* Open Next unread notification with <kbd>Alt</kbd>+<kbd>m</kbd> shortcut.
 * Receive inbox notifications even when not on אייוועלט. 
 * New response notifications while on topic pages.
 * New page notification while on topic pages.
@@ -19,7 +20,7 @@ A browser extension that adds accessibility and usability improvements to איי
 * Search in thread with Google.
 * Various other fixes and options.
 * Prevent accidental mark all notifications as read, and prevent loosing form
-* Hide your name 
+* add option to hide notifications that are read on notifications page
 
 ## Install from Chrome Web Store
 1. Visit the **[Chrome Web Store](https://chromewebstore.google.com/detail/ivelt-helper-v2/ahidenbhdkloaingggdcijofobjboopi)** page
