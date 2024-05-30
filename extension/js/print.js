@@ -1,9 +1,6 @@
 // from https://bookmarkify.it/47839
 // https://www.ivelt.com/forum/viewtopic.php?f=2&t=14310
 
-let lastPage = (Array.from(document.querySelectorAll('.pagination li:not(.next)')).pop() || {}).textContent || '';
-
-const baseUrl = document.URL.replace(/&start=\d*/, '');
 
 function cleanPosts() {
 
@@ -39,18 +36,19 @@ function cleanPosts() {
     });
 }
 
-async function loadPage(page) {
+async function loadPage(page, lastPage) {
     if (page < lastPage) {
         document.getElementById('loading-page').textContent = page;
-        await loadNextPage(page);
+        await loadNextPage(page, lastPage);
     } else {
         cleanPosts();
         window.print();
     }
 }
 
-function loadNextPage(page) {
-    let url = baseUrl + '&start=' + (page++ * 25);
+function loadNextPage(page, lastPage) {
+    const baseUrl = document.URL.replace(/&start=\d*/, '');
+    const url = baseUrl + '&start=' + (page++ * 25);
 
     return fetch(url)
         .then(response => response.text())
@@ -68,19 +66,23 @@ function loadNextPage(page) {
             const lastPost = posts[posts.length - 1]
             lastPost.insertAdjacentHTML('afterend', element.outerHTML + postsHTML);
 
-            return loadPage(page);
+            return loadPage(page, lastPage);
         });
 }
 
 function printThread() {
+    let lastPage = Number((Array.from(document.querySelectorAll('.pagination li:not(.next)')).pop() || {}).textContent || document.querySelector('.pagination strong')?.textContent || 0);
 
-    const on_page = document.querySelector('.pagination li.active')?.textContent || "0";
+    const on_page = Number(document.querySelector('.pagination li.active')?.textContent || document.querySelector('.pagination strong')?.textContent || 0);
 
-    if (on_page === "0") {
+    if (on_page === 0) {
         return;
     }
 
-    lastPage = Math.max(Number(on_page), Math.min(lastPage, prompt('You are on page ' + on_page + ' of ' + lastPage + ' pages.\r\nTill which page do you want to print?', lastPage)));
+    if (on_page !== lastPage){
+        lastPage = Math.max(on_page, Math.min(lastPage, prompt('You are on page ' + on_page + ' of ' + lastPage + ' pages.\r\nTill which page do you want to print?', lastPage)));
+    }
+
     let newElement = document.createElement('h3');
     newElement.style.textAlign = 'center';
     newElement.style.fontSize = '14px';
@@ -91,7 +93,7 @@ function printThread() {
     let pageBody = document.querySelector('#page-body');
     pageBody.parentNode.insertBefore(newElement, pageBody);
 
-    loadPage(on_page);
+    loadPage(on_page, lastPage);
 }
 
 
