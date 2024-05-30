@@ -7,11 +7,11 @@ function nextPage() {
 }
 
 function scrollTop() {
-	window.scrollTo({ top: 0, behavior: 'smooth' });
+	window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
 function scrollBottom() {
-	window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' } );
+	window.scrollTo({ top: document.body.scrollHeight, behavior: 'instant' } );
 }
 
 function sendPost(post) {
@@ -27,7 +27,7 @@ function previewPost() {
 function toggleNotification() {
 	const notificationNode = document.getElementById("notification_list_button");
 	if (notificationNode) {
-		notificationNode.scrollIntoView({ behavior: "smooth", block: "start" })
+		notificationNode.scrollIntoView({ behavior: "instant", block: "start" })
 		notificationNode.click();
 	}
 }
