@@ -33,8 +33,9 @@
 						let confirmation = confirm('איר זענט זיכער אז איר ווילט פארצייכענען אלעס ווי געליינט?');
 						if (!confirmation) {
 							event.preventDefault();
+							event.stopImmediatePropagation();
 						}
-					});
+					}, true);
 				});
 
 			}
