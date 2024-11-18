@@ -376,3 +376,108 @@ addBtn();
 
 
 
+async function fetchTopicMapping() {
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/1bziJ_h6bIRBXFSBJHT3aBsb13-QrEnrSjjy_-IS3FFw/values/CommentMapping!A2:B?key=***API_KEY***`;
+
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        const mappings = {};
+
+        data.values.forEach(row => {
+            mappings[row[0]] = row[1];         });
+        return mappings;
+    } catch (error) {
+        console.error("Error fetching topic mappings:", error);
+        return null;
+    }
+}
+
+function getCurrentTopicIdFromDOM() {
+    const topicTitleElement = document.querySelector('.topic-title a');
+    
+    if (topicTitleElement) {
+        const href = topicTitleElement.href;
+        const match = href.match(/[?&]t=(\d+)/);
+        
+        if (match) {
+            return match[1];
+        }
+    }
+    
+    return null;
+}
+
+function addQuoteInOtherTopicButton(btn, postID, topicMapping) {
+    const currentTopicId = getCurrentTopicIdFromDOM();
+    
+    if (!currentTopicId) {
+        console.error("Unable to determine the current topic ID.");
+        return;
+    }
+
+    const targetTopicId = topicMapping[currentTopicId];
+    
+    if (!targetTopicId) {
+        return;
+    }
+
+    let button = createButton(null, 'fa-comment', 'ציטיר אין קאמענטארן אשכול', 'ציטיר אין קאמענטארן אשכול', `quoteInOtherTopic("${postID}", ${JSON.stringify(topicMapping)})`);
+    
+    let quoteLi = getQuoteElm(btn)?.parentElement;
+    if (quoteLi) {
+        quoteLi.parentNode.insertBefore(button.li, quoteLi.nextSibling);
+    }
+}
+
+async function quoteInOtherTopic(postID, topicMapping) {
+    const currentTopicId = getCurrentTopicIdFromDOM();
+    const targetTopicId = topicMapping[currentTopicId];
+
+    if (!targetTopicId) {
+        alert("No target topic found for this topic in the mapping.");
+        return;
+    }
+
+    const quoteURL = `https://www.ivelt.com/forum/posting.php?mode=quote&p=${postID}`;
+    const response = await fetch(quoteURL);
+    const responseText = await response.text();
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(responseText, "text/html");
+    const messageBox = doc.querySelector("#message-box #message");
+
+    if (!messageBox) {
+        alert("די ציטירטע תגובה איז נישט אויפגעכאפט געווארן.");
+        return;
+    }
+
+    const quotedMessage = messageBox.value;
+
+    const replyURL = `https://www.ivelt.com/forum/posting.php?mode=reply&t=${targetTopicId}`;
+    const replyWindow = window.open(replyURL, '_blank');
+
+    replyWindow.onload = () => {
+        const textarea = replyWindow.document.querySelector("#message-box textarea");
+        if (textarea) {
+            textarea.value = quotedMessage;
+        }
+    };
+}
+
+async function addCustomButtonsToAllPosts() {
+    const topicMapping = await fetchTopicMapping();
+
+    if (!topicMapping) {
+        alert("Failed to load topic mappings.");
+        return;
+    }
+
+    let btns = document.querySelectorAll('.post-buttons');
+    btns.forEach(btn => {
+        let postID = btn.parentElement.getAttribute("id").replace("post_content", "");
+        addQuoteInOtherTopicButton(btn, postID, topicMapping);
+    });
+}
+
+addCustomButtonsToAllPosts();
