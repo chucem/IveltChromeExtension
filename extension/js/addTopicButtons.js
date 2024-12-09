@@ -376,16 +376,38 @@ addBtn();
 
 
 
+let cachedTopicMapping = null;
+const CACHE_EXPIRY_MS = 30 * 60 * 1000;
+let lastFetchTime = 0;
+
 async function fetchTopicMapping() {
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/1bziJ_h6bIRBXFSBJHT3aBsb13-QrEnrSjjy_-IS3FFw/values/CommentMapping!A2:B?key=***API_KEY***`;
+    const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS8-2oWC0g995y_fNyR4scrXBEimeYpI5Hm0TPqt1IyvVqEdVUDKYw2n7Z6A2d1DDj3Ef6ofpwe2s3T/pub?gid=986512672&single=true&output=csv";
+
+    const now = Date.now();
+    if (cachedTopicMapping && now - lastFetchTime < CACHE_EXPIRY_MS) {
+        return cachedTopicMapping;
+    }
 
     try {
         const response = await fetch(url);
-        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(`Failed to fetch CSV data: ${response.statusText}`);
+        }
+
+        const csvText = await response.text();
         const mappings = {};
 
-        data.values.forEach(row => {
-            mappings[row[0]] = row[1];         });
+        const rows = csvText.split("\n");
+        rows.forEach(row => {
+            const [sourceTopic, targetTopic] = row.split(",").map(cell => cell.trim());
+            if (sourceTopic && targetTopic) {
+                mappings[sourceTopic] = targetTopic;
+            }
+        });
+
+        cachedTopicMapping = mappings;
+        lastFetchTime = now;
+
         return mappings;
     } catch (error) {
         console.error("Error fetching topic mappings:", error);
@@ -417,14 +439,19 @@ function addQuoteInOtherTopicButton(btn, postID, topicMapping) {
     }
 
     const targetTopicId = topicMapping[currentTopicId];
-    
     if (!targetTopicId) {
         return;
     }
 
-    let button = createButton(null, 'fa-comment', 'ציטיר אין קאמענטארן אשכול', 'ציטיר אין קאמענטארן אשכול', `quoteInOtherTopic("${postID}", ${JSON.stringify(topicMapping)})`);
+    let button = createButton(
+        null,
+        'fa-comment',
+        'ציטיר אין קאמענטארן אשכול',
+        'ציטיר אין קאמענטארן אשכול',
+        `quoteInOtherTopic("${postID}", ${JSON.stringify(topicMapping)})`
+    );
     
-    let quoteLi = getQuoteElm(btn)?.parentElement;
+    const quoteLi = getQuoteElm(btn)?.parentElement;
     if (quoteLi) {
         quoteLi.parentNode.insertBefore(button.li, quoteLi.nextSibling);
     }
@@ -469,14 +496,17 @@ async function addCustomButtonsToAllPosts() {
     const topicMapping = await fetchTopicMapping();
 
     if (!topicMapping) {
-        alert("Failed to load topic mappings.");
+        console.error("Failed to load topic mappings.");
         return;
     }
 
-    let btns = document.querySelectorAll('.post-buttons');
+    const btns = document.querySelectorAll('.post-buttons');
     btns.forEach(btn => {
-        let postID = btn.parentElement.getAttribute("id").replace("post_content", "");
-        addQuoteInOtherTopicButton(btn, postID, topicMapping);
+        const parentElement = btn.parentElement;
+        if (parentElement && parentElement.getAttribute("id")) {
+            const postID = parentElement.getAttribute("id").replace("post_content", "");
+            addQuoteInOtherTopicButton(btn, postID, topicMapping);
+        }
     });
 }
 
