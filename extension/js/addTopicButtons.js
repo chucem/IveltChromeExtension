@@ -376,3 +376,138 @@ addBtn();
 
 
 
+let cachedTopicMapping = null;
+const CACHE_EXPIRY_MS = 30 * 60 * 1000;
+let lastFetchTime = 0;
+
+async function fetchTopicMapping() {
+    const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS8-2oWC0g995y_fNyR4scrXBEimeYpI5Hm0TPqt1IyvVqEdVUDKYw2n7Z6A2d1DDj3Ef6ofpwe2s3T/pub?gid=986512672&single=true&output=csv";
+
+    const now = Date.now();
+    if (cachedTopicMapping && now - lastFetchTime < CACHE_EXPIRY_MS) {
+        return cachedTopicMapping;
+    }
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch CSV data: ${response.statusText}`);
+        }
+
+        const csvText = await response.text();
+        const mappings = {};
+
+        const rows = csvText.split("\n");
+        rows.forEach(row => {
+            const [sourceTopic, targetTopic] = row.split(",").map(cell => cell.trim());
+            if (sourceTopic && targetTopic) {
+                mappings[sourceTopic] = targetTopic;
+            }
+        });
+
+        cachedTopicMapping = mappings;
+        lastFetchTime = now;
+
+        return mappings;
+    } catch (error) {
+        console.error("Error fetching topic mappings:", error);
+        return null;
+    }
+}
+
+function getCurrentTopicIdFromDOM() {
+    const topicTitleElement = document.querySelector('.topic-title a');
+    
+    if (topicTitleElement) {
+        const href = topicTitleElement.href;
+        const match = href.match(/[?&]t=(\d+)/);
+        
+        if (match) {
+            return match[1];
+        }
+    }
+    
+    return null;
+}
+
+function addQuoteInOtherTopicButton(btn, postID, topicMapping) {
+    const currentTopicId = getCurrentTopicIdFromDOM();
+    
+    if (!currentTopicId) {
+        console.error("Unable to determine the current topic ID.");
+        return;
+    }
+
+    const targetTopicId = topicMapping[currentTopicId];
+    if (!targetTopicId) {
+        return;
+    }
+
+    let button = createButton(
+        null,
+        'fa-comment',
+        'ציטיר אין קאמענטארן אשכול',
+        'ציטיר אין קאמענטארן אשכול',
+        `quoteInOtherTopic("${postID}", ${JSON.stringify(topicMapping)})`
+    );
+    
+    const quoteLi = getQuoteElm(btn)?.parentElement;
+    if (quoteLi) {
+        quoteLi.parentNode.insertBefore(button.li, quoteLi.nextSibling);
+    }
+}
+
+async function quoteInOtherTopic(postID, topicMapping) {
+    const currentTopicId = getCurrentTopicIdFromDOM();
+    const targetTopicId = topicMapping[currentTopicId];
+
+    if (!targetTopicId) {
+        alert("No target topic found for this topic in the mapping.");
+        return;
+    }
+
+    const quoteURL = `https://www.ivelt.com/forum/posting.php?mode=quote&p=${postID}`;
+    const response = await fetch(quoteURL);
+    const responseText = await response.text();
+
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(responseText, "text/html");
+    const messageBox = doc.querySelector("#message-box #message");
+
+    if (!messageBox) {
+        alert("די ציטירטע תגובה איז נישט אויפגעכאפט געווארן.");
+        return;
+    }
+
+    const quotedMessage = messageBox.value;
+
+    const replyURL = `https://www.ivelt.com/forum/posting.php?mode=reply&t=${targetTopicId}`;
+    const replyWindow = window.open(replyURL, '_blank');
+
+    replyWindow.onload = () => {
+        const textarea = replyWindow.document.querySelector("#message-box textarea");
+        if (textarea) {
+            textarea.value = quotedMessage;
+        }
+    };
+}
+
+async function addCustomButtonsToAllPosts() {
+    const topicMapping = await fetchTopicMapping();
+
+    if (!topicMapping) {
+        console.error("Failed to load topic mappings.");
+        return;
+    }
+
+    const btns = document.querySelectorAll('.post-buttons');
+    btns.forEach(btn => {
+        const parentElement = btn.parentElement;
+        if (parentElement && parentElement.getAttribute("id")) {
+            const postID = parentElement.getAttribute("id").replace("post_content", "");
+            addQuoteInOtherTopicButton(btn, postID, topicMapping);
+        }
+    });
+}
+
+addCustomButtonsToAllPosts();
