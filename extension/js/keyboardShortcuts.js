@@ -27,7 +27,7 @@ function previewPost() {
 function toggleNotification() {
 	const notificationNode = document.getElementById("notification_list_button");
 	if (notificationNode) {
-		notificationNode.scrollIntoView({ behavior: "instant", block: "start" })
+        notificationNode.scrollIntoView({ behavior: "instant", block: "start" });
 		notificationNode.click();
 	}
 }
@@ -35,53 +35,57 @@ function toggleNotification() {
 function nextNotification() {
 	Array.from(document.querySelectorAll("li.bg2 .notification-block")).some(node => {
 		if (node.querySelector('strong').innerText === 'תגובה') {
-			window.location.href = node.dataset.realUrl
+            window.location.href = node.dataset.realUrl;
 			return true;
 		}
 	});
 }
 
 function checkKey(e) {
-	if (e.code == "KeyA" && e.altKey) {
+    const post = document.getElementsByName("post")[0] || document.getElementsByName("submit")[0] || false;
+    const isAltKey = e.altKey || e.getModifierState('AltGraph');
+
+    if (e.code === "KeyA" && isAltKey) {
 		window.location.href = 'https://www.ivelt.com/forum/search.php?search_id=active_topics';
 	}
 
-	if (e.key == "Enter" && e.ctrlKey && post) {
+    if (e.key === "Enter" && e.ctrlKey && post) {
 		sendPost(post);
 	}
 
-	if (e.code == "KeyV" && e.altKey && post) {
+    if (e.code === "KeyV" && isAltKey && post) {
 		previewPost();
 	}
 
-	if (e.code == "KeyN" && e.altKey) {
+    if (e.code === "KeyN" && isAltKey) {
 		toggleNotification();
 	}
 
-	if (e.code == "KeyM" && e.altKey) {
+    if (e.code === "KeyM" && isAltKey) {
 		nextNotification();
 	}
 
 	e = e || window.event;
 
-	if (e.target.nodeName == "INPUT" || e.target.nodeName == "TEXTAREA") return;
-	if (e.target.isContentEditable) return;
+    if (e.target.nodeName === "INPUT" || e.target.nodeName === "TEXTAREA" || e.target.isContentEditable) {
+        return;
+    }
 
-	if (e.key == "ArrowLeft") {
+    if (e.key === "ArrowLeft") {
 		try {
 			nextPage();
 		} catch {
 			console.log("attempted to go after last page");
 		}
-	} else if (e.key == "ArrowRight") {
+    } else if (e.key === "ArrowRight") {
 		try {
 			previousPage();
 		} catch {
 			console.log("attempted to go before first page");
 		}
-	} else if (e.key == "ArrowUp") {
+    } else if (e.key === "ArrowUp") {
 		scrollTop();
-	} else if (e.key == "ArrowDown") {
+    } else if (e.key === "ArrowDown") {
 		scrollBottom();
 	}
 }
