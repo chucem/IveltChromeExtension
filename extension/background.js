@@ -8,7 +8,8 @@ const defualtPreferences = {
   debugMode: false,
   backgroundSync: true,
   backgroundSyncPosts: 20000,
-  backgroundSyncNotif: 1
+  backgroundSyncNotif: 1,
+  cachedTopicMappingExpire: 1440
 };
 
 let debugQueue = {};
@@ -22,7 +23,7 @@ let checkNewNotification = function () {
 
       let matches =
         data.match(/id="notification_list_button"\D*(\d{1,4})/) || [];
-      let newCount = matches.length == 2 ? matches[1] : "0";
+      let newCount = matches.length === 2 ? matches[1] : "0";
 
       if (newCount !== "0") {
         chrome.action.setBadgeText({ text: newCount });
@@ -42,7 +43,7 @@ let checkNewNotification = function () {
     });
 };
 
-chrome.alarms.onAlarm.addListener((a) => {
+chrome.alarms.onAlarm.addListener(() => {
   checkNewNotification();
 });
 
@@ -71,7 +72,7 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 });
 
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (request) {
   if(request.type === 'badgeText'){
     chrome.action.setBadgeText({ text: request.text });
   }

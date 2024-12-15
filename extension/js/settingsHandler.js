@@ -1,7 +1,7 @@
 (function(){
 
 	if(chrome.storage){
-		chrome.storage.local.get(['alwaysCopyTopic', 'hideUserName', 'warnOnLosingPost','backgroundSync', 'backgroundSyncPosts'], function(items){
+		chrome.storage.local.get(['alwaysCopyTopic', 'cachedTopicMappingExpire', 'hideUserName', 'warnOnLosingPost','backgroundSync', 'backgroundSyncPosts'], function(items){
 			if(items.hideUserName){
 				let userName = document.querySelector('.header-avatar .username');
 				if (userName)
@@ -46,6 +46,7 @@
             e.setAttribute('data-background-sync',items.backgroundSync);
             e.setAttribute('data-background-sync-posts',items.backgroundSyncPosts);
 			e.setAttribute('data-always-copy-topic',items.alwaysCopyTopic);
+			e.setAttribute('data-cached-topic-mapping-expire',items.cachedTopicMappingExpire);
 			document.body.appendChild(e);
 		});
 	}
