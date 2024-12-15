@@ -1,9 +1,8 @@
 {
-  "update_url": "https://clients2.google.com/service/update2/crx",
   "manifest_version": 3,
   "name": "iVelt Helper v2",
   "description": "Adds accessibility and usability improvements to אייוועלט.",
-  "version": "2.2.4",
+  "version": "2.2.5",
   "icons": {
     "48": "img/icon48.png",
     "128": "img/icon128.png"
@@ -47,7 +46,8 @@
     "*://*.ivelt.com/*",
     "*://*.198.153.76.147/*",
     "*://*.yiddishworld.com/*",
-    "*://www.xn--4dbhss5b.com/*"
+    "*://www.xn--4dbhss5b.com/*",
+    "https://docs.google.com/*"
   ],
   "declarative_net_request": {
     "rule_resources": [

@@ -6,7 +6,8 @@ const preferencesOptions = [
 	'backgroundSyncPosts',
 	'backgroundSyncNotif',
 	'debugMode',
-	"alwaysCopyTopic"
+	"alwaysCopyTopic",
+	'cachedTopicMappingExpire'
 ];
 
 // Listen to settings changes
