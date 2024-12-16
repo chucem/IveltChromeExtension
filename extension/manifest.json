@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "iVelt Helper v2",
   "description": "Adds accessibility and usability improvements to אייוועלט.",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "icons": {
     "48": "img/icon48.png",
     "128": "img/icon128.png"

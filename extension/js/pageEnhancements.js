@@ -1,5 +1,3 @@
-const TOP_OF_FIRST_PAGE_BUTTONS = document.querySelector('.has-profile .post-buttons')?.getBoundingClientRect().top;
-
 function enchancePage() {
   const url = new URL(window.location.href);
   const params = new URLSearchParams(url.search);
@@ -10,23 +8,14 @@ function enchancePage() {
     window.addEventListener('scroll', function() {
       const postButtons = document.querySelectorAll('.has-profile .post-buttons');
 
-      // Get the distance from the top of the document
-      const scrollY = window.scrollY || window.pageYOffset;
-      // When you scroll past a certain point, switch to sticky
-      if (scrollY > TOP_OF_FIRST_PAGE_BUTTONS) {
-        postButtons.forEach(btn => {
-              btn.classList.add('sticky-post');
-        });
-      } else {
-        postButtons.forEach(btn => {
+      postButtons.forEach(btn => {
+        if (btn.getBoundingClientRect().top < 10){
+          btn.classList.add('sticky-post');
+        } else {
           btn.classList.remove('sticky-post');
-        });
-      }
+        }
+      });
     });
-
-    // document.querySelectorAll('.has-profile .post-buttons').forEach(btn => {
-    //       btn.classList.add('sticky-post');
-    // });
   }
   // Only run on Topic page
   if (url.pathname === "/forum/viewtopic.php"){
