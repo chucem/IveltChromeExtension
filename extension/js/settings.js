@@ -8,7 +8,8 @@ const preferencesOptions = [
 	'debugMode',
 	"alwaysCopyTopic",
 	'cachedTopicMappingExpire',
-	'copyAttachments'
+	'copyAttachments',
+	'stickyPostButtons'
 ];
 
 // Listen to settings changes

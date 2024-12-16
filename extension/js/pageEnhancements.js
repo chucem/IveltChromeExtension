@@ -2,6 +2,14 @@ function enchancePage() {
   const url = new URL(window.location.href);
   const params = new URLSearchParams(url.search);
 
+
+  if (document.getElementById("iveltHelperSettings").getAttribute("data-sticky-post-buttons") === "true") {
+    document.querySelectorAll('.has-profile .post-buttons').forEach(btn => {
+        btn.style.position = "sticky";
+        btn.style.top = "5px";
+        btn.style.zIndex = "1";
+    });
+  }
   // Only run on Topic page
   if (url.pathname === "/forum/viewtopic.php"){
     // Duplicate link for "Unread Post" to bottom of page.
