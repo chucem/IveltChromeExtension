@@ -1,5 +1,6 @@
-const topicMappingExpire = document.getElementById("iveltHelperSettings").getAttribute("data-cached-topic-mapping-expire");
-const CACHE_EXPIRY_MS = (topicMappingExpire || 3600) * 1000;
+const TOPIC_MAPPING_EXPIRE = document.getElementById("iveltHelperSettings").getAttribute("data-cached-topic-mapping-expire");
+const COPY_ATTACHMENTS = document.getElementById("iveltHelperSettings").getAttribute("data-copy-attachments");
+const CACHE_EXPIRY_MS = (TOPIC_MAPPING_EXPIRE || 3600) * 1000;
 const CACHE_KEY = "topicMappingCache";
 const CACHE_TIME_KEY = "topicMappingLastFetchTime";
 
@@ -41,6 +42,35 @@ function getPMHref(id) {
     return null;
 }
 
+function extractImageUrlsAndNames(contentElement) {
+    const images = contentElement.querySelectorAll("img.postimage");
+    const imageUrls = [];
+
+    images.forEach(function(image) {
+        imageUrls.push({url:image.src, name:image.alt});
+    });
+
+    return imageUrls;
+}
+
+function replaceAttachmentsWithImgBBCode(text, imageData) {
+    if (COPY_ATTACHMENTS !== "true") {
+        return text;
+    }
+
+    const regex = /\[attachment=(.*?)\](.*?)\[\/attachment\]/g;
+    imageData = JSON.parse(imageData);
+    return text.replace(regex, function(match, index, filename) {
+        const image = imageData.find(function (image) {
+            return image.name === filename;
+        });
+        if (image) {
+            return `[img]${image.url}[/img]`;
+        } else {
+            return match;
+        }
+    });
+}
 async function addBtn() {
     let onlyLastQuote = window.location.href.includes("last=true");
     if (onlyLastQuote) {
@@ -57,7 +87,7 @@ async function addBtn() {
     var needUpdating = false;
     let topicMapping;
 
-    if (topicMappingExpire !== "") {
+    if (TOPIC_MAPPING_EXPIRE !== "") {
          topicMapping = await fetchTopicMapping();
     }
 
@@ -77,12 +107,15 @@ async function addBtn() {
         addUnderlineForQuoteBtn(btn);
 
         let contentElement = btn.parentElement.getElementsByClassName("content").item(0)
+
+        const imageData = extractImageUrlsAndNames(contentElement);
+
         let id = btn.parentElement.getAttribute("id") || ""
 
         let strippedId = id.replace("post_content", "")
         strippedId = strippedId.replace("pr", "")
         if (!isPosting) {
-            addCopyQuoteButton(btn, id.replace("post_content", ""))
+            addCopyQuoteButton(btn, id.replace("post_content", ""), imageData)
         }
         let pingOnClick = `ping_user(${strippedId})`
         addSimpleButton(btn, null, 'fa-at', 'דערמאן תגובה', 'דערמאן תגובה', pingOnClick)
@@ -90,9 +123,9 @@ async function addBtn() {
             addQuoteLastButton(btn, isPosting);
         }
 
-        if (topicMappingExpire !== "" && !isPosting) {
+        if (TOPIC_MAPPING_EXPIRE !== "" && !isPosting) {
             if (topicMapping) {
-                addQuoteInOtherTopicButton(btn, strippedId, topicMapping);
+                addQuoteInOtherTopicButton(btn, strippedId, topicMapping, imageData);
             }
         }
 
@@ -144,11 +177,12 @@ function addUnderlineForQuoteBtn(btn) {
     sourceURL.style.background = '#ebeadd';
 }
 
-function addCopyQuoteButton(btn, postID){
+function addCopyQuoteButton(btn, postID, imageData){
     let sourceURL = getPMHref(postID) || getQuoteElm(btn)
     addSimpleButton(btn, null, 'fa-copy', 'ציטיר אין אנדערע אשכול', 'ציטיר אין אנדערע אשכול',
         sourceURL?
-            `copyQuote("${sourceURL.getAttribute("href")}", "${postID}")`:
+            `copyQuote("${sourceURL.getAttribute("href")}", "${postID}", 
+            '${JSON.stringify(imageData)}')`:
             `copyQuoteParse("${postID}")`
     )
 }
@@ -333,9 +367,11 @@ function lastaddquote(post_id, username) {
 
 }
 
-function copyQuote(url, post_id){
+function copyQuote(url, post_id, imageData){
     let post_url = getPostLink(post_id)
     fetchMsgText(url).then( res => {
+        res = replaceAttachmentsWithImgBBCode(res, imageData);
+
             if (url.toString().includes("posting.php")){
                 res = `${res} [url=${post_url}]מקור[/url]`
             }
@@ -434,7 +470,7 @@ function getCurrentTopicIdFromDOM() {
     return match?.[1] ?? null;
 }
 
-function addQuoteInOtherTopicButton(btn, postID, topicMapping) {
+function addQuoteInOtherTopicButton(btn, postID, topicMapping, imageData) {
     const currentTopicId = getCurrentTopicIdFromDOM();
 
     if (!currentTopicId) {
@@ -448,7 +484,13 @@ function addQuoteInOtherTopicButton(btn, postID, topicMapping) {
     }
     let sourceURL = getPMHref(postID) || getQuoteElm(btn)
 
-    addSimpleButton(btn, null, 'fa-comment', 'ציטיר אין קאמענטארן אשכול', 'ציטיר אין קאמענטארן אשכול', `quoteInOtherTopic("${sourceURL.getAttribute("href")}", "${postID}", "${targetTopicId}")`)
+    addSimpleButton(
+        btn,
+        null,
+        'fa-comment',
+        'ציטיר אין קאמענטארן אשכול',
+        'ציטיר אין קאמענטארן אשכול',
+        `quoteInOtherTopic("${sourceURL.getAttribute("href")}", "${postID}", "${targetTopicId}" ,'${JSON.stringify(imageData)}')`)
 
 }
 
@@ -462,25 +504,51 @@ function fetchMsgText(url) {
         });
 }
 
-async function quoteInOtherTopic(url, postID, targetTopicId) {
-
+async function quoteInOtherTopic(url, postID, targetTopicId, imageData) {
     if (!targetTopicId) {
         alert("No target topic found for this topic in the mapping.");
         return;
     }
 
-    fetchMsgText(url).then( res => {
-            const replyURL = `https://www.ivelt.com/forum/posting.php?mode=reply&t=${targetTopicId}`;
-            const replyWindow = window.open(replyURL, '_blank');
-
-            replyWindow.onload = () => {
-                const textarea = replyWindow.document.querySelector("#message-box textarea");
-                if (textarea) {
-                    textarea.value = res;
-                }
-            };
+    try {
+        // Fetch the message text
+        let res = await fetchMsgText(url);
+        if (!res) {
+            console.error("Failed to fetch message text.");
+            return;
         }
-    )
+
+        // Process the message text
+        res = replaceAttachmentsWithImgBBCode(res, imageData);
+
+        // Open the reply window
+        const replyURL = `https://www.ivelt.com/forum/posting.php?mode=reply&t=${targetTopicId}`;
+        const replyWindow = window.open(replyURL, '_blank');
+
+        if (!replyWindow) {
+            alert("Popup blocked. Please allow popups for this site.");
+            return;
+        }
+
+        // Wait for the textarea to load
+        replyWindow.onload = () => {
+            const interval = setInterval(() => {
+                try {
+                    const textarea = replyWindow.document.querySelector("#message-box textarea");
+                    if (textarea) {
+                        textarea.value = res;
+                        clearInterval(interval);
+                    }
+                } catch (e) {
+                    console.error("Error accessing textarea:", e);
+                    clearInterval(interval);
+                }
+            }, 100); // Retry every 100ms
+        };
+    } catch (error) {
+        console.error("Error in quoteInOtherTopic:", error);
+    }
 }
+
 
 addBtn();

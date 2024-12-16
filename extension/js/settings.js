@@ -7,7 +7,8 @@ const preferencesOptions = [
 	'backgroundSyncNotif',
 	'debugMode',
 	"alwaysCopyTopic",
-	'cachedTopicMappingExpire'
+	'cachedTopicMappingExpire',
+	'copyAttachments'
 ];
 
 // Listen to settings changes
