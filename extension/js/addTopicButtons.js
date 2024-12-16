@@ -1,3 +1,8 @@
+const topicMappingExpire = document.getElementById("iveltHelperSettings").getAttribute("data-cached-topic-mapping-expire");
+const CACHE_EXPIRY_MS = (topicMappingExpire || 1440) * 1000;
+const CACHE_KEY = "topicMappingCache";
+const CACHE_TIME_KEY = "topicMappingLastFetchTime";
+
 function createButton(reference, customClass, title, text, onclick, itext="") {
     let li = document.createElement('li');
     let a = document.createElement('a');
@@ -36,7 +41,7 @@ function getPMHref(id) {
     return null;
 }
 
-function addBtn(){
+async function addBtn() {
     let onlyLastQuote = window.location.href.includes("last=true");
     if (onlyLastQuote) {
         let messageArea = document.querySelector("#message");
@@ -50,31 +55,45 @@ function addBtn(){
     let btns = document.querySelectorAll('.post-buttons');
     let isPosting = (window.location.href.includes("posting.php"));
     var needUpdating = false;
+    let topicMapping;
+
+    if (topicMappingExpire !== "") {
+         topicMapping = await fetchTopicMapping();
+    }
+
+
     btns.forEach(btn => {
         // Check if custom buttons have been added already, if yes ignore.
-        if(btn.getElementsByClassName('custom-btn').length > 0){
+        if (btn.getElementsByClassName('custom-btn').length > 0) {
             return;
         }
         needUpdating = true
         btn.querySelectorAll('li.hidden:not(.responsive-menu)').forEach(b => {
-            if (b.getAttribute('class') === "hidden"){
+            if (b.getAttribute('class') === "hidden") {
                 b.removeAttribute('class')
             }
         })
 
         addUnderlineForQuoteBtn(btn);
 
-       let contentElement = btn.parentElement.getElementsByClassName("content").item(0)
+        let contentElement = btn.parentElement.getElementsByClassName("content").item(0)
         let id = btn.parentElement.getAttribute("id") || ""
+
         let strippedId = id.replace("post_content", "")
         strippedId = strippedId.replace("pr", "")
-        if (!isPosting){
+        if (!isPosting) {
             addCopyQuoteButton(btn, id.replace("post_content", ""))
         }
         let pingOnClick = `ping_user(${strippedId})`
         addSimpleButton(btn, null, 'fa-at', 'דערמאן תגובה', 'דערמאן תגובה', pingOnClick)
         if (contentElement.innerHTML.includes("blockquote")) {
             addQuoteLastButton(btn, isPosting);
+        }
+
+        if (topicMappingExpire !== "" && !isPosting) {
+            if (topicMapping) {
+                addQuoteInOtherTopicButton(btn, strippedId, topicMapping);
+            }
         }
 
         // let responsiveMenu = btn.getElementsByClassName('responsive-menu').item(0);
@@ -85,7 +104,7 @@ function addBtn(){
         }
     });
     let navUpdate = addDefaultPage();
-    if (needUpdating || navUpdate){
+    if (needUpdating || navUpdate) {
         let navBar = document.querySelector('#nav-footer');
         navBar.querySelectorAll('li.hidden:not(.responsive-menu)').forEach(si => {
             si.setAttribute('class', si.getAttribute('class').replace('hidden', ''))
@@ -98,7 +117,7 @@ function addBtn(){
 function addSimpleButton(btn, href, customClass, title, text, onclick, itext=""){
     let button = createButton(href, customClass, title, text, onclick, itext);
 
-    let quoteLi = getQuoteElm(btn).parentElement;
+    let quoteLi = getQuoteElm(btn)?.parentElement;
     if (quoteLi){
         quoteLi.parentNode.insertBefore(button.li, quoteLi.nextSibling)
     }
@@ -316,18 +335,13 @@ function lastaddquote(post_id, username) {
 
 function copyQuote(url, post_id){
     let post_url = getPostLink(post_id)
-    fetch(url).then(
-        response => {
-            return response.text();
-        }).then( data =>{
-            var parser = new DOMParser();
-            var doc = parser.parseFromString(data, "text/html");
-            var res = doc.querySelector("#message-box #message").innerText
+    fetchMsgText(url).then( res => {
             if (url.toString().includes("posting.php")){
                 res = `${res} [url=${post_url}]מקור[/url]`
             }
-            navigator.clipboard.writeText(res)
-            iveltNotify("קאפירט צום קליפבאורד")
+            navigator.clipboard.writeText(res).then(r =>
+                iveltNotify("קאפירט צום קליפבאורד")
+            )
         }
     )
 }
@@ -366,158 +380,107 @@ function iveltNotify(message){
 }
 
 
-
-addBtn();
-
 // topic mapping via google sheet by טעכניש גערעדט
 //https://docs.google.com/spreadsheets/d/1bziJ_h6bIRBXFSBJHT3aBsb13-QrEnrSjjy_-IS3FFw/edit?gid=1771705226#gid=1771705226
 
-const topicMappingExpire = document.getElementById("iveltHelperSettings").getAttribute("data-cached-topic-mapping-expire");
-if (topicMappingExpire !== "") {
 
-    const CACHE_EXPIRY_MS = topicMappingExpire * 1000;
-    const CACHE_KEY = "topicMappingCache";
-    const CACHE_TIME_KEY = "topicMappingLastFetchTime";
+async function fetchTopicMapping() {
+    const now = Date.now();
 
-    async function fetchTopicMapping() {
-        const now = Date.now();
+// Check if we have cached data and if it's still valid
+const cachedData = localStorage.getItem(CACHE_KEY);
+const lastFetchTime = localStorage.getItem(CACHE_TIME_KEY);
 
-    // Check if we have cached data and if it's still valid
-    const cachedData = localStorage.getItem(CACHE_KEY);
-    const lastFetchTime = localStorage.getItem(CACHE_TIME_KEY);
-
-    if (cachedData && lastFetchTime && now - lastFetchTime < CACHE_EXPIRY_MS) {
-        // Use cached data if available and valid
-        console.log("Using cached topic mapping.");
-        return JSON.parse(cachedData);
-        }
-
-    // Otherwise, fetch new data from Google Sheets
-        try {
-            console.log('fetching topic mappings form google sheet');
-            const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS8-2oWC0g995y_fNyR4scrXBEimeYpI5Hm0TPqt1IyvVqEdVUDKYw2n7Z6A2d1DDj3Ef6ofpwe2s3T/pub?gid=986512672&single=true&output=csv";
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`Failed to fetch CSV data: ${response.statusText}`);
-            }
-
-            const csvText = await response.text();
-            const mappings = {};
-
-            const rows = csvText.split("\n");
-            rows.forEach(row => {
-                const [sourceTopic, targetTopic] = row.split(",").map(cell => cell.trim());
-                if (sourceTopic && targetTopic) {
-                    mappings[sourceTopic] = targetTopic;
-                }
-            });
-
-            // Save the fetched mappings and current time to localStorage
-            localStorage.setItem(CACHE_KEY, JSON.stringify(mappings));
-            localStorage.setItem(CACHE_TIME_KEY, now.toString());
-
-            console.log("Fetched and cached new topic mapping.");
-            return mappings;
-        } catch (error) {
-            console.error("Error fetching topic mappings:", error);
-            return null;
-        }
+if (cachedData && lastFetchTime && now - lastFetchTime < CACHE_EXPIRY_MS) {
+    // Use cached data if available and valid
+    console.log("Using cached topic mapping.");
+    return JSON.parse(cachedData);
     }
 
-    function getCurrentTopicIdFromDOM() {
-        const topicTitleElement = document.querySelector('.topic-title a');
-
-        if (topicTitleElement) {
-            const href = topicTitleElement.href;
-            const match = href.match(/[?&]t=(\d+)/);
-
-            if (match) {
-                return match[1];
-            }
+// Otherwise, fetch new data from Google Sheets
+    try {
+        console.log('fetching topic mappings form google sheet');
+        const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS8-2oWC0g995y_fNyR4scrXBEimeYpI5Hm0TPqt1IyvVqEdVUDKYw2n7Z6A2d1DDj3Ef6ofpwe2s3T/pub?gid=986512672&single=true&output=csv";
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch CSV data: ${response.statusText}`);
         }
 
-        return null;
-    }
+        const csvText = await response.text();
+        const mappings = {};
 
-    function addQuoteInOtherTopicButton(btn, postID, topicMapping) {
-        const currentTopicId = getCurrentTopicIdFromDOM();
-
-        if (!currentTopicId) {
-            console.error("Unable to determine the current topic ID.");
-            return;
-        }
-
-        const targetTopicId = topicMapping[currentTopicId];
-        if (!targetTopicId) {
-            return;
-        }
-
-        let button = createButton(
-            null,
-            'fa-comment',
-            'ציטיר אין קאמענטארן אשכול',
-            'ציטיר אין קאמענטארן אשכול',
-            `quoteInOtherTopic("${postID}", ${JSON.stringify(topicMapping)})`
-        );
-
-        const quoteLi = getQuoteElm(btn)?.parentElement;
-        if (quoteLi) {
-            quoteLi.parentNode.insertBefore(button.li, quoteLi.nextSibling);
-        }
-    }
-
-    async function quoteInOtherTopic(postID, topicMapping) {
-        const currentTopicId = getCurrentTopicIdFromDOM();
-        const targetTopicId = topicMapping[currentTopicId];
-
-        if (!targetTopicId) {
-            alert("No target topic found for this topic in the mapping.");
-            return;
-        }
-
-        const quoteURL = `https://www.ivelt.com/forum/posting.php?mode=quote&p=${postID}`;
-        const response = await fetch(quoteURL);
-        const responseText = await response.text();
-
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(responseText, "text/html");
-        const messageBox = doc.querySelector("#message-box #message");
-
-        if (!messageBox) {
-            alert("די ציטירטע תגובה איז נישט אויפגעכאפט געווארן.");
-            return;
-        }
-
-        const quotedMessage = messageBox.value;
-
-        const replyURL = `https://www.ivelt.com/forum/posting.php?mode=reply&t=${targetTopicId}`;
-        const replyWindow = window.open(replyURL, '_blank');
-
-        replyWindow.onload = () => {
-            const textarea = replyWindow.document.querySelector("#message-box textarea");
-            if (textarea) {
-                textarea.value = quotedMessage;
-            }
-        };
-    }
-
-    async function addCustomButtonsToAllPosts() {
-        const topicMapping = await fetchTopicMapping();
-
-        if (!topicMapping) {
-            console.error("Failed to load topic mappings.");
-            return;
-        }
-
-        const btns = document.querySelectorAll('.post-buttons');
-        btns.forEach(btn => {
-            const parentElement = btn.parentElement;
-            if (parentElement && parentElement.getAttribute("id")) {
-                const postID = parentElement.getAttribute("id").replace("post_content", "");
-                addQuoteInOtherTopicButton(btn, postID, topicMapping);
+        const rows = csvText.split("\n");
+        rows.forEach(row => {
+            const [sourceTopic, targetTopic] = row.split(",").map(cell => cell.trim());
+            if (sourceTopic && targetTopic) {
+                mappings[sourceTopic] = targetTopic;
             }
         });
+
+        // Save the fetched mappings and current time to localStorage
+        localStorage.setItem(CACHE_KEY, JSON.stringify(mappings));
+        localStorage.setItem(CACHE_TIME_KEY, now.toString());
+
+        console.log("Fetched and cached new topic mapping.");
+        return mappings;
+    } catch (error) {
+        console.error("Error fetching topic mappings:", error);
+        return null;
+    }
+}
+
+function getCurrentTopicIdFromDOM() {
+    const match = document.querySelector('.topic-title a')?.href?.match(/[?&]t=(\d+)/);
+    return match?.[1] ?? null;
+}
+
+function addQuoteInOtherTopicButton(btn, postID, topicMapping) {
+    const currentTopicId = getCurrentTopicIdFromDOM();
+
+    if (!currentTopicId) {
+        console.error("Unable to determine the current topic ID.");
+        return;
     }
 
-    addCustomButtonsToAllPosts();
+    const targetTopicId = topicMapping[currentTopicId];
+    if (!targetTopicId) {
+        return;
+    }
+    let sourceURL = getPMHref(postID) || getQuoteElm(btn)
+
+    addSimpleButton(btn, null, 'fa-comment', 'ציטיר אין קאמענטארן אשכול', 'ציטיר אין קאמענטארן אשכול', `quoteInOtherTopic("${sourceURL.getAttribute("href")}", "${postID}", "${targetTopicId}")`)
+
 }
+
+function fetchMsgText(url) {
+    return fetch(url)
+        .then(response => response.text())
+        .then(data => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(data, "text/html");
+            return doc.querySelector("#message-box #message").innerText;
+        });
+}
+
+async function quoteInOtherTopic(url, postID, targetTopicId) {
+
+    if (!targetTopicId) {
+        alert("No target topic found for this topic in the mapping.");
+        return;
+    }
+
+    fetchMsgText(url).then( res => {
+            const replyURL = `https://www.ivelt.com/forum/posting.php?mode=reply&t=${targetTopicId}`;
+            const replyWindow = window.open(replyURL, '_blank');
+
+            replyWindow.onload = () => {
+                const textarea = replyWindow.document.querySelector("#message-box textarea");
+                if (textarea) {
+                    textarea.value = res;
+                }
+            };
+        }
+    )
+}
+
+addBtn();
