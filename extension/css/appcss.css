@@ -10,3 +10,10 @@
 .post-buttons .app-hidden {
     display: none;
 }
+
+.sticky-post{
+    padding: 2px 0 0 0;
+    position: sticky !important;
+    z-index: 1 !important;
+    top: 5px !important;
+}
