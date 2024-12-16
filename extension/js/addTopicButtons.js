@@ -58,18 +58,16 @@ function replaceAttachmentsWithImgBBCode(text, imageData) {
         return text;
     }
 
-    const regex = /\[attachment=(.*?)\](.*?)\[\/attachment\]/g;
     imageData = JSON.parse(imageData);
-    return text.replace(regex, function(match, index, filename) {
-        const image = imageData.find(function (image) {
-            return image.name === filename;
-        });
-        if (image) {
-            return `[img]${image.url}[/img]`;
-        } else {
-            return match;
-        }
+
+    // Loop through each image in the imageData array
+    imageData.forEach(image => {
+        // Create a regex that matches the exact filename anywhere in the text
+        const regex = new RegExp(image.name, "g"); // Matches the filename exactly, even if there's no space
+        text = text.replace(regex, `[img]${image.url}[/img]`);
     });
+
+    return text;
 }
 async function addBtn() {
     let onlyLastQuote = window.location.href.includes("last=true");
@@ -484,7 +482,7 @@ function addQuoteInOtherTopicButton(btn, postID, topicMapping, imageData) {
     if (!targetTopicId) {
         return;
     }
-    let sourceURL = getPMHref(postID) || getQuoteElm(btn)
+    let sourceURL = getQuoteElm(btn)
 
     addSimpleButton(
         btn,
