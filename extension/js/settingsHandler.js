@@ -1,7 +1,7 @@
 (function(){
 
 	if(chrome.storage){
-		chrome.storage.local.get(['alwaysCopyTopic', 'copyAttachments', 'cachedTopicMappingExpire', 'hideUserName', 'warnOnLosingPost','backgroundSync', 'backgroundSyncPosts'], function(items){
+		chrome.storage.local.get(['alwaysCopyTopic', 'copyAttachments', 'forceUpdateTopicMapCache', 'cachedTopicMappingExpire', 'hideUserName', 'warnOnLosingPost','backgroundSync', 'backgroundSyncPosts'], function(items){
 			if(items.hideUserName){
 				let userName = document.querySelector('.header-avatar .username');
 				if (userName)
@@ -48,7 +48,14 @@
 			e.setAttribute('data-always-copy-topic',items.alwaysCopyTopic);
 			e.setAttribute('data-copy-attachments',items.copyAttachments);
 			e.setAttribute('data-cached-topic-mapping-expire',items.cachedTopicMappingExpire);
+			e.setAttribute('data-force-update-topic-map-cache',items.forceUpdateTopicMapCache);
 			document.body.appendChild(e);
+
+			if(items.forceUpdateTopicMapCache === true){
+				chrome.storage.local.set({ forceUpdateTopicMapCache: false }, function () {
+					console.log('Topic mapping set back to false');
+				});
+			}
 		});
 	}
 

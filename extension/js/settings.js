@@ -28,6 +28,11 @@ function startListeners(){
 		});
 	});
 
+	document.getElementById('forceUpdateTopicMapCache').addEventListener('click', () => {
+		chrome.storage.local.set({ forceUpdateTopicMapCache: true }, function () {
+			notify();
+		});
+	});
 	document.querySelector('.js-copy-logs').addEventListener('click', copyLogs);
 }
 

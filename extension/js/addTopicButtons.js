@@ -427,7 +427,9 @@ async function fetchTopicMapping() {
 const cachedData = localStorage.getItem(CACHE_KEY);
 const lastFetchTime = localStorage.getItem(CACHE_TIME_KEY);
 
-if (cachedData && lastFetchTime && now - lastFetchTime < CACHE_EXPIRY_MS) {
+const forceRefresh = document.getElementById("iveltHelperSettings").getAttribute("data-force-update-topic-map-cache") === "true";
+
+if (!forceRefresh && cachedData && lastFetchTime && now - lastFetchTime < CACHE_EXPIRY_MS) {
     // Use cached data if available and valid
     console.log("Using cached topic mapping.");
     return JSON.parse(cachedData);
