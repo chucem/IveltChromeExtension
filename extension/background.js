@@ -50,6 +50,18 @@ chrome.alarms.onAlarm.addListener(() => {
 });
 
 chrome.runtime.onInstalled.addListener((details) => {
+
+  // Migrate settings from sync storage to local storage
+  chrome.storage.sync.get(null, function (items) {
+    if (Object.keys(items).length > 0) {
+      Object.keys(items).forEach((key) => {
+        chrome.storage.local.set({ [key]: items[key] });
+        chrome.storage.sync.remove(key);
+        console.log(`Migrated ${key}`);
+      });
+    }
+  });
+
   if (details.reason === "update" || details.reason === "install") {
     // Get current settings in local storage
     chrome.storage.local.get(null, (currentSettings) => {
@@ -74,17 +86,6 @@ chrome.runtime.onInstalled.addListener((details) => {
       });
     });
   }
-
-  // Migrate settings from sync storage to local storage
-  chrome.storage.sync.get(null, function (items) {
-    if (Object.keys(items).length > 0) {
-      Object.keys(items).forEach((key) => {
-        chrome.storage.local.set({ [key]: items[key] });
-        chrome.storage.sync.remove(key);
-        console.log(`Migrated ${key}`);
-      });
-    }
-  });
 
   // Set default settings to storage if not already present (fresh install or otherwise)
   chrome.storage.local.get({
