@@ -1,5 +1,5 @@
 const topicMappingExpire = document.getElementById("iveltHelperSettings").getAttribute("data-cached-topic-mapping-expire");
-const CACHE_EXPIRY_MS = (topicMappingExpire || 1440) * 1000;
+const CACHE_EXPIRY_MS = (topicMappingExpire || 3600) * 1000;
 const CACHE_KEY = "topicMappingCache";
 const CACHE_TIME_KEY = "topicMappingLastFetchTime";
 

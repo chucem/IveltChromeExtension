@@ -9,7 +9,7 @@ const defualtPreferences = {
   backgroundSync: true,
   backgroundSyncPosts: 20000,
   backgroundSyncNotif: 1,
-  cachedTopicMappingExpire: 1440
+  cachedTopicMappingExpire: 3600
 };
 
 let debugQueue = {};
