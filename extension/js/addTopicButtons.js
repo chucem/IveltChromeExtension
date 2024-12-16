@@ -82,6 +82,7 @@ async function addBtn() {
 
     let btns = document.querySelectorAll('.post-buttons');
     let isPosting = (window.location.href.includes("posting.php"));
+    let isPM = (window.location.href.includes("ucp.php"));
     var needUpdating = false;
     let topicMapping;
 
@@ -121,7 +122,7 @@ async function addBtn() {
             addQuoteLastButton(btn, isPosting);
         }
 
-        if (TOPIC_MAPPING_EXPIRE !== "" && !isPosting) {
+        if (TOPIC_MAPPING_EXPIRE !== "" && !isPosting && !isPM) {
             if (topicMapping) {
                 addQuoteInOtherTopicButton(btn, strippedId, topicMapping, imageData);
             }
