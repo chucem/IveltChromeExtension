@@ -48,20 +48,33 @@ chrome.alarms.onAlarm.addListener(() => {
   checkNewNotification();
 });
 
-chrome.runtime.onInstalled.addListener(() => {
+chrome.runtime.onInstalled.addListener((details) => {
+  if (details.reason === "update") {
+    // Ensure default settings are applied if no settings are defined
+    chrome.storage.local.get(null, (items) => {
+      const hasSettings = Object.keys(items).some(key => key in defualtPreferences);
 
-  // migrate settings from sync storage to local storage
-  chrome.storage.sync.get(null, function(items){
-    if(Object.keys(items).length > 0){
-      Object.keys(items).forEach(key => {
-        chrome.storage.local.set({[key]: items[key]});
+      if (!hasSettings) {
+        console.log("Applying default settings after update...");
+        chrome.storage.local.set(defualtPreferences, () => {
+          console.log("Default settings applied.");
+        });
+      }
+    });
+  }
+
+  // Migrate settings from sync storage to local storage
+  chrome.storage.sync.get(null, function (items) {
+    if (Object.keys(items).length > 0) {
+      Object.keys(items).forEach((key) => {
+        chrome.storage.local.set({ [key]: items[key] });
         chrome.storage.sync.remove(key);
-        console.log(`migrated ${key}`);
+        console.log(`Migrated ${key}`);
       });
     }
   });
-  
-  // set default settings to storage
+
+  // Set default settings to storage if not already present (fresh install or otherwise)
   chrome.storage.local.get({
     ...defualtPreferences,
     isFreshInstall: true // needed for initial notifications
