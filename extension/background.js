@@ -49,17 +49,28 @@ chrome.alarms.onAlarm.addListener(() => {
 });
 
 chrome.runtime.onInstalled.addListener((details) => {
-  if (details.reason === "update") {
-    // Ensure default settings are applied if no settings are defined
-    chrome.storage.local.get(null, (items) => {
-      const hasSettings = Object.keys(items).some(key => key in defualtPreferences);
+  if (details.reason === "update" || details.reason === "install") {
+    // Get current settings in local storage
+    chrome.storage.local.get(null, (currentSettings) => {
+      const updatedSettings = { ...currentSettings };
+      const addedSettings = []; // Track added settings
 
-      if (!hasSettings) {
-        console.log("Applying default settings after update...");
-        chrome.storage.local.set(defualtPreferences, () => {
-          console.log("Default settings applied.");
-        });
-      }
+      // Add missing settings from defaultPreferences
+      Object.keys(defualtPreferences).forEach((key) => {
+        if (!(key in currentSettings)) {
+          updatedSettings[key] = defualtPreferences[key];
+          addedSettings.push(key); // Track the key being added
+        }
+      });
+
+      // Save updated settings back to local storage
+      chrome.storage.local.set(updatedSettings, () => {
+        if (addedSettings.length > 0) {
+          console.log(`The following settings were added: ${addedSettings.join(', ')}`);
+        } else {
+          console.log("No new settings were added. All settings are up-to-date.");
+        }
+      });
     });
   }
 
