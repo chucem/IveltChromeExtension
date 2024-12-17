@@ -10,7 +10,7 @@ function enchancePage() {
       const postButtons = document.querySelectorAll('.has-profile .post-buttons');
 
       postButtons.forEach((btn,ind) => {
-        if (btn.parentElement.getBoundingClientRect().top < -20) {
+        if (btn.parentElement.getBoundingClientRect().top < -10) {
           btn.classList.add('sticky-post');
         } else {
           btn.classList.remove('sticky-post');
