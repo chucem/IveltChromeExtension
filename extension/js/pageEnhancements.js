@@ -3,13 +3,14 @@ function enchancePage() {
   const params = new URLSearchParams(url.search);
 
 
+  // sticky post buttons
   if (document.getElementById("iveltHelperSettings").getAttribute("data-sticky-post-buttons") === "true") {
 
     window.addEventListener('scroll', function() {
       const postButtons = document.querySelectorAll('.has-profile .post-buttons');
 
-      postButtons.forEach(btn => {
-        if (btn.getBoundingClientRect().top < 10){
+      postButtons.forEach((btn,ind) => {
+        if (btn.parentElement.getBoundingClientRect().top < -20) {
           btn.classList.add('sticky-post');
         } else {
           btn.classList.remove('sticky-post');
