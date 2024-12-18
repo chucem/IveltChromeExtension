@@ -3,20 +3,41 @@ function enchancePage() {
   const params = new URLSearchParams(url.search);
 
 
-  // sticky post buttons
+// Sticky post buttons logic with logging
   if (document.getElementById("iveltHelperSettings").getAttribute("data-sticky-post-buttons") === "true") {
+    const postButtons = document.querySelectorAll('.has-profile .post-buttons');
 
-    window.addEventListener('scroll', function() {
-      const postButtons = document.querySelectorAll('.has-profile .post-buttons');
+    const checkStickyPosition = () => {
+      let firstStickyFound = false;
 
-      postButtons.forEach((btn,ind) => {
-        if (btn.parentElement.getBoundingClientRect().top < -10) {
-          btn.classList.add('sticky-post');
+      postButtons.forEach((btn, i) => {
+        const parent = btn.parentElement;
+
+        const parentRect = parent.getBoundingClientRect();
+        const btnRect = btn.getBoundingClientRect();
+
+        // Add or remove the sticky-post class based on the parent's top position
+        if (parentRect.top < -30 && parentRect.bottom > 30 && !firstStickyFound) {
+          firstStickyFound = true;
+          // console.log(`found 'sticky-post' `, i, parentRect.bottom, parentRect.top);
+
+          if (!btn.classList.contains('sticky-post')) {
+            // console.log(`Adding 'sticky-post' to`, i);
+            btn.style.left = `${btnRect.left}px`; // Keep the original X position
+            btn.classList.add('sticky-post');
+          }
         } else {
-          btn.classList.remove('sticky-post');
+          if (btn.classList.contains('sticky-post')) {
+            // console.log(`Removing 'sticky-post' from`, i);
+            btn.classList.remove('sticky-post');
+            btn.style.left = '';
+          }
         }
       });
-    });
+    };
+
+    window.addEventListener('scroll', checkStickyPosition); // 100ms debounce delay
+    checkStickyPosition();
   }
   // Only run on Topic page
   if (url.pathname === "/forum/viewtopic.php"){
