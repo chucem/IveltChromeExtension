@@ -10,16 +10,16 @@ function enchancePage() {
     const checkStickyPosition = () => {
       let firstStickyFound = false;
 
-      postButtons.forEach((btn, i) => {
+      postButtons.forEach(btn => {
         const parent = btn.parentElement;
 
         const parentRect = parent.getBoundingClientRect();
         const btnRect = btn.getBoundingClientRect();
 
         // Add or remove the sticky-post class based on the parent's top position
-        if (parentRect.top < -30 && parentRect.bottom > 30 && !firstStickyFound) {
+        if (parentRect.top < 0 && parentRect.bottom > 30 && !firstStickyFound) {
           firstStickyFound = true;
-          // console.log(`found 'sticky-post' `, i, parentRect.bottom, parentRect.top);
+          // console.log(`found button set to stick. the parent.bottom is ${parentRect.bottom}, the parentRect.top is ${parentRect.top} `);
 
           if (!btn.classList.contains('sticky-post')) {
             // console.log(`Adding 'sticky-post' to`, i);

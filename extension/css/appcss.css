@@ -11,9 +11,14 @@
     display: none;
 }
 
+
 .sticky-post{
-    padding: 2px 0 0 0;
     position: fixed !important;
     z-index: 1 !important;
     top: 5px !important;
+    background-color: rgb(202 220 235 / 45%);
+    border: 1px solid #C7C3BF;
+    padding: 4px 4px 4px 7px;
+    border-radius: 4px;
+    backdrop-filter: blur(2px);
 }
