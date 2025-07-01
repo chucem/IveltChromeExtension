@@ -67,6 +67,13 @@ function replaceAttachmentsWithImgBBCode(text, imageData) {
         text = text.replace(regex, `[img]${image.url}[/img]`);
     });
 
+    // Remove all [attachment=X] and [/attachment] tags in one go.
+    // This regex matches either:
+    // 1. '[attachment=' followed by one or more digits and then ']'
+    // 2. '[/attachment]'
+    const allAttachmentBBCodeRegex = /\[attachment=\d+\]|\[\/attachment\]/g;
+    text = text.replace(allAttachmentBBCodeRegex, "");
+
     return text;
 }
 async function addBtn() {
