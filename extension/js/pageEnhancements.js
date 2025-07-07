@@ -100,14 +100,6 @@ function splitNotifications() {
     // Remove matched items from original list
     [...citirtItemsAll, ...badanktItemsAll, ...dermantItemsAll].forEach(li => li.remove());
 
-    // Update original badge count
-    const originalBadge = originalLI.querySelector('strong.badge');
-    if (originalBadge) {
-      const currentCount = parseInt(originalBadge.textContent.trim(), 10);
-      const adjusted = currentCount - citirtCount - badanktCount - dermantCount;
-      originalBadge.textContent = adjusted >= 0 ? adjusted : 0;
-    }
-
     function createNotificationBell(type, label, count, items, iconClass) {
       // Clone the original notification LI
       const li = originalLI.cloneNode(true);
@@ -136,8 +128,7 @@ function splitNotifications() {
         const badge = link.querySelector('strong.badge');
         if (badge) {
           if (count <= 0) {
-            badge.style.backgroundColor = '#999';
-            badge.style.color = '#fff';
+            badge.remove();
           }
           badge.textContent = count;
         }
@@ -154,11 +145,11 @@ function splitNotifications() {
           header.textContent = label;
         }
 
-        // Clear and repopulate items
+        // Move original items to the new dropdown
         const ul = dropdown.querySelector('ul');
         if (ul) {
           ul.innerHTML = '';
-          items.forEach(item => ul.appendChild(item.cloneNode(true)));
+          items.forEach(item => ul.appendChild(item));
         }
 
         // Update footer link
@@ -203,6 +194,20 @@ function splitNotifications() {
       [badanktLI, dermantLI, citirtLI].filter(Boolean).forEach(bell => {
         parent.insertBefore(bell, originalLI);
       });
+    }
+
+    // Update original badge count
+    const originalBadge = originalLI.querySelector('strong.badge');
+    if (originalBadge) {
+      const currentCount = parseInt(originalBadge.textContent.trim(), 10);
+      const adjusted = currentCount - citirtCount - badanktCount - dermantCount;
+      const newCount = adjusted > 0 ? adjusted : 0;
+
+      if (newCount > 0) {
+        originalBadge.textContent = newCount;
+      } else {
+        originalBadge.remove();
+      }
     }
 }
 
