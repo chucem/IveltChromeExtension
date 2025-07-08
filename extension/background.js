@@ -24,29 +24,49 @@ let checkNewNotification = async function () {
     const tabs = await chrome.tabs.query({ url: notificationUrl });
 
     if (tabs.length > 0) {
-        // If the tab is open, inject content script and get data
         try {
-            const response = await chrome.scripting.executeScript({
+            // Check if content script is already injected
+            const [result] = await chrome.scripting.executeScript({
                 target: { tabId: tabs[0].id },
-                files: ['js/notificationContentScript.js']
+                func: () => {
+                    return {
+                        isInjected: window.iveltNotificationScriptInjected === true
+                    };
+                }
             });
 
-            // Send a message to the content script to fetch the data
-            const fetchResult = await chrome.tabs.sendMessage(tabs[0].id, { type: "fetchNotifications" });
+            // Inject content script if not already injected
+            if (!result?.result?.isInjected) {
+                await chrome.scripting.executeScript({
+                    target: { tabId: tabs[0].id },
+                    files: ['js/notificationContentScript.js']
+                });
+            }
+
+
+            const fetchResult = await chrome.tabs.sendMessage(tabs[0].id, {
+                type: "fetchNotifications"
+            });
+
             if (fetchResult) {
                 newCount = fetchResult.newCount;
                 data = fetchResult.data;
+
+                const prefs = await new Promise(resolve => {
+                    chrome.storage.local.get(['getBrowserNotifications'], resolve);
+                });
+
+                // If notifications are enabled, parse and send them
+                if (prefs.getBrowserNotifications && data) {
+                    parseAndSendNotifications(data);
+                }
             }
 
         } catch (e) {
-            console.error("Error executing script or fetching from content script:", e);
-            // Handle error, maybe try to open a new tab or fall back
+            console.error("Error checking notifications:", e);
         }
     } else {
-        // Option 1: Open a hidden tab, fetch, then close it (resource intensive)
-        // Option 2: Inform the user the tab needs to be open or try to use a more advanced bypass (see below)
-        // For simplicity, let's assume the user has the tab open or we just skip if not.
-        console.warn("Notification URL tab not open. Skipping notification check.");
+        console.log("iVelt tab not open. Will check again later.");
     }
 
     if (newCount !== "0") {
@@ -66,8 +86,40 @@ let checkNewNotification = async function () {
     debugLog('backgroundSync', `checkNewNotification: newCount(${newCount}), ${debugDate.getUTCMinutes()}:${debugDate.getUTCSeconds()})`);
 };
 
-chrome.alarms.onAlarm.addListener(() => {
-    checkNewNotification();
+// Set up the interval for checking notifications
+function setupNotificationCheck() {
+    // Clear any existing alarms
+    chrome.alarms.clear('notificationCheck');
+
+    chrome.storage.local.get(['backgroundSyncNotif'], function(items){
+        if(items.backgroundSyncNotif){
+            chrome.alarms.create('notificationCheck', {
+                periodInMinutes: backgroundSyncNotif / 60000 // Convert to minutes});        }
+    
+            });
+        }
+    });
+}
+
+// Listen for alarm events
+chrome.alarms.onAlarm.addListener((alarm) => {
+    if (alarm.name === 'notificationCheck') {
+        checkNewNotification();
+    }
+});
+
+// Initial setup when the extension loads
+chrome.runtime.onStartup.addListener(setupNotificationCheck);
+chrome.runtime.onInstalled.addListener(setupNotificationCheck);
+
+// Also run immediately when the background script loads
+checkNewNotification();
+
+// Listen for tab updates to check notifications when the user navigates to iVelt
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    if (changeInfo.status === 'complete' && tab.url && tab.url.includes('ivelt.com')) {
+        checkNewNotification();
+    }
 });
 
 chrome.runtime.onInstalled.addListener((details) => {
