@@ -94,7 +94,7 @@ function setupNotificationCheck() {
     chrome.storage.local.get(['backgroundSyncNotif'], function(items){
         if(items.backgroundSyncNotif){
             chrome.alarms.create('notificationCheck', {
-                periodInMinutes: backgroundSyncNotif / 60000 // Convert to minutes});        }
+                periodInMinutes: items.backgroundSyncNotif / 60000 // Convert to minutes});        }
     
             });
         }

@@ -122,7 +122,7 @@ function sendBrowserNotification(item){
   debugLog(item.id, 'Sending notification');
   chrome.notifications.create(item.id, {
     type: 'basic',
-    iconUrl: origin + 'fav/apple-icon-60x60.png',
+    iconUrl: 'img/site_logo.png',
     title: item.title,
     message: item.message,
     contextMessage: item.subMessage,
