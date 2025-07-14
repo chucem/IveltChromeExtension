@@ -40,9 +40,7 @@
     "notifications",
     "background",
     "declarativeNetRequestWithHostAccess",
-    "declarativeNetRequestFeedback",
-    "activeTab",
-    "scripting"
+    "declarativeNetRequestFeedback"
   ],
   "host_permissions": [
     "*://*.ivelt.com/*",
