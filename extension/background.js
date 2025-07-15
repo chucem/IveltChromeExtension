@@ -74,7 +74,7 @@ let checkNewNotification = async function () {
                     parseAndSendNotifications(data);
                 }
 
-                if (fetchResult.data.length !== "0") {
+                if (fetchResult.data.length.toString() !== "0") {
                     chrome.action.setBadgeText({ text: fetchResult.data.length.toString() });
                 } else {
                     chrome.action.setBadgeText({ text: "" });
