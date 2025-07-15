@@ -36,12 +36,9 @@ let checkNewNotification = async function () {
 
             // Inject content script if not already injected
             if (!result?.result?.isInjected) {
-                await chrome.scripting.executeScript({
-                    target: { tabId: tabs[0].id },
-                    files: ['js/notificationContentScript.js']
-                });
+                console.error('Content script not injected!');
+                return;
             }
-
 
             const fetchResult = await chrome.tabs.sendMessage(tabs[0].id, {
                 type: "fetchNotifications"
@@ -50,16 +47,23 @@ let checkNewNotification = async function () {
             if (fetchResult && fetchResult.success) {
                 data = fetchResult.data;
 
-                    chrome.tabs.query({ url: "*://www.ivelt.com/*" }, (tabs) => {
-                        for (const tab of tabs) {
-                            // Send message to all tabs on ivelt.com
-                            chrome.tabs.sendMessage(tab.id, {
-                                type: "notificationsUpdated",
-                                data: data
-                            });
-                        }
-                    });
+                // update all tabs notifications
+                const tabs = await chrome.tabs.query({ url: "*://www.ivelt.com/*" });
 
+                for (const tab of tabs) {
+                    try {
+                        await chrome.tabs.sendMessage(tab.id, {
+                            type: "notificationsUpdated",
+                            data: data
+                        });
+                    } catch (e) {
+                        if (e.message.includes("Receiving end does not exist")) {
+                            console.warn(`Tab ${tab.id} does not have the content script injected. Skipping.`);
+                        } else {
+                            console.error(`Error sending message to tab ${tab.id}:`, e);
+                        }
+                    }
+                }
 
                 const prefs = await new Promise(resolve => {
                     chrome.storage.local.get(['getBrowserNotifications'], resolve);
@@ -176,7 +180,7 @@ chrome.runtime.onInstalled.addListener((details) => {
     });
 });
 
-
+// not in use i think
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     if (request.type === 'badgeText') {
         chrome.action.setBadgeText({ text: request.text });

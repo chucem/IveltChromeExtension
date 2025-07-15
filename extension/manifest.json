@@ -19,11 +19,11 @@
       "matches": [
         "*://*.ivelt.com/*"
       ],
-	  "css":["css/appcss.css"],
+      "css": ["css/appcss.css"],
       "js": [
         "js/settingsHandler.js",
         "js/contentScript.js",
-        "js/split_notifications.js"
+        "js/notificationContentScript.js"
       ]
     }
   ],
