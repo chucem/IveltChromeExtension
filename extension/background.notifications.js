@@ -20,8 +20,7 @@ chrome.notifications.onClicked.addListener(function(notifId) {
   });
 });
 
-function parseAndSendNotifications(data){
-  var unreadElements = getTagContent(data, 'li', 'row bg3');
+function parseAndSendNotifications(unreadNotifications) {
   var storeOnly = false;
 
   chrome.storage.local.get(['notificationsSent', 'isFreshInstall'], items => {
@@ -33,32 +32,28 @@ function parseAndSendNotifications(data){
       storeOnly = true;
     }
 
-    if(!unreadElements.length){
+    if(!unreadNotifications.length){
       return;
     }
 
-    var unread = unreadElements.map(item => {
+    let unread = unreadNotifications.map(item => {
 
-      const href = getAttrValue(item, 'a', 'href');
-      let notificationParts = getTagContent(item, 'p', 'notifications_title', true)[0].split(':');
-      const time = getTagContent(item, 'p', 'notifications_time', true)[0];
       let id;
-
       // not all notifications have a link
-      if(href){
-        const url = new URL(htmlToText(href).replace('./', origin + 'forum/')); // to text for htmlized "&"
+      if(item.link){
+        const url = new URL(item.link.replace('./', origin + 'forum/')); // to text for htmlized "&"
         id = url.searchParams.get('mark_notification') + '-' + url.searchParams.get('hash');
       }
-      else {
-        id = getAttrValue(item, 'input', 'value');
-      }
+      // else {
+      //   id = getAttrValue(item, 'input', 'value');
+      // }
 
-      debugLog(id, notificationParts[0].substr(0, 10));
+      debugLog(id, item.threadTitle);
 
       return {
-        title: notificationParts.shift(),
-        message: notificationParts.join(':'),
-        subMessage: time,
+        title: htmlToText(item.title),
+        message: htmlToText(item.threadTitle),
+        subMessage: item.timestamp,
         id: id
       }
     });
@@ -130,33 +125,6 @@ function sendBrowserNotification(item){
   });
 }
 
-function getTagContent(string, tag, className, textOnly){
-
-  const startEl = `<${tag} class="${className}">`;
-  const endEl = `</${tag}>`;
-
-  var splitted = string.split(startEl);
-
-  // remove value before the tag
-  splitted.shift();
-
-  splitted = splitted.map(s => {
-
-    var content = s.split(endEl)[0];
-
-    if(textOnly)
-      return htmlToText(content);
-
-    return startEl + content + endEl;
-  });
-
-  return splitted;
-}
-
-function getAttrValue(string, tag, attr){
-  const match = string.match(new RegExp(`<${tag}.*${attr}="([^"]+)"`));
-  return match && match[1];
-}
 
 function htmlToText(string){
   return string.replace(/<[^>]*>/g, ' ')

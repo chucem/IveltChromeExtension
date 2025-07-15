@@ -17,15 +17,13 @@
   "content_scripts": [
     {
       "matches": [
-        "*://*.ivelt.com/*",
-        "*://*.yiddishworld.com/*",
-        "*://*.198.153.76.147/*"
+        "*://*.ivelt.com/*"
       ],
 	  "css":["css/appcss.css"],
       "js": [
         "js/settingsHandler.js",
         "js/contentScript.js",
-        "js/refreshNotificationCount.js"
+        "js/split_notifications.js"
       ]
     }
   ],

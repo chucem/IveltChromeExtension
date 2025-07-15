@@ -19,7 +19,6 @@ let debugQueue = {};
 let debugQueueTimeout;
 const debugLogPrefix = 'debug-';
 let checkNewNotification = async function () {
-    let newCount = "0";
     let data = null;
     const tabs = await chrome.tabs.query({ url: notificationUrl });
 
@@ -48,9 +47,19 @@ let checkNewNotification = async function () {
                 type: "fetchNotifications"
             });
 
-            if (fetchResult) {
-                newCount = fetchResult.newCount;
+            if (fetchResult && fetchResult.success) {
                 data = fetchResult.data;
+
+                    chrome.tabs.query({ url: "*://www.ivelt.com/*" }, (tabs) => {
+                        for (const tab of tabs) {
+                            // Send message to all tabs on ivelt.com
+                            chrome.tabs.sendMessage(tab.id, {
+                                type: "notificationsUpdated",
+                                data: data
+                            });
+                        }
+                    });
+
 
                 const prefs = await new Promise(resolve => {
                     chrome.storage.local.get(['getBrowserNotifications'], resolve);
@@ -60,6 +69,16 @@ let checkNewNotification = async function () {
                 if (prefs.getBrowserNotifications && data) {
                     parseAndSendNotifications(data);
                 }
+
+                if (fetchResult.data.length !== "0") {
+                    chrome.action.setBadgeText({ text: fetchResult.data.length.toString() });
+                } else {
+                    chrome.action.setBadgeText({ text: "" });
+                }
+
+                const debugDate = new Date();
+                debugLog('backgroundSync', `checkNewNotification: newCount(${fetchResult.data.length}), ${debugDate.getUTCMinutes()}:${debugDate.getUTCSeconds()})`);
+
             }
 
         } catch (e) {
@@ -69,21 +88,6 @@ let checkNewNotification = async function () {
         console.log("iVelt tab not open. Will check again later.");
     }
 
-    if (newCount !== "0") {
-        chrome.action.setBadgeText({ text: newCount });
-    } else {
-        chrome.action.setBadgeText({ text: "" });
-    }
-
-    // triggere browser notifications
-    chrome.storage.local.get(['getBrowserNotifications'], function(items){
-        if(items.getBrowserNotifications && data){
-            parseAndSendNotifications(data);
-        }
-    });
-
-    const debugDate = new Date();
-    debugLog('backgroundSync', `checkNewNotification: newCount(${newCount}), ${debugDate.getUTCMinutes()}:${debugDate.getUTCSeconds()})`);
 };
 
 // Set up the interval for checking notifications
@@ -94,7 +98,7 @@ function setupNotificationCheck() {
     chrome.storage.local.get(['backgroundSyncNotif'], function(items){
         if(items.backgroundSyncNotif){
             chrome.alarms.create('notificationCheck', {
-                periodInMinutes: items.backgroundSyncNotif / 60000 // Convert to minutes});        }
+                periodInMinutes: items.backgroundSyncNotif
     
             });
         }
@@ -113,7 +117,7 @@ chrome.runtime.onStartup.addListener(setupNotificationCheck);
 chrome.runtime.onInstalled.addListener(setupNotificationCheck);
 
 // Also run immediately when the background script loads
-checkNewNotification();
+// checkNewNotification();
 
 // Listen for tab updates to check notifications when the user navigates to iVelt
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
