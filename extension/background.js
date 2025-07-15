@@ -37,7 +37,12 @@ let checkNewNotification = async function () {
             // Inject content script if not already injected
             if (!result?.result?.isInjected) {
                 console.error('Content script not injected!');
-                return;
+                // inject
+                chrome.scripting.executeScript({
+                    target: { tabId: tabs[0].id },
+                    files: ["js/notificationContentScript.js"]
+                });
+
             }
 
             const fetchResult = await chrome.tabs.sendMessage(tabs[0].id, {
