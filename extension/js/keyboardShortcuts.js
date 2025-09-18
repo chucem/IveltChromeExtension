@@ -33,12 +33,14 @@ function toggleNotification() {
 }
 
 function nextNotification() {
-	Array.from(document.querySelectorAll("li.bg2 .notification-block")).some(node => {
-		if (node.querySelector('strong').innerText === 'תגובה') {
-            window.location.href = node.dataset.realUrl;
-			return true;
-		}
-	});
+  const nodes = document.querySelectorAll("li.bg2 .notification-block");
+  for (const node of nodes) {
+    const url = node.dataset.realUrl || node.href;
+    if (url) {
+      window.location.href = url;
+      break;
+    }
+  }
 }
 
 function checkKey(e) {
