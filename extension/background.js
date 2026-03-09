@@ -12,7 +12,8 @@ const defualtPreferences = {
   backgroundSyncNotif: 1,
   cachedTopicMappingExpire: 3600,
   forceUpdateTopicMapCache: false,
-  stickyPostButtons: false
+  stickyPostButtons: false,
+  ShowMultiNotifs: false
 };
 
 let debugQueue = {};
