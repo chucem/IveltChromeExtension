@@ -3,6 +3,7 @@ let scripts = [
   "js/keyboardShortcuts.js",
   "js/newResponseNotification.js",
   "js/pageEnhancements.js",
+  "js/splitNotifications.js",
   "js/addTopicButtons.js",
   "js/addGoogleSearch.js"
 ];
