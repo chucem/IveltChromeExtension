@@ -33,6 +33,8 @@
   if (!backgroundSync || !backgroundSyncPosts) return;
 
   let interval = parseInt(backgroundSyncPosts);
+  let notificationElement = null;
+  let titleFlashInterval = null;
   let checkNewResponse = function () {
     if (isLastPage() && currentCount > 0) {
       fetch(forumURL)
@@ -46,7 +48,7 @@
             Array.from(doc.getElementsByClassName("forumbg"))
               .pop()
               .getElementsByClassName("topics")[0]
-              .querySelectorAll("li.row")
+                .querySelectorAll('li.row:has(dl[class*="_unread"])')
           );
           let topic = topics.find((t) => {
             let tHref = t.children[0]?.children[0].children[0].href;
@@ -57,22 +59,48 @@
             if (tId == topicId) return true;
             else return false;
           });
-          //If we cannot find the topic on the first page of the forum we can safely assume that no new post exists.
-          if (!topic) return setTimeout(checkNewResponse, interval);
+          //If we cannot find the topic in unread list, it means it was read (even in another tab)
+          if (!topic) {
+            // Topic is read, remove notification if it exists
+            if (notificationElement) {
+              notificationElement.remove();
+              notificationElement = null;
+            }
+            if (titleFlashInterval) {
+              clearInterval(titleFlashInterval);
+              titleFlashInterval = null;
+              document.title = title;
+            }
+            return setTimeout(checkNewResponse, interval);
+          }
           let newCount =
             topic.children[0]?.children[1]?.firstChild?.textContent?.trim();
           if (currentCount < newCount * 1 + 1) {
-            lastPost.insertAdjacentHTML(
-              "afterend",
-              `<h3 style="margin:4px auto;text-align:center;background:#cadceb;padding:7px 5px 5px 5px;border:none;border-radius:7px;user-select:none;">
-                              נייע תגובות זענען צוגעקומען
-                              <a class="button" style="width:150px;margin:5px auto;display:block;" href="/forum/viewtopic.php?t=${topicId}&view=unread#unread">רילאוד</a>
-                          </h3>`
-            );
-            setInterval(function () {
-              document.title =
-                document.title == title ? "\u26B9 " + title : title;
-            }, 500);
+            if (!notificationElement || !document.getElementById("ivelt-new-response-notification")) {
+              // Remove any existing notification first
+              let existingNotification = document.getElementById("ivelt-new-response-notification");
+              if (existingNotification) {
+                existingNotification.remove();
+              }
+
+              lastPost.insertAdjacentHTML(
+                "afterend",
+                `<h3 id="ivelt-new-response-notification" style="margin:4px auto;text-align:center;background:#cadceb;padding:7px 5px 5px 5px;border:none;border-radius:7px;user-select:none;">
+                                נייע תגובות זענען צוגעקומען
+                                <a class="button" style="width:150px;margin:5px auto;display:block;" href="/forum/viewtopic.php?t=${topicId}&view=unread#unread">רילאוד</a>
+                            </h3>`
+              );
+              notificationElement = document.getElementById("ivelt-new-response-notification");
+
+              if (!titleFlashInterval) {
+                titleFlashInterval = setInterval(function () {
+                  document.title =
+                    document.title == title ? "\u26B9 " + title : title;
+                }, 500);
+              }
+            }
+            currentCount = newCount * 1 + 1;
+            setTimeout(checkNewResponse, interval);
           } else {
             setTimeout(checkNewResponse, interval);
           }
