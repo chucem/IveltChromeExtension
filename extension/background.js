@@ -13,7 +13,8 @@ const defualtPreferences = {
   cachedTopicMappingExpire: 3600,
   forceUpdateTopicMapCache: false,
   stickyPostButtons: false,
-  ShowMultiNotifs: true
+  ShowMultiNotifs: true,
+  upDownArrowKeys: true
 };
 
 let debugQueue = {};

@@ -14,6 +14,12 @@ function scrollBottom() {
 	window.scrollTo({ top: document.body.scrollHeight, behavior: 'instant' } );
 }
 
+function upDownArrowKeysEnabled() {
+	const settings = document.getElementById("iveltHelperSettings");
+	// Enabled unless the user explicitly turned it off in the extension settings
+	return !settings || settings.getAttribute("data-up-down-arrow-keys") !== "false";
+}
+
 function sendPost(post) {
 	if (post) {
 		post.click();
@@ -85,9 +91,9 @@ function checkKey(e) {
 		} catch {
 			console.log("attempted to go before first page");
 		}
-    } else if (e.key === "ArrowUp") {
+    } else if (e.key === "ArrowUp" && upDownArrowKeysEnabled()) {
 		scrollTop();
-    } else if (e.key === "ArrowDown") {
+    } else if (e.key === "ArrowDown" && upDownArrowKeysEnabled()) {
 		scrollBottom();
 	}
 }

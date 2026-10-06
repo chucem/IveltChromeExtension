@@ -1,7 +1,7 @@
 (function(){
 
 	if(chrome.storage){
-		chrome.storage.local.get(['alwaysCopyTopic', 'stickyPostButtons', 'copyAttachments', 'forceUpdateTopicMapCache', 'cachedTopicMappingExpire', 'hideUserName', 'warnOnLosingPost','backgroundSync', 'backgroundSyncPosts', 'ShowMultiNotifs'], function(items){
+		chrome.storage.local.get(['alwaysCopyTopic', 'stickyPostButtons', 'copyAttachments', 'forceUpdateTopicMapCache', 'cachedTopicMappingExpire', 'hideUserName', 'warnOnLosingPost','backgroundSync', 'backgroundSyncPosts', 'ShowMultiNotifs', 'upDownArrowKeys'], function(items){
 			if(items.hideUserName){
 				let userName = document.querySelector('.header-avatar .username');
 				if (userName)
@@ -51,6 +51,7 @@
 			e.setAttribute('data-force-update-topic-map-cache',items.forceUpdateTopicMapCache);
 			e.setAttribute('data-sticky-post-buttons',items.stickyPostButtons);
 			e.setAttribute('data-show-multi-notifs',items.ShowMultiNotifs);
+			e.setAttribute('data-up-down-arrow-keys',items.upDownArrowKeys);
 			document.body.appendChild(e);
 
 			if(items.forceUpdateTopicMapCache === true){
