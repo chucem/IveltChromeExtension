@@ -10,7 +10,8 @@ const preferencesOptions = [
 	'cachedTopicMappingExpire',
 	'copyAttachments',
 	'stickyPostButtons',
-	'ShowMultiNotifs'
+	'ShowMultiNotifs',
+	'upDownArrowKeys'
 ];
 
 // Listen to settings changes
