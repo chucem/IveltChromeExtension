@@ -1,0 +1,124 @@
+/* Image Resizer widget - everything is scoped under the ivr- prefix so it can't leak into the forum's own styles */
+
+#ivr-mini,
+#ivr-floater,
+#ivr-floater * {
+    box-sizing: border-box;
+    direction: ltr;
+    font-family: sans-serif;
+}
+
+#ivr-mini {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    padding: 0;
+    border-radius: 50%;
+    background: #E65100;
+    color: #fff;
+    border: 2px solid #fff;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 2147483000;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s, background 0.2s;
+}
+
+#ivr-mini:hover { transform: scale(1.1); background: #FF9800; }
+#ivr-mini.ivr-full { background: #d32f2f; cursor: not-allowed; }
+#ivr-mini.ivr-full:hover { transform: none; background: #d32f2f; }
+#ivr-mini.ivr-dragover { background: #FFB74D; transform: scale(1.2); }
+
+#ivr-floater {
+    display: none;
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    width: 230px;
+    padding: 12px;
+    background: #fff;
+    color: #333;
+    border: 1px solid #999;
+    border-radius: 8px;
+    z-index: 2147483000;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    text-align: center;
+    transition: background 0.2s, box-shadow 0.2s;
+}
+
+#ivr-floater.ivr-open { display: block; }
+#ivr-floater.ivr-dragover { background: #FFF3E0; box-shadow: 0 4px 20px rgba(230, 81, 0, 0.4); }
+
+#ivr-floater .ivr-close {
+    position: absolute;
+    top: 2px;
+    right: 6px;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: #666;
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 1;
+    cursor: pointer;
+}
+
+#ivr-floater .ivr-title {
+    margin: 5px 0 10px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#ivr-floater .ivr-btn {
+    display: block;
+    width: 100%;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    background: #E65100;
+    color: #fff;
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+#ivr-floater .ivr-btn + .ivr-btn { margin-top: 6px; }
+#ivr-floater .ivr-btn.ivr-zip { background: #00695C; }
+#ivr-floater .ivr-btn:disabled { background: #ccc; cursor: not-allowed; }
+#ivr-floater.ivr-busy .ivr-btn:disabled { cursor: wait; }
+
+#ivr-floater .ivr-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    font-size: 11px;
+    line-height: 1.3;
+    color: #555;
+    text-align: left;
+    cursor: pointer;
+}
+
+#ivr-floater .ivr-option input { margin: 0; flex-shrink: 0; }
+
+#ivr-floater .ivr-status {
+    display: none;
+    margin-top: 8px;
+    padding: 6px 8px;
+    border-radius: 4px;
+    background: #ECEFF1;
+    color: #37474F;
+    font-size: 12px;
+    line-height: 1.35;
+    word-break: break-word;
+}
+
+#ivr-floater .ivr-status.ivr-show { display: block; }
+#ivr-floater .ivr-status.ivr-ok { background: #E8F5E9; color: #1B5E20; }
+#ivr-floater .ivr-status.ivr-error { background: #FFEBEE; color: #B71C1C; }
+#ivr-floater .ivr-status.ivr-warn { background: #FFF8E1; color: #7A4F01; }

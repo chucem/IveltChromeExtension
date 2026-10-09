@@ -14,7 +14,8 @@ const defualtPreferences = {
   forceUpdateTopicMapCache: false,
   stickyPostButtons: false,
   ShowMultiNotifs: true,
-  upDownArrowKeys: true
+  upDownArrowKeys: true,
+  imageResizer: true
 };
 
 let debugQueue = {};

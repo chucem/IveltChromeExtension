@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "iVelt Helper v2",
   "description": "Adds accessibility and usability improvements to אייוועלט.",
-  "version": "2.3.8",
+  "version": "2.4.0",
   "icons": {
     "48": "img/icon48.png",
     "128": "img/icon128.png"
@@ -27,6 +27,15 @@
         "js/contentScript.js",
         "js/refreshNotificationCount.js"
       ]
+    },
+    {
+      "matches": [
+        "*://*.ivelt.com/forum/posting.php*",
+        "*://*.yiddishworld.com/forum/posting.php*",
+        "*://*.198.153.76.147/forum/posting.php*"
+      ],
+      "css": ["css/imageResizer.css"],
+      "js": ["js/imageResizer.js"]
     }
   ],
   "background": {

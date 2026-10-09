@@ -11,7 +11,8 @@ const preferencesOptions = [
 	'copyAttachments',
 	'stickyPostButtons',
 	'ShowMultiNotifs',
-	'upDownArrowKeys'
+	'upDownArrowKeys',
+	'imageResizer'
 ];
 
 // Listen to settings changes
