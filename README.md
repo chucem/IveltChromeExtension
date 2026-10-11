@@ -22,6 +22,7 @@ A browser extension that adds accessibility and usability improvements to איי
 * Prevent accidental mark all notifications as read, and prevent loosing form
 * Option to hide notifications that are read on notifications page
 * Notifications hide in ucp and shortcut to next unread notification
+* Image Resizer on the post editor: shrinks images under the attachment size limit, and packs a whole folder into a single ZIP attachment (can be turned off in the settings).
 * Print multiple pages, forked from: https://bookmarkify.it/47839
 
 ## Install from Chrome Web Store
