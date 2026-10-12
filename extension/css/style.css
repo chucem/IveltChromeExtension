@@ -184,3 +184,17 @@ select {
 }
 
 .shortcut-key .icon:before { padding-right: 2px; }
+  .settings-group {
+    margin-bottom: 30px;
+  }
+  .settings-group h3 {
+    font-size: 15px;
+    font-weight: 600;
+    color: #0A8ED0;
+    margin: 0 0 18px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #e7e7e7;
+  }
+  .aaa .row + h2 {
+    margin-top: 30px;
+  }

@@ -215,7 +215,7 @@ function addDefaultPage(){
     li.setAttribute("class", "rightside")
     li.setAttribute("id", "kf-app-default-page")
     a.setAttribute('onClick', "saveDefaultPage()")
-    a.innerText = "מאך די בלאט די דיפאולט בלאט"
+    a.innerText = "מאך דאס פאר מיין דיפאולט בלאט"
     let pagination = document.querySelectorAll("#nav-footer").item(0)
     if (pagination){
         pagination.insertBefore(li, pagination.firstChild);
@@ -496,8 +496,8 @@ function addQuoteInOtherTopicButton(btn, postID, topicMapping, imageData) {
         btn,
         null,
         'fa-comment',
-        'ציטיר אין קאמענטארן אשכול',
-        'ציטיר אין קאמענטארן אשכול',
+        'ציטיר אינעם קאמענטארן אשכול',
+        'ציטיר אינעם קאמענטארן אשכול',
         `quoteInOtherTopic("${sourceURL.getAttribute("href")}", "${postID}", "${targetTopicId}" ,'${JSON.stringify(imageData)}')`)
 
 }

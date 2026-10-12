@@ -102,14 +102,14 @@ function addPrintBtn() {
 
     let newA = document.createElement('a');
     newA.href = "javascript:void(0);";
-    newA.title = "פרינט עטליכע בלעטער/גאנצע אשכול";
+    newA.title = "פרינט עטליכע בלעטער / דעם גאנצן אשכול";
 
     let newI = document.createElement('i');
     newI.className = "icon fa-print fa-fw";
     newI.setAttribute('aria-hidden', 'true');
 
     let newSpan = document.createElement('span');
-    let textNode = document.createTextNode("פרינט עטליכע בלעטער/גאנצע אשכול");
+    let textNode = document.createTextNode("פרינט עטליכע בלעטער / דעם גאנצן אשכול");
     newSpan.appendChild(textNode);
 
     newA.appendChild(newI);

@@ -39,6 +39,32 @@ function enchancePage() {
     window.addEventListener('scroll', checkStickyPosition); // 100ms debounce delay
     checkStickyPosition();
   }
+  // Copy the post link (the small icon next to the author name) on a plain left click instead of navigating.
+  // Right click, long press, middle click and modifier clicks keep the browser's default behavior.
+  if (document.getElementById("iveltHelperSettings").getAttribute("data-copy-post-link") !== "false") {
+    document.addEventListener('click', (event) => {
+      if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) {
+        return;
+      }
+
+      const link = event.target.closest('[id^="post_content"] > p.author > a[href*="#p"]');
+      if (!link) {
+        return;
+      }
+
+      const postId = new URL(link.href).hash.replace('#p', '');
+      if (!/^\d+$/.test(postId)) {
+        return;
+      }
+
+      event.preventDefault();
+      const postUrl = `${window.location.origin}/forum/viewtopic.php?p=${postId}#p${postId}`;
+      navigator.clipboard.writeText(postUrl)
+        .then(() => showCopiedTip(link))
+        .catch(() => { window.location.href = link.href; });
+    });
+  }
+
   // Only run on Topic page
   if (url.pathname === "/forum/viewtopic.php"){
     // Duplicate link for "Unread Post" to bottom of page.
@@ -74,6 +100,20 @@ function enchancePage() {
     pagination.insertBefore(linkWrap, pagination.firstChild);
   }
 
+}
+
+function showCopiedTip(anchor) {
+  const tip = document.createElement('span');
+  tip.className = 'ext-copied-tip';
+  tip.innerText = 'לינק קאפירט ✓';
+
+  const rect = anchor.getBoundingClientRect();
+  tip.style.top = `${rect.top + window.scrollY - 28}px`;
+  tip.style.left = `${rect.left + window.scrollX + rect.width / 2}px`;
+  document.body.appendChild(tip);
+
+  setTimeout(() => tip.classList.add('ext-copied-tip-hide'), 1200);
+  setTimeout(() => tip.remove(), 1600);
 }
 
 enchancePage();

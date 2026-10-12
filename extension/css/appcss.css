@@ -22,3 +22,22 @@
     border-radius: 4px;
     backdrop-filter: blur(2px);
 }
+.ext-copied-tip {
+    position: absolute;
+    z-index: 9999;
+    transform: translateX(-50%);
+    background: #333;
+    color: #fff;
+    font-size: 11px;
+    line-height: 1;
+    padding: 5px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 1;
+    transition: opacity 0.4s ease;
+}
+
+.ext-copied-tip.ext-copied-tip-hide {
+    opacity: 0;
+}

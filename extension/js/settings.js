@@ -12,7 +12,8 @@ const preferencesOptions = [
 	'stickyPostButtons',
 	'ShowMultiNotifs',
 	'upDownArrowKeys',
-	'imageResizer'
+	'imageResizer',
+	'copyPostLink'
 ];
 
 // Listen to settings changes
@@ -61,7 +62,7 @@ function copyLogs(){
 					logs.push(key + ' -> ' + items[key]);
 			});
 			navigator.clipboard.writeText(logs.join('\n'))
-				.then(() => notify('לאגס זענען קאפירט געווארן'));
+				.then(() => notify('די לאגס זענען קאפירט געווארן'));
 		});
 	});
 }
@@ -79,7 +80,7 @@ function commitNewSetting(nameValue){
 
 function notify(message){
 	const fadeTarget = document.getElementById('notify');
-	fadeTarget.innerHTML = message || 'דיינע אנשטעלונגען זענען אפגעהיטן געווארן';
+	fadeTarget.innerHTML = message || 'די אנשטעלונגען זענען געסעיווט געווארן';
 	fadeTarget.classList.add('fade');
 	setTimeout(function() {
 		fadeTarget.classList.remove('fade');

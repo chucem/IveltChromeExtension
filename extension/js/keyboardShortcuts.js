@@ -100,7 +100,7 @@ function checkKey(e) {
 
 let post = document.getElementsByName("post")[0] || document.getElementsByName("submit")[0] || false;
 if (post) {
-	post.setAttribute("title", "שיק (שארטקאט קאנטראל+ענטער)");
+	post.setAttribute("title", "שיק (Ctrl+Enter)");
 }
 document.onkeydown = checkKey;
 

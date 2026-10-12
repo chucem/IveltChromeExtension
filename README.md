@@ -1,41 +1,67 @@
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/ahidenbhdkloaingggdcijofobjboopi?label=Chrome%20Web%20Store%20Version&style=flat-square&color=66bb6a)](https://chromewebstore.google.com/detail/ivelt-helper-v2/ahidenbhdkloaingggdcijofobjboopi)
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/chucem/IveltChromeExtension?label=GitHub%20Release%20Version&style=flat-square&color=42a5f5)](https://github.com/chucem/IveltChromeExtension/releases/latest/) 
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/chucem/IveltChromeExtension?label=GitHub%20Release%20Version&style=flat-square&color=42a5f5)](https://github.com/chucem/IveltChromeExtension/releases/latest/)
 ![Chrome Web Store](https://img.shields.io/chrome-web-store/users/ahidenbhdkloaingggdcijofobjboopi?label=Users&style=flat-square&color=9575cd)
 
+**English** | [אידיש](README.yi.md)
+
 # iVelt Helper v2
-A browser extension that adds accessibility and usability improvements to אייוועלט.
+A Chrome extension that adds shortcuts, notifications and other usability improvements to the [אייוועלט](https://www.ivelt.com/forum/) forum.
+
+Most features can be turned on or off on the extension's settings page (right-click the toolbar icon → **Options**).
 
 ## Features
-* Go to next/previous page by pressing the right/left <kbd>←</kbd><kbd>→</kbd> keyboard keys.
-* Go to up/down by pressing the up/down <kbd>↑</kbd><kbd>↓</kbd> keyboard keys (can be turned off in the settings).
-* Submit posts with <kbd>Ctrl</kbd>+<kbd>Enter</kbd> shortcut.
-* Preview posts with <kbd>Alt</kbd>+<kbd>v</kbd> shortcut (works in quick post and full editor).
-* Go to אקטיווע אשכולות with <kbd>Alt</kbd>+<kbd>a</kbd> shortcut.
-* Popup notification with <kbd>Alt</kbd>+<kbd>n</kbd> shortcut.
-* Open Next unread notification with <kbd>Alt</kbd>+<kbd>m</kbd> shortcut.
-* Receive inbox notifications even when not on אייוועלט. 
-* New response notifications while on topic pages.
-* New page notification while on topic pages.
-* Quote last reply only, for posts with multiple quotes.
-* Search in thread with Google.
-* Various other fixes and options.
-* Prevent accidental mark all notifications as read, and prevent loosing form
-* Option to hide notifications that are read on notifications page
-* Notifications hide in ucp and shortcut to next unread notification
-* Image Resizer on the post editor: shrinks images under the attachment size limit, and packs a whole folder into a single ZIP attachment (can be turned off in the settings).
-* Print multiple pages, forked from: https://bookmarkify.it/47839
 
-## Install from Chrome Web Store
-1. Visit the **[Chrome Web Store](https://chromewebstore.google.com/detail/ivelt-helper-v2/ahidenbhdkloaingggdcijofobjboopi)** page
-2. Click **Add to Chrome**.
-3. Confirm the **Add extension** popup.
-4. Pin **iVelt Helper** to the toolbar for better visibility of the notification badge.
+### Keyboard shortcuts
+| Keys | Action |
+| --- | --- |
+| <kbd>→</kbd> / <kbd>←</kbd> | Previous / next page in a topic |
+| <kbd>↑</kbd> / <kbd>↓</kbd> | Jump to the top / bottom of the page (can be turned off) |
+| <kbd>Ctrl</kbd>+<kbd>Enter</kbd> | Submit the post |
+| <kbd>Alt</kbd>+<kbd>v</kbd> | Preview the post (quick reply and full editor) |
+| <kbd>Alt</kbd>+<kbd>a</kbd> | Go to אקטיווע אשכולות (active topics) |
+| <kbd>Alt</kbd>+<kbd>n</kbd> | Open the notifications list |
+| <kbd>Alt</kbd>+<kbd>m</kbd> | Open the next unread notification |
 
+### Post buttons
+Extra buttons next to the regular quote button on every post:
+* **Quote last only** – for posts with nested quotes, quote just the last reply.
+* **Mention** (דערמאן) – insert an empty quote so the poster gets a notification (optionally copies it to the clipboard instead).
+* **Quote in another topic** – copy the post as a quote (with a source link and, optionally, its images) to paste in a different topic.
+* **Quote in the comments topic** – for topics that have a linked קאמענטארן topic, open a reply there with the post already quoted.
+* **Copy post link** – a plain click on the small post icon next to the author's name copies the post's link instead of opening it. Right-click and long-press work as before.
+* Option to keep the post buttons visible while scrolling through a long post.
+
+### Notifications
+* Toolbar badge with your unread notification count, and optional browser notifications, even when אייוועלט isn't open.
+* Alert when new replies arrive in the topic you're reading, with a reload button.
+* Separate notification bells for quotes, thanks and mentions (ציטירט / באדאנקט / דערמאנט).
+* Button to hide read notifications on the notifications page.
+* Confirmation before "mark all as read", so it isn't clicked by accident.
+
+### Writing posts
+* Warning before leaving a page with an unsent post.
+* **Image Resizer** on the post editor: shrinks images to fit under the attachment size limit, and packs a whole folder into a single ZIP attachment.
+
+### Other
+* Google search within the current topic, or across the whole site.
+* Print several pages, or a whole topic, at once (forked from [bookmarkify.it/47839](https://bookmarkify.it/47839)).
+* Toolbar popup with quick links (home page, inbox, active topics), quick sign-in, and emergency sign-out.
+
+## Install from the Chrome Web Store
+1. Open the **[Chrome Web Store](https://chromewebstore.google.com/detail/ivelt-helper-v2/ahidenbhdkloaingggdcijofobjboopi)** page.
+   <sub>Using Microsoft Edge? Install from **[Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/ivelt-helper-v2/hnklcnfpeamfiflmpnmjphigmbjoeknc)** instead.</sub>
+2. Click **Add to Chrome** and confirm **Add extension**.
+3. Pin **iVelt Helper** to the toolbar so you can see the notification badge.
 
 ## Install from GitHub (manual install)
-1. Download the **_Source code (zip)_** from _Assets_ on the **[Releases Page](https://github.com/chucem/IveltChromeExtension/releases/latest/)** 
-2. Extract the **IveltChromeExtension-x.x.x** folder from the ZIP archive, and move to a safe place (the extension will remain running from this folder and it will need to remain available and in the same location)
-3. Open the Chrome **Extensions** page (or go to chrome://extensions/)
-4. (If it's not yet enabled) Enable **Developer mode** on the upper-right side
-5. Press the **Load Unpacked** button and browse to the location you placed the folder
-6. Select the **extension** folder inside it and click on **Select Folder**
+1. Download **ivelt-helper-x.x.x.zip** from the _Assets_ of the latest release on the **[Releases page](https://github.com/chucem/IveltChromeExtension/releases/latest/)**.
+2. Extract it to an **ivelt-helper-x.x.x** folder and move it somewhere permanent. Chrome runs the extension from this folder, so it has to stay in the same place.
+3. Open `chrome://extensions/`.
+4. Turn on **Developer mode** (top right).
+5. Click **Load unpacked**, select the **ivelt-helper-x.x.x** folder, and click **Select Folder**.
+
+## Building
+`build.bat` zips the `extension` folder into `dist/ivelt-helper-<version>.zip` (requires [7-Zip](https://www.7-zip.org/) on the `PATH`).
+
+## Credits
+Made by members of אייוועלט; the full list is on the extension's settings page.

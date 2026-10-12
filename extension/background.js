@@ -15,7 +15,8 @@ const defualtPreferences = {
   stickyPostButtons: false,
   ShowMultiNotifs: true,
   upDownArrowKeys: true,
-  imageResizer: true
+  imageResizer: true,
+  copyPostLink: true
 };
 
 let debugQueue = {};
