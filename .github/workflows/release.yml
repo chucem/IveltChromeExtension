@@ -1,0 +1,65 @@
+# Creates a GitHub release whenever the version in extension/manifest.json changes on master.
+# Merging a version bump is the release: the workflow tags the merge as v<version>,
+# builds the zip and attaches it to the release.
+# If a release for that version already exists, it does nothing.
+#
+# Store uploads are a separate, manual step: see store-upload.yml.
+
+name: Release
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - extension/manifest.json
+  workflow_dispatch:
+
+concurrency:
+  group: release
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Read version
+        id: version
+        run: |
+          version=$(jq -r .version extension/manifest.json)
+          if ! [[ "$version" =~ ^[0-9]+(\.[0-9]+){0,3}$ ]]; then
+            echo "::error::Invalid manifest version: $version"
+            exit 1
+          fi
+          echo "tag=v$version" >> "$GITHUB_OUTPUT"
+          echo "zip=dist/ivelt-helper-$version.zip" >> "$GITHUB_OUTPUT"
+          if gh release view "v$version" > /dev/null 2>&1; then
+            echo "::notice::Release v$version already exists, nothing to do"
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build zip
+        if: steps.version.outputs.exists == 'false'
+        run: |
+          mkdir -p dist
+          cd extension
+          zip -r -X "../${{ steps.version.outputs.zip }}" . -x '_metadata/*'
+
+      - name: Create GitHub release
+        if: steps.version.outputs.exists == 'false'
+        run: |
+          gh release create "${{ steps.version.outputs.tag }}" "${{ steps.version.outputs.zip }}" \
+            --target "$GITHUB_SHA" \
+            --title "${{ steps.version.outputs.tag }}" \
+            --generate-notes

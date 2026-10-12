@@ -63,5 +63,11 @@ Extra buttons next to the regular quote button on every post:
 ## Building
 `build.bat` zips the `extension` folder into `dist/ivelt-helper-<version>.zip` (requires [7-Zip](https://www.7-zip.org/) on the `PATH`).
 
+## Releasing
+1. Bump `version` in `extension/manifest.json` and merge it to `master`. The [Release workflow](.github/workflows/release.yml) then tags the merge as `v<version>`, builds the zip and creates the GitHub release with it attached.
+2. To publish to the stores, go to **Actions → Store upload → Run workflow**, pick the release (blank = latest) and the store. The [Store upload workflow](.github/workflows/store-upload.yml) uploads that release's zip and, unless you uncheck it, submits it for review.
+
+The store upload needs these repository secrets: `CWS_SERVICE_ACCOUNT_KEY` (a Google Cloud service account JSON key) and `CWS_PUBLISHER_ID` for the Chrome Web Store, and `EDGE_PRODUCT_ID`, `EDGE_CLIENT_ID`, `EDGE_API_KEY` for Edge Add-ons.
+
 ## Credits
 Made by members of אייוועלט; the full list is on the extension's settings page.

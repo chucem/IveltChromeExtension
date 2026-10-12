@@ -1,0 +1,165 @@
+# Manual button (Actions -> Store upload -> Run workflow) that takes the zip from a
+# GitHub release and uploads it to the Chrome Web Store and/or Edge Add-ons.
+#
+# Secrets:
+#   Chrome Web Store: CWS_SERVICE_ACCOUNT_KEY (service account JSON key), CWS_PUBLISHER_ID
+#   Edge Add-ons:     EDGE_PRODUCT_ID, EDGE_CLIENT_ID, EDGE_API_KEY
+
+name: Store upload
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Release to upload, e.g. v2.5.0 (blank = latest release)
+        required: false
+        default: ''
+      store:
+        description: Store
+        type: choice
+        options:
+          - chrome
+          - edge
+          - both
+        default: chrome
+      submit:
+        description: Submit for review (unchecked = upload as draft only)
+        type: boolean
+        default: true
+
+concurrency:
+  group: store-upload
+
+permissions:
+  contents: read
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      CWS_EXTENSION_ID: ahidenbhdkloaingggdcijofobjboopi
+      CWS_PUBLISHER_ID: ${{ secrets.CWS_PUBLISHER_ID }}
+      CWS_SERVICE_ACCOUNT_KEY: ${{ secrets.CWS_SERVICE_ACCOUNT_KEY }}
+      EDGE_PRODUCT_ID: ${{ secrets.EDGE_PRODUCT_ID }}
+      EDGE_CLIENT_ID: ${{ secrets.EDGE_CLIENT_ID }}
+      EDGE_API_KEY: ${{ secrets.EDGE_API_KEY }}
+
+    steps:
+      - name: Download release zip
+        id: zip
+        env:
+          VERSION_INPUT: ${{ inputs.version }}
+        run: |
+          tag="$VERSION_INPUT"
+          if [ -z "$tag" ]; then
+            tag=$(gh release view --json tagName -q .tagName)
+          fi
+          if ! [[ "$tag" =~ ^v[0-9]+(\.[0-9]+){0,3}$ ]]; then
+            echo "::error::Invalid version: $tag"
+            exit 1
+          fi
+          mkdir -p dist
+          gh release download "$tag" --pattern 'ivelt-helper-*.zip' --dir dist
+          zip=$(ls dist/ivelt-helper-*.zip)
+          echo "Uploading $zip from release $tag"
+          echo "path=$zip" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Check Chrome Web Store secrets
+        if: inputs.store == 'chrome' || inputs.store == 'both'
+        run: |
+          if [ -z "$CWS_SERVICE_ACCOUNT_KEY" ] || [ -z "$CWS_PUBLISHER_ID" ]; then
+            echo "::error::Chrome Web Store secrets are not set"
+            exit 1
+          fi
+
+      - name: Get Chrome Web Store access token
+        id: cws-auth
+        if: inputs.store == 'chrome' || inputs.store == 'both'
+        uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed # v2.1.13
+        with:
+          credentials_json: ${{ secrets.CWS_SERVICE_ACCOUNT_KEY }}
+          create_credentials_file: false
+          token_format: access_token
+          access_token_scopes: https://www.googleapis.com/auth/chromewebstore
+
+      - name: Chrome Web Store
+        if: inputs.store == 'chrome' || inputs.store == 'both'
+        env:
+          CWS_TOKEN: ${{ steps.cws-auth.outputs.access_token }}
+        run: |
+          item="publishers/$CWS_PUBLISHER_ID/items/$CWS_EXTENSION_ID"
+          auth=(-H "Authorization: Bearer $CWS_TOKEN")
+
+          echo "Uploading package"
+          result=$(curl -sS --fail-with-body "${auth[@]}" -X POST \
+            -T "${{ steps.zip.outputs.path }}" \
+            "https://chromewebstore.googleapis.com/upload/v2/$item:upload")
+          echo "$result"
+          if echo "$result" | grep -q 'FAIL'; then
+            exit 1
+          fi
+
+          for _ in $(seq 1 30); do
+            echo "$result" | grep -q 'IN_PROGRESS' || break
+            sleep 10
+            result=$(curl -sS --fail-with-body "${auth[@]}" "https://chromewebstore.googleapis.com/v2/$item:fetchStatus")
+            echo "$result"
+          done
+          if echo "$result" | grep -qE 'IN_PROGRESS|FAIL'; then
+            echo "::error::Chrome Web Store upload did not finish"
+            exit 1
+          fi
+
+          if [ "${{ inputs.submit }}" = "true" ]; then
+            echo "Submitting for review"
+            curl -sS --fail-with-body "${auth[@]}" -X POST \
+              "https://chromewebstore.googleapis.com/v2/$item:publish"
+          fi
+
+      - name: Edge Add-ons
+        if: inputs.store == 'edge' || inputs.store == 'both'
+        run: |
+          if [ -z "$EDGE_API_KEY" ]; then
+            echo "::error::Edge Add-ons secrets are not set"
+            exit 1
+          fi
+          api="https://api.addons.microsoftedge.microsoft.com/v1/products/$EDGE_PRODUCT_ID/submissions"
+          auth=(-H "Authorization: ApiKey $EDGE_API_KEY" -H "X-ClientID: $EDGE_CLIENT_ID")
+
+          # Starts an operation, then waits for it. $1 = status URL prefix, rest = curl args.
+          run_operation() {
+            local status_url=$1; shift
+            local headers; headers=$(mktemp)
+            curl -sS --fail-with-body -D "$headers" -o /dev/null "${auth[@]}" "$@"
+            local operation; operation=$(grep -i '^location:' "$headers" | awk '{print $2}' | tr -d '\r')
+            operation=${operation##*/}
+            for _ in $(seq 1 30); do
+              local result; result=$(curl -sS --fail-with-body "${auth[@]}" "$status_url/$operation")
+              local status; status=$(echo "$result" | jq -r .status)
+              echo "Status: $status"
+              case "$status" in
+                Succeeded) return 0 ;;
+                Failed) echo "$result"; return 1 ;;
+              esac
+              sleep 10
+            done
+            echo "::error::Timed out waiting for Edge Add-ons"
+            return 1
+          }
+
+          echo "Uploading package"
+          run_operation "$api/draft/package/operations" -X POST \
+            -H "Content-Type: application/zip" \
+            --data-binary @"${{ steps.zip.outputs.path }}" \
+            "$api/draft/package"
+
+          if [ "${{ inputs.submit }}" = "true" ]; then
+            echo "Submitting for review"
+            run_operation "$api/operations" -X POST \
+              -H "Content-Type: application/json" \
+              -d "$(jq -n --arg tag "${{ steps.zip.outputs.tag }}" '{notes: ("Release " + $tag)}')" \
+              "$api"
+          fi
