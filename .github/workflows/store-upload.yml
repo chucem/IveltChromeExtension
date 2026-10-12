@@ -78,7 +78,7 @@ jobs:
       - name: Get Chrome Web Store access token
         id: cws-auth
         if: inputs.store == 'chrome' || inputs.store == 'both'
-        uses: google-github-actions/auth@c200f3691d83b41bf9bbd8638997a462592937ed # v2.1.13
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3.0.0
         with:
           credentials_json: ${{ secrets.CWS_SERVICE_ACCOUNT_KEY }}
           create_credentials_file: false
@@ -126,8 +126,16 @@ jobs:
             echo "::error::Edge Add-ons secrets are not set"
             exit 1
           fi
-          api="https://api.addons.microsoftedge.microsoft.com/v1/products/$EDGE_PRODUCT_ID/submissions"
-          auth=(-H "Authorization: ApiKey $EDGE_API_KEY" -H "X-ClientID: $EDGE_CLIENT_ID")
+          # Drop stray spaces/newlines picked up when pasting the secrets
+          product_id=$(printf '%s' "$EDGE_PRODUCT_ID" | tr -d '[:space:]')
+          client_id=$(printf '%s' "$EDGE_CLIENT_ID" | tr -d '[:space:]')
+          api_key=$(printf '%s' "$EDGE_API_KEY" | tr -d '[:space:]')
+          if ! [[ "$product_id" =~ ^[0-9A-Fa-f]{8}-([0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}$ ]]; then
+            echo "::error::EDGE_PRODUCT_ID is not a GUID (like d34f98f5-f9b7-42b1-bebb-98707202b21d). Copy the Product ID from Partner Center > Extension overview > Extension identity."
+            exit 1
+          fi
+          api="https://api.addons.microsoftedge.microsoft.com/v1/products/$product_id/submissions"
+          auth=(-H "Authorization: ApiKey $api_key" -H "X-ClientID: $client_id")
 
           # Starts an operation, then waits for it. $1 = status URL prefix, rest = curl args.
           run_operation() {
