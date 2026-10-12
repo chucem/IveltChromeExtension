@@ -1,7 +1,7 @@
 (function(){
 
 	if(chrome.storage){
-		chrome.storage.local.get(['alwaysCopyTopic', 'stickyPostButtons', 'copyAttachments', 'forceUpdateTopicMapCache', 'cachedTopicMappingExpire', 'hideUserName', 'warnOnLosingPost','backgroundSync', 'backgroundSyncPosts', 'ShowMultiNotifs', 'upDownArrowKeys'], function(items){
+		chrome.storage.local.get(['alwaysCopyTopic', 'stickyPostButtons', 'copyAttachments', 'forceUpdateTopicMapCache', 'cachedTopicMappingExpire', 'hideUserName', 'warnOnLosingPost','backgroundSync', 'backgroundSyncPosts', 'ShowMultiNotifs', 'upDownArrowKeys', 'copyPostLink'], function(items){
 			if(items.hideUserName){
 				let userName = document.querySelector('.header-avatar .username');
 				if (userName)
@@ -30,7 +30,7 @@
 					// link.setAttribute('href', 'javascript:void(0);');
 
 					link.addEventListener('click', function(event) {
-						let confirmation = confirm('איר זענט זיכער אז איר ווילט פארצייכענען אלעס ווי געליינט?');
+						let confirmation = confirm('זענט איר זיכער אז איר ווילט פארצייכענען אלעס ווי געליינט?');
 						if (!confirmation) {
 							event.preventDefault();
 							event.stopImmediatePropagation();
@@ -52,6 +52,7 @@
 			e.setAttribute('data-sticky-post-buttons',items.stickyPostButtons);
 			e.setAttribute('data-show-multi-notifs',items.ShowMultiNotifs);
 			e.setAttribute('data-up-down-arrow-keys',items.upDownArrowKeys);
+			e.setAttribute('data-copy-post-link',items.copyPostLink);
 			document.body.appendChild(e);
 
 			if(items.forceUpdateTopicMapCache === true){
@@ -67,7 +68,7 @@
 
 		if(textarea && textarea.value){
 			event.preventDefault();
-			return event.returnValue = 'Changes you made may not be saved. Are you sure you want to lose you post?';
+			return event.returnValue = 'Changes you made may not be saved. Are you sure you want to lose your post?';
 		}
 	}
 }())
