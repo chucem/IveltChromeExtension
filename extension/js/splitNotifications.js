@@ -78,7 +78,7 @@ function splitNotifications() {
         const footerLink = dropdown.querySelector('.footer a');
         if (footerLink) {
           footerLink.href = "./ucp.php?i=ucp_notifications";
-          footerLink.textContent = "צייג אלע";
+          footerLink.textContent = "ווייז אלע";
         }
 
         // Add click handlers

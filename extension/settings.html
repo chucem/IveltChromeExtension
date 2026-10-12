@@ -45,82 +45,100 @@
 
   <div class='content'>
     <div class='sub-section'>
-      <h2 >אנשטעלונגען</h2>
+      <h2>אנשטעלונגען</h2>
 
-      <div class='row'>
-        <input type='checkbox' id='hideUserName' class='option' />
-        <del> <label for='hideUserName' class='label' >ווייז נישט מיין ניק ווען איך בין אריינגעסיינט</label></del>
-        <div style="font-size: 0.8em;"> ביטע שטעלט אן די <a href="https://www.ivelt.com/forum/ucp.php?i=165">באהאלט מיין ניק:</a> אפציע צו יא. <a href="https://www.ivelt.com/forum/viewtopic.php?p=5080519#p5080519"> ליינט מער</a> </div>
-
-      </div>
-      <div class='row'>
-        <input type='checkbox' id='alwaysCopyTopic' class='option' />
-        <label for='alwaysCopyTopic' class='label'>קאפיר די ציטירטע תגובה אנשטאט גלייך אריינשרייבן</label>
-      </div>
-      <div class='row'>
-        <input type='checkbox' id='copyAttachments' class='option' />
-        <label for='copyAttachments' class='label'>קאפיר אויך די בילדער אדער אטעטשמענטס</label>
-      </div>
-      <div class='row'>
-        <input type='checkbox' id='getBrowserNotifications' class='option' />
-        <label for='getBrowserNotifications' class='label'>שיק בראוזער נאטיפיקאציעס פון מיין אייוועלט אינבאקס</label>
-      </div>
-      <div class='row'>
-        <input type='checkbox' id='warnOnLosingPost' class='option' />
-        <label for='warnOnLosingPost' class='label'>ווייז א ווארענונג פארן פארלירן א נישט געשיקטע תגובה/אשכול</label>
-      </div>
-      <div class='row'>
-        <input type='checkbox' id='stickyPostButtons' class='option' />
-        <label for='stickyPostButtons' class='label'>ווייז די תגובה קנעפלעך א גאנצע צייט</label>
-      </div>
-      <div class='row'>
-        <input type='checkbox' id='upDownArrowKeys' class='option' />
-        <label for='upDownArrowKeys' class='label'>נוץ די ארויף/אראפ ערראוס <span class="shortcut-key">↑</span><span class="shortcut-key">↓</span> אויפן קיבאורד צו גיין צום ארויף/אראפ אינעם אשכול</label>
-      </div>
-      <div class='row'>
-        <input type='checkbox' id='imageResizer' class='option' />
-        <label for='imageResizer' class='label'>ווייז א קנעפל אויפן שרייב פענסטער צו פארקלענערן בילדער און פאקן א פאלדער אין א ZIP פאר'ן צולייגן אנהענגען</label>
-      </div>
-      <div class='row'>
-        <input type='checkbox' id='ShowMultiNotifs' class='option' />
-        <label for='ShowMultiNotifs' class='label'>ווייז נאטיפיקאציעס באזונדער <span style="font-size: 0.8em;">(צוטיילטע נאטיפיקאצעיס)</span></label>
-      </div>
-      <div class='row' >
-        <label for='cachedTopicMappingExpire' class='label'>אפדעיט קאמענטארן אשכול דאטאבעיס יעדע</label>
-        <select id='cachedTopicMappingExpire' class='option'>
-          <option value="3600">שעה</option>
-          <option value="86400">טאג</option>
-          <option value="604800">וואך</option>
-          <option value="">קיינמאל</option>
-        </select>
-        <div>
-          <a style="font-size: 0.8em;" id='forceUpdateTopicMapCache' class='button'>ריפרעש די דאטאבעיס יעצט</a>
+      <div class='settings-group'>
+        <h3>שרייבן און ציטירן</h3>
+        <div class='row'>
+          <input type='checkbox' id='alwaysCopyTopic' class='option' />
+          <label for='alwaysCopyTopic' class='label'>ביים <span class="shortcut-key"><i class="icon fa-at fa-fw" aria-hidden="true"></i></span> "דערמאן תגובה" קנעפל: קאפיר עס צום קליפבאורד אנשטאט עס גלייך אריינצולייגן אין שרייב קעסטל</label>
+        </div>
+        <div class='row'>
+          <input type='checkbox' id='copyAttachments' class='option' />
+          <label for='copyAttachments' class='label'>ביים ציטירן אין אן אנדער אשכול, נעם אויך מיט די בילדער און עטעטשמענטס</label>
+        </div>
+        <div class='row'>
+          <input type='checkbox' id='warnOnLosingPost' class='option' />
+          <label for='warnOnLosingPost' class='label'>ווארן מיך איידער איך פארליר א נישט-געשיקטע תגובה/אשכול, און איידער איך פארצייכן אלע נאטיפיקאציעס ווי געליינט</label>
+        </div>
+        <div class='row'>
+          <input type='checkbox' id='imageResizer' class='option' />
+          <label for='imageResizer' class='label'>ווייז א קנעפל ביים שרייבן א תגובה צו פארקלענערן בילדער, און צו מאכן א פאלדער אין א ZIP, פארן צולייגן עטעטשמענטס</label>
         </div>
       </div>
-      <div class='row'>
-        <input type='checkbox' id='backgroundSync' class='option' />
-        <label for='backgroundSync' class='label'>זוך שטילערהייט פאר פרישע תגובות אדער נאטיפיקאציעס</label>
+
+      <div class='settings-group'>
+        <h3>ליינען אן אשכול</h3>
+        <div class='row'>
+          <input type='checkbox' id='stickyPostButtons' class='option' />
+          <label for='stickyPostButtons' class='label'>ווייז די תגובה קנעפלעך די גאנצע צייט (אויך ביים סקראלן)</label>
+        </div>
+        <div class='row'>
+          <input type='checkbox' id='copyPostLink' class='option' />
+          <label for='copyPostLink' class='label'>א קליק אויפן <span class="shortcut-key"><i class="icon fa-file fa-fw" aria-hidden="true"></i></span> אייקאן לעבן א תגובה קאפירט דעם לינק צו דער תגובה, אנשטאט אריינצוגיין אין לינק</label>
+        </div>
+        <div class='row'>
+          <input type='checkbox' id='upDownArrowKeys' class='option' />
+          <label for='upDownArrowKeys' class='label'>נוץ די ארויף/אראפ עראוס <span class="shortcut-key">↑</span><span class="shortcut-key">↓</span> אויפן קיבאורד צו שפרינגען צום אנהייב/סוף פונעם בלאט</label>
+        </div>
       </div>
-      <div class='row row-indented' >
-        <label for='backgroundSyncPosts' class='label'>זוך פרישע תגובות אין אן אשכול יעדע</label>
-        <select id='backgroundSyncPosts' class='option'>
-          <option value="20000">20 סעקונדעס</option>
-          <option value="60000">מינוט</option>
-          <option value="">זוך נישט</option>
-        </select>
+
+      <div class='settings-group'>
+        <h3>נאטיפיקאציעס</h3>
+        <div class='row'>
+          <input type='checkbox' id='getBrowserNotifications' class='option' />
+          <label for='getBrowserNotifications' class='label'>שיק בראוזער נאטיפיקאציעס פון מיין אייוועלט אינבאקס</label>
+        </div>
+        <div class='row'>
+          <input type='checkbox' id='ShowMultiNotifs' class='option' />
+          <label for='ShowMultiNotifs' class='label'>ווייז די נאטיפיקאציעס באזונדער לויט סארט <span style="font-size: 0.8em;">(ציטירט, באדאנקט, דערמאנט)</span></label>
+        </div>
+        <div class='row'>
+          <input type='checkbox' id='backgroundSync' class='option' />
+          <label for='backgroundSync' class='label'>טשעק אין הינטערגרונט פאר נייע תגובות און נאטיפיקאציעס</label>
+        </div>
+        <div class='row row-indented' >
+          <label for='backgroundSyncPosts' class='label'>טשעק פאר נייע תגובות אינעם אשכול יעדע</label>
+          <select id='backgroundSyncPosts' class='option'>
+            <option value="20000">20 סעקונדעס</option>
+            <option value="60000">מינוט</option>
+            <option value="">טשעק נישט</option>
+          </select>
+        </div>
+        <div class='row row-indented' >
+          <label for='backgroundSyncNotif' class='label'>טשעק פאר נייע נאטיפיקאציעס יעדע</label>
+          <select id='backgroundSyncNotif' class='option'>
+            <option value="1">מינוט</option>
+            <option value="5">5 מינוט</option>
+            <option value="">טשעק נישט</option>
+          </select>
+        </div>
       </div>
-      <div class='row row-indented' >
-        <label for='backgroundSyncNotif' class='label'>זוך פרישע נאטיפיקאציעס יעדע</label>
-        <select id='backgroundSyncNotif' class='option'>
-          <option value="1">מינוט</option>
-          <option value="5">5 מינוט</option>
-          <option value="">זוך נישט</option>
-        </select>
-      </div>
-      <div class='row' >
-        <input type='checkbox' id='debugMode' class='option' />
-        <label for='debugMode' class='label warning'>דיבאג מאוד</label>
-        <a class="hidden js-copy-logs">Copy logs</a>
+
+      <div class='settings-group'>
+        <h3>אנדערע</h3>
+        <div class='row'>
+          <input type='checkbox' id='hideUserName' class='option' />
+          <del> <label for='hideUserName' class='label' >ווייז נישט מיין ניק ווען איך בין אריינגעסיינט</label></del>
+          <div style="font-size: 0.8em;">ביטע שטעלט די <a href="https://www.ivelt.com/forum/ucp.php?i=165">"באהאלט מיין ניק"</a> אפציע אויף "יא". <a href="https://www.ivelt.com/forum/viewtopic.php?p=5080519#p5080519">ליינט מער</a></div>
+        </div>
+        <div class='row' >
+          <label for='cachedTopicMappingExpire' class='label'>אפדעיט די ליסטע פון קאמענטארן אשכולות יעדע</label>
+          <select id='cachedTopicMappingExpire' class='option'>
+            <option value="3600">שעה</option>
+            <option value="86400">טאג</option>
+            <option value="604800">וואך</option>
+            <option value="">קיינמאל</option>
+          </select>
+          <div>
+            <a style="font-size: 0.8em;" id='forceUpdateTopicMapCache' class='button'>אפדעיט די ליסטע יעצט</a>
+          </div>
+        </div>
+        <div class='row' >
+          <input type='checkbox' id='debugMode' class='option' />
+          <label for='debugMode' class='label warning'>דיבאג מאוד <span style="font-size: 0.8em;">(נאר פאר טעכנישע פראבלעמען)</span></label>
+          <a class="hidden js-copy-logs">קאפיר די לאגס</a>
+        </div>
       </div>
 
     </div>
@@ -130,25 +148,32 @@
 
       <div class='row'>
         <ul>
-          <li>דרוקט די רעכטע/לינקע ערראוס אויפן קיבאורד <span class="shortcut-key">→</span><span class="shortcut-key">←</span> צו גיין צום פריערדיגן/קומענדיגן בלאט אינעם אשכול.</li>
-          <li>דרוקט די ארויף/אראפ ערראוס אויפן קיבאורד <span class="shortcut-key">↑</span><span class="shortcut-key">↓</span> צו גיין צום ארויף/אראפ אינעם אשכול. <span style="font-size: 0.8em;">(מען קען דאס אויסשאלטן אין די אנשטעלונגען)</span></li>
-          <li>דרוקט <span class="shortcut-key">Ctrl</span>+<span class="shortcut-key">Enter</span> צו שיקן א געשריבענעם תגובה.</li>
-          <li>דרוקט <span class="shortcut-key">Alt</span>+<span class="shortcut-key">v</span> פאר א פריוויו פונעם געשריבענעם תגובה.</li>
+          <li>דרוקט די רעכטס/לינקס עראוס <span class="shortcut-key">→</span><span class="shortcut-key">←</span> אויפן קיבאורד צו גיין צום פריערדיגן/קומענדיגן בלאט אינעם אשכול.</li>
+          <li>דרוקט די ארויף/אראפ עראוס <span class="shortcut-key">↑</span><span class="shortcut-key">↓</span> אויפן קיבאורד צו שפרינגען צום אנהייב/סוף פונעם בלאט. <span style="font-size: 0.8em;">(מען קען דאס אויסלעשן אין די אנשטעלונגען)</span></li>
+          <li>דרוקט <span class="shortcut-key">Ctrl</span>+<span class="shortcut-key">Enter</span> צו שיקן די תגובה.</li>
+          <li>דרוקט <span class="shortcut-key">Alt</span>+<span class="shortcut-key">v</span> צו זען א פריוויו פון די תגובה.</li>
           <li>דרוקט <span class="shortcut-key">Alt</span>+<span class="shortcut-key">a</span> צו גיין צו אקטיווע אשכולות.</li>
-          <li>דרוקט <span class="shortcut-key">Alt</span>+<span class="shortcut-key">n</span> צו גיין צו נאטיפיקאציעס.</li>
-          <li>דרוקט <span class="shortcut-key">Alt</span>+<span class="shortcut-key">m</span> צו עפענען די נעקסטע אומגעליינטע נאטיפיקאציע.</li>
-          <li>דרוקט אויף דעם קנעפל אין א תגובה: <span class="shortcut-key">_</span> צו ציטירן נאר דעם לעצטן פון דעם פריערדיגן ציטאט.</li>
-		  <li>דרוקט אויף דעם קנעפל אין א תגובה: <span class="shortcut-key"><i class="icon fa-at fa-fw" aria-hidden="true"></i></span> צו דערמאנען דעם תגובה.</li>
-		  <li>דרוקט אויף דעם קנעפל אין א תגובה: <span class="shortcut-key"><i class="icon fa-copy fa-fw" aria-hidden="true"></i></span> צו ציטירן דעם תגובה אין אן אנדערע אשכול.</li>
-		  <li>דרוקט אויף דעם קנעפל אין א תגובה: <span class="shortcut-key"><i class="icon fa-comment fa-fw" aria-hidden="true"></i></span> צו ציטירן דעם תגובה אין דעם קאמענטארן אשכול.</li>
-		</ul>
+          <li>דרוקט <span class="shortcut-key">Alt</span>+<span class="shortcut-key">n</span> צו עפענען די נאטיפיקאציעס.</li>
+          <li>דרוקט <span class="shortcut-key">Alt</span>+<span class="shortcut-key">m</span> צו עפענען די קומענדיגע אומגעליינטע נאטיפיקאציע.</li>
+        </ul>
+      </div>
+
+      <h2>קנעפלעך ביי א תגובה</h2>
+
+      <div class='row'>
+        <ul>
+          <li><span class="shortcut-key"><i class="icon fa-quote-left fa-fw" aria-hidden="true">1</i></span> צו ציטירן נאר די לעצטע תגובה, אן די פריערדיגע ציטאטן וואס זענען אין איר. <span style="font-size: 0.8em;">(ווייזט זיך נאר ביי א תגובה וואס האט א ציטאט)</span></li>
+          <li><span class="shortcut-key"><i class="icon fa-at fa-fw" aria-hidden="true"></i></span> צו דערמאנען די תגובה, אזוי אז דער שרייבער באקומט א נאטיפיקאציע.</li>
+          <li><span class="shortcut-key"><i class="icon fa-copy fa-fw" aria-hidden="true"></i></span> צו ציטירן די תגובה אין אן אנדער אשכול.</li>
+          <li><span class="shortcut-key"><i class="icon fa-comment fa-fw" aria-hidden="true"></i></span> צו ציטירן די תגובה אינעם קאמענטארן אשכול.</li>
+          <li><span class="shortcut-key"><i class="icon fa-file fa-fw" aria-hidden="true"></i></span> (לעבן דעם נאמען פונעם שרייבער) צו קאפירן דעם לינק צו דער תגובה. <span style="font-size: 0.8em;">(מען קען דאס אויסלעשן אין די אנשטעלונגען)</span></li>
+        </ul>
       </div>
 
     </div>
   </div>
   </div>
   </div>
-
   <div id="notify"></div>
   <script src="js/settings.js"></script>
 </div>
