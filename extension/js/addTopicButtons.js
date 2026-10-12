@@ -185,7 +185,7 @@ function addUnderlineForQuoteBtn(btn) {
 
 function addCopyQuoteButton(btn, postID, imageData){
     let sourceURL = getPMHref(postID) || getQuoteElm(btn)
-    addSimpleButton(btn, null, 'fa-copy', 'ציטיר אין אן אנדער אשכול', 'ציטיר אין אן אנדער אשכול',
+    addSimpleButton(btn, null, 'fa-copy', 'ציטיר אין אנדערע אשכול', 'ציטיר אין אנדערע אשכול',
         sourceURL?
             `copyQuote("${sourceURL.getAttribute("href")}", "${postID}", 
             '${JSON.stringify(imageData)}')`:
