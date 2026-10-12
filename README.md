@@ -49,15 +49,16 @@ Extra buttons next to the regular quote button on every post:
 
 ## Install from the Chrome Web Store
 1. Open the **[Chrome Web Store](https://chromewebstore.google.com/detail/ivelt-helper-v2/ahidenbhdkloaingggdcijofobjboopi)** page.
+   <sub>Using Microsoft Edge? Install from **[Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/ivelt-helper-v2/hnklcnfpeamfiflmpnmjphigmbjoeknc)** instead.</sub>
 2. Click **Add to Chrome** and confirm **Add extension**.
 3. Pin **iVelt Helper** to the toolbar so you can see the notification badge.
 
 ## Install from GitHub (manual install)
-1. Download **Source code (zip)** from the _Assets_ of the latest release on the **[Releases page](https://github.com/chucem/IveltChromeExtension/releases/latest/)**.
-2. Extract the **IveltChromeExtension-x.x.x** folder and move it somewhere permanent. Chrome runs the extension from this folder, so it has to stay in the same place.
+1. Download **ivelt-helper-x.x.x.zip** from the _Assets_ of the latest release on the **[Releases page](https://github.com/chucem/IveltChromeExtension/releases/latest/)**.
+2. Extract it to an **ivelt-helper-x.x.x** folder and move it somewhere permanent. Chrome runs the extension from this folder, so it has to stay in the same place.
 3. Open `chrome://extensions/`.
 4. Turn on **Developer mode** (top right).
-5. Click **Load unpacked**, select the **extension** folder inside the extracted folder, and click **Select Folder**.
+5. Click **Load unpacked**, select the **ivelt-helper-x.x.x** folder, and click **Select Folder**.
 
 ## Building
 `build.bat` zips the `extension` folder into `dist/ivelt-helper-<version>.zip` (requires [7-Zip](https://www.7-zip.org/) on the `PATH`).
