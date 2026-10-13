@@ -521,7 +521,7 @@
             const panel = document.getElementById('attach-panel');
             if (!panel) return null;
             return Array.from(panel.querySelectorAll('p'))
-                .find(p => /\d\s*(KiB|MiB|KB|MB)/i.test(p.textContent)) || null;
+                .find(p => /\d\s*(KiB|MiB|KB|MB)\b/i.test(p.textContent)) || null;
         }
 
         function placeZipButton() {
