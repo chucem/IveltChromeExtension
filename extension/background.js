@@ -21,6 +21,7 @@ const defualtPreferences = {
   driveButtonPlace: 'attachments',
   driveFolderName: 'Shared on iVelt',
   copyPostLink: true,
+  themesEnabled: false,
   theme: 'default'
 };
 

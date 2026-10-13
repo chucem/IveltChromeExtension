@@ -72,7 +72,12 @@ function open_colors() {
 function initThemeSwatches() {
     const container = document.getElementById('themeSwatches');
 
-    chrome.storage.local.get(['theme', 'customTheme'], function (items) {
+    chrome.storage.local.get(['themesEnabled', 'theme', 'customTheme'], function (items) {
+        // the colors section is only shown when themes are turned on in the settings
+        if (!items.themesEnabled)
+            return;
+        document.getElementById('themesSection').hidden = false;
+
         const current = items.theme || 'default';
         const custom = sanitizeTheme(items.customTheme);
         const themes = custom ? themePresets.concat({ ...custom, name: custom.name || 'אייגענע' }) : themePresets;

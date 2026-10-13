@@ -161,3 +161,20 @@ function importCustomTheme(){
 	customThemeChanged();
 	notify();
 }
+
+// The whole feature can be turned off, then the colors tab (and the popup section) is hidden
+function initThemesToggle(enabled){
+	const checkbox = document.getElementById('themesEnabled');
+	checkbox.checked = !!enabled;
+	showThemesTab(checkbox.checked);
+
+	checkbox.addEventListener('change', () => {
+		commitNewSetting({ themesEnabled: checkbox.checked });
+		showThemesTab(checkbox.checked);
+	});
+}
+
+function showThemesTab(enabled){
+	document.querySelector('.page-tabs').classList.toggle('hidden', !enabled);
+	showTab();
+}
