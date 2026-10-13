@@ -16,6 +16,8 @@ const defualtPreferences = {
   ShowMultiNotifs: true,
   upDownArrowKeys: true,
   imageResizer: true,
+  driveUpload: true,
+  driveFolderName: 'Shared on iVelt',
   copyPostLink: true
 };
 
@@ -176,4 +178,4 @@ function commitDebugLog(name, values){
   })
 }
 
-importScripts('./background.notifications.js')
+importScripts('./background.notifications.js', './background.drive.js')

@@ -54,6 +54,8 @@ jobs:
         run: |
           mkdir -p dist
           cd extension
+          # The "key" only pins the extension ID for local unpacked testing; the store rejects it
+          jq 'del(.key)' manifest.json > manifest.tmp && mv manifest.tmp manifest.json
           zip -r -X "../${{ steps.version.outputs.zip }}" . -x '_metadata/*'
 
       - name: Create GitHub release
