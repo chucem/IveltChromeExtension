@@ -14,6 +14,8 @@ const preferencesOptions = [
 	'upDownArrowKeys',
 	'imageResizer',
 	'pasteImages',
+	'driveUpload',
+	'driveFolderName',
 	'copyPostLink'
 ];
 
@@ -47,6 +49,10 @@ function postSettingChange(items){
 	if(items.hasOwnProperty('backgroundSync')){
 		document.getElementById('backgroundSyncPosts').disabled = !items.backgroundSync;
 		document.getElementById('backgroundSyncNotif').disabled = !items.backgroundSync;
+	}
+
+	if(items.hasOwnProperty('driveUpload')){
+		document.getElementById('driveFolderName').disabled = !items.driveUpload;
 	}
 
 	if(items.hasOwnProperty('debugMode')){

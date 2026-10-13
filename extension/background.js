@@ -17,6 +17,8 @@ const defualtPreferences = {
   upDownArrowKeys: true,
   imageResizer: true,
   pasteImages: true,
+  driveUpload: true,
+  driveFolderName: 'Shared on iVelt',
   copyPostLink: true,
   theme: 'default'
 };
@@ -178,4 +180,4 @@ function commitDebugLog(name, values){
   })
 }
 
-importScripts('./background.notifications.js')
+importScripts('./background.notifications.js', './background.drive.js')
