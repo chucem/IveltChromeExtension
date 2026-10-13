@@ -512,14 +512,25 @@
         zipButton.title = 'קלייבט אויס א פאלדער, און ער ווערט צוגעלייגט אלס איין ZIP פייל';
 
         // Without the old floating button nothing shows that big images are fine to add,
-        // so say so next to the forum's own "add file" button
-        const resizeHint = el('span', 'ivr-hint', '📷 בילדער גרעסער ווי 400 KiB ווערן אויטאמאטיש פארקלענערט');
+        // so say so right after the forum's own "...ביז: 400 KiB." line. The limit itself
+        // stays: it still applies to every file that isn't an image.
+        const resizeHint = el('span', 'ivr-hint', '📷 גרעסערע בילדער ווערן אויטאמאטיש פארקלענערט');
+
+        // The forum's size-limit paragraph in the attachments panel
+        function findLimitLine() {
+            const panel = document.getElementById('attach-panel');
+            if (!panel) return null;
+            return Array.from(panel.querySelectorAll('p'))
+                .find(p => /\d\s*(KiB|MiB|KB|MB)/i.test(p.textContent)) || null;
+        }
 
         function placeZipButton() {
             const addFiles = document.getElementById('add_files');
             if (!addFiles || zipButton.isConnected) return !!addFiles;
             addFiles.insertAdjacentElement('afterend', zipButton);
-            zipButton.insertAdjacentElement('afterend', resizeHint);
+            const limitLine = findLimitLine();
+            if (limitLine) limitLine.append(' ', resizeHint);
+            else zipButton.insertAdjacentElement('afterend', resizeHint);
             return true;
         }
 

@@ -24,9 +24,9 @@ input.ivr-zip { margin-inline-start: 6px; }
 
 /* Next to it: tells the user that big images are fine to add */
 .ivr-hint {
-    margin-inline-start: 10px;
-    color: #546E7A;
-    font-size: 11px;
+    margin-inline-start: 4px;
+    color: #2E7D32;
+    font-weight: bold;
 }
 
 .ivr-hint[hidden] { display: none; }
