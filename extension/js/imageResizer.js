@@ -238,12 +238,14 @@
                 return result;
             }
 
-            // More files than the forum lets us attach - offer to pack them all into one ZIP
+            // More files than the forum lets us attach - offer to pack them all into one ZIP.
+            // The dialog picks each line's direction from its first letter, so every line
+            // has to start with Yiddish - a line starting with "OK" comes out scrambled.
             if (resize && files.length > slots) {
                 const zip = confirm(
                     `איר האט אויסגעקליבן ${files.length} פיילס, אבער עס איז נאר דא פלאץ פאר ${plural(slots, 'עטעטשמענט', 'עטעטשמענטס')}.\n\n` +
-                    `OK - לייג זיי אלע אריין אין איין ZIP פייל (די בילדער ווערן פארקלענערט אז עס זאל אריינפאסן)\n` +
-                    `Cancel - לייג צו נאר די ערשטע ${slots}`
+                    `• דרוקט OK צו לייגן זיי אלע אריין אין איין ZIP פייל (די בילדער ווערן פארקלענערט אז עס זאל אריינפאסן)\n` +
+                    `• דרוקט Cancel צו צולייגן נאר די ערשטע ${slots}`
                 );
                 if (zip) {
                     await zipAndAttach(files.map(f => ({ path: f.name, file: f })), 'files-' + new Date().toLocaleDateString('sv'));
@@ -495,7 +497,8 @@
 
         const zipButton = el('input', 'button2 ivr-zip');
         zipButton.type = 'button';
-        zipButton.value = '🗂️ פאלדער → ZIP';
+        // The page is right-to-left, so the arrow has to point left to read "folder to ZIP"
+        zipButton.value = '🗂️ פאלדער ← ZIP';
         zipButton.title = 'קלייבט אויס א פאלדער, און ער ווערט צוגעלייגט אלס איין ZIP פייל';
 
         function placeZipButton() {
