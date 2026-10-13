@@ -1,10 +1,8 @@
-/* Google Drive upload button - scoped under the ivd- prefix */
+/* Google Drive upload button and its account popup - scoped under the ivd- prefix */
 
 #ivd-wrap {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    margin: 0 4px;
+    position: relative;
+    display: inline-block;
     vertical-align: middle;
 }
 
@@ -14,11 +12,145 @@
     justify-content: center;
 }
 #ivd-button svg { display: block; }
-#ivd-button:disabled { opacity: 0.6; cursor: wait; }
+
+#ivd-wrap .ivd-popup {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: 2147483000;
+    width: 290px;
+    padding: 12px 14px;
+    background: #fff;
+    color: #333;
+    border: 1px solid #b8c4d0;
+    border-radius: 8px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1.4;
+    text-align: right;
+    white-space: normal;
+}
+
+#ivd-wrap .ivd-popup[hidden],
+#ivd-wrap .ivd-popup [hidden] { display: none !important; }
+
+#ivd-wrap .ivd-heading {
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #105289;
+}
+
+#ivd-wrap .ivd-account {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 8px 10px;
+    background: #f1f6fb;
+    border: 1px solid #dbe5ef;
+    border-radius: 6px;
+}
+
+#ivd-wrap .ivd-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+#ivd-wrap .ivd-account-text { min-width: 0; }
+
+#ivd-wrap .ivd-account-name {
+    font-weight: bold;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#ivd-wrap .ivd-account-email {
+    display: block;
+    direction: ltr;
+    text-align: right;
+    color: #555;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#ivd-wrap .ivd-quota { margin: -2px 0 10px; }
+
+#ivd-wrap .ivd-quota-bar {
+    height: 6px;
+    background: #e3e8ee;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+#ivd-wrap .ivd-quota-fill {
+    height: 100%;
+    background: #1a73e8;
+    border-radius: 3px;
+}
+
+#ivd-wrap .ivd-quota-low .ivd-quota-fill { background: #d93025; }
+
+#ivd-wrap .ivd-quota-text {
+    margin-top: 3px;
+    font-size: 12px;
+    color: #555;
+}
+
+#ivd-wrap .ivd-quota-low .ivd-quota-text { color: #B71C1C; }
+
+#ivd-wrap .ivd-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+#ivd-wrap .ivd-btn {
+    padding: 6px 12px;
+    border: 1px solid #b8c4d0;
+    border-radius: 4px;
+    background: #fff;
+    color: #105289;
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+#ivd-wrap .ivd-btn:hover { background: #f1f6fb; }
+
+#ivd-wrap .ivd-btn.ivd-primary {
+    background: #1a73e8;
+    border-color: #1a73e8;
+    color: #fff;
+}
+
+#ivd-wrap .ivd-btn.ivd-primary:hover { background: #1765cc; }
+
+#ivd-wrap .ivd-btn:disabled,
+#ivd-wrap .ivd-link:disabled { opacity: 0.55; cursor: not-allowed; }
+#ivd-wrap .ivd-busy .ivd-btn:disabled { cursor: wait; }
+
+#ivd-wrap .ivd-link {
+    display: block;
+    margin-top: 10px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: #666;
+    font: inherit;
+    font-size: 12px;
+    text-decoration: underline;
+    cursor: pointer;
+}
 
 #ivd-wrap .ivd-status {
-    font-size: 12px;
+    margin-top: 8px;
     color: #37474F;
+    word-break: break-word;
 }
 
 #ivd-wrap .ivd-status:empty { display: none; }

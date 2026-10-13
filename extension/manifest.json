@@ -43,10 +43,6 @@
     "service_worker": "background.js"
   },
   "options_page": "settings.html",
-  "oauth2": {
-    "client_id": "403521975867-sqccs4d97bf3rogrr3gs9626phfj71i5.apps.googleusercontent.com",
-    "scopes": ["https://www.googleapis.com/auth/drive.file"]
-  },
   "permissions": [
     "alarms",
     "identity",

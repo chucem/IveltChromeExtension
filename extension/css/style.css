@@ -153,6 +153,10 @@ input[type='checkbox']:checked + label:before {
     content: '\f14a';
     color: #3477db;
 }
+/* A labelled field lines up with the text of the checkbox above it */
+.row.row-field {
+    padding-right: 30px;
+}
 .row.row-field .label {
     display: block;
     margin-bottom: 6px;

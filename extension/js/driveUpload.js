@@ -1,8 +1,10 @@
 // Google Drive Upload
 //
-// Adds a "Drive" button to the post editor toolbar. Picked files are uploaded to a
-// folder in the user's Google Drive (name set in the settings), shared as
-// "anyone with the link can view", and a link to each one is inserted into the post.
+// Adds a Google Drive button to the post editor toolbar. It opens a small popup
+// that always shows which Google account the files will go to, so nobody uploads
+// to their own account by mistake. Picked files are uploaded to a folder in that
+// Drive (name set in the settings), shared as "anyone with the link can view",
+// and a link to each one is inserted into the post.
 //
 // Sign-in and the folder lookup happen in the background (background.drive.js);
 // the upload itself runs here so the file never has to pass through messaging.
@@ -35,8 +37,6 @@
 
     function init() {
         if (!chrome.storage || !chrome.storage.local) return;
-        // chrome.identity.getAuthToken only works in Google Chrome
-        if (isEdge()) return;
 
         chrome.storage.local.get([SETTING_KEY], (items) => {
             if (items[SETTING_KEY] !== false) mount();
@@ -47,11 +47,6 @@
             if (changes[SETTING_KEY].newValue === false) unmount();
             else mount();
         });
-    }
-
-    function isEdge() {
-        const brands = (navigator.userAgentData && navigator.userAgentData.brands) || [];
-        return brands.some(b => /edge/i.test(b.brand)) || /\bEdg\//.test(navigator.userAgent);
     }
 
     function mount() {
@@ -90,11 +85,21 @@
         return node;
     }
 
-    function getUploadTarget(staleToken) {
+    function formatSize(bytes) {
+        if (bytes < 1024 * 1024) return Math.max(1, Math.round(bytes / 1024)) + ' KB';
+        if (bytes < 1024 * 1024 * 1024) return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        return (bytes / (1024 * 1024 * 1024)).toFixed(1) + ' GB';
+    }
+
+    function sendToBackground(type, extra) {
         return new Promise((resolve, reject) => {
-            chrome.runtime.sendMessage({ type: 'driveUploadTarget', staleToken }, (response) => {
+            chrome.runtime.sendMessage({ type, ...extra }, (response) => {
                 if (chrome.runtime.lastError) return reject(new Error(chrome.runtime.lastError.message));
-                if (!response || response.error) return reject(new Error((response && response.error) || 'No response'));
+                if (!response || response.error) {
+                    const error = new Error((response && response.error) || 'No response');
+                    error.code = response && response.code;
+                    return reject(error);
+                }
                 resolve(response);
             });
         });
@@ -169,17 +174,59 @@
     // ---------------------------------------------------------------------
 
     function createWidget() {
+        const cleanups = [];
+
         const wrap = el('span');
         wrap.id = 'ivd-wrap';
 
         const button = el('button', 'button button-secondary');
         button.id = 'ivd-button';
         button.type = 'button';
-        button.title = 'Upload files to Google Drive and insert a public link';
-        button.setAttribute('aria-label', button.title);
+        button.title = 'Google Drive';
+        button.setAttribute('aria-label', 'Google Drive');
+        button.setAttribute('aria-haspopup', 'dialog');
+        button.setAttribute('aria-expanded', 'false');
         button.innerHTML = DRIVE_ICON;
 
-        const status = el('span', 'ivd-status');
+        // --- Popup: shows the connected account before anything is uploaded ---
+        const popup = el('div', 'ivd-popup');
+        popup.setAttribute('role', 'dialog');
+        popup.setAttribute('aria-label', 'Google Drive');
+        popup.dir = 'rtl';
+        popup.hidden = true;
+
+        const heading = el('div', 'ivd-heading');
+
+        const accountBox = el('div', 'ivd-account');
+        const avatar = el('img', 'ivd-avatar');
+        avatar.alt = '';
+        avatar.referrerPolicy = 'no-referrer';
+        const accountText = el('div', 'ivd-account-text');
+        const accountName = el('div', 'ivd-account-name');
+        const accountEmail = el('bdi', 'ivd-account-email');
+        accountText.append(accountName, accountEmail);
+        accountBox.append(avatar, accountText);
+
+        const quotaBox = el('div', 'ivd-quota');
+        const quotaBar = el('div', 'ivd-quota-bar');
+        const quotaFill = el('div', 'ivd-quota-fill');
+        quotaBar.append(quotaFill);
+        const quotaText = el('div', 'ivd-quota-text');
+        quotaBox.append(quotaBar, quotaText);
+
+        const pickBtn = el('button', 'ivd-btn ivd-primary', '⬆ קלייבט אויס פיילס');
+        pickBtn.type = 'button';
+        const connectBtn = el('button', 'ivd-btn ivd-primary', 'פארבינד א Google אקאונט');
+        connectBtn.type = 'button';
+        const switchBtn = el('button', 'ivd-btn', 'טויש אקאונט');
+        switchBtn.type = 'button';
+        const disconnectBtn = el('button', 'ivd-link', 'ארויסלאגן');
+        disconnectBtn.type = 'button';
+
+        const actions = el('div', 'ivd-actions');
+        actions.append(pickBtn, connectBtn, switchBtn);
+
+        const status = el('div', 'ivd-status');
         status.setAttribute('role', 'status');
         status.setAttribute('aria-live', 'polite');
 
@@ -188,13 +235,17 @@
         input.multiple = true;
         input.hidden = true;
 
-        wrap.append(button, status, input);
+        popup.append(heading, accountBox, quotaBox, actions, status, disconnectBtn);
+        wrap.append(button, popup, input);
 
         // Next to the BBCode buttons when the page has them, otherwise above the textarea
         const toolbar = findToolbar();
         if (toolbar) toolbar.append(wrap);
         else findTextarea().before(wrap);
 
+        // --- State ---
+        let account = null;
+        let quota = null;
         let busy = false;
         let statusTimer = null;
 
@@ -205,8 +256,141 @@
             if (text && holdMs) statusTimer = setTimeout(() => showStatus(''), holdMs);
         }
 
-        button.addEventListener('click', () => {
-            if (busy) return;
+        // Single place that decides what the popup shows
+        function render() {
+            const connected = !!account;
+            heading.textContent = connected ? 'די פיילס וועלן ארויפגיין צו:' : 'ארויפלייגן פיילס אויף Google Drive';
+            accountBox.hidden = !connected;
+            renderQuota();
+            pickBtn.hidden = !connected;
+            switchBtn.hidden = !connected;
+            disconnectBtn.hidden = !connected;
+            connectBtn.hidden = connected;
+
+            if (connected) {
+                accountName.textContent = account.name || account.email;
+                accountEmail.textContent = account.email;
+                avatar.hidden = !account.photo;
+                if (account.photo) avatar.src = account.photo;
+                button.title = 'Google Drive: ' + account.email;
+            } else {
+                button.title = 'Google Drive';
+            }
+
+            [pickBtn, connectBtn, switchBtn, disconnectBtn].forEach(b => { b.disabled = busy; });
+        }
+
+        function freeSpace() {
+            return quota && quota.limit != null ? Math.max(0, quota.limit - quota.usage) : null;
+        }
+
+        function renderQuota() {
+            const free = freeSpace();
+            quotaBox.hidden = !account || free === null;
+            if (quotaBox.hidden) return;
+
+            const used = Math.min(1, quota.usage / quota.limit);
+            quotaFill.style.width = (used * 100).toFixed(1) + '%';
+            quotaBox.classList.toggle('ivd-quota-low', used >= 0.9);
+            quotaText.textContent = `פריי: ${formatSize(free)} פון ${formatSize(quota.limit)}`;
+        }
+
+        // Quietly in the background - if it can't be read, the bar just stays hidden
+        async function refreshQuota() {
+            if (!account) {
+                quota = null;
+                renderQuota();
+                return;
+            }
+            try {
+                quota = (await sendToBackground('driveQuota')).quota;
+            } catch (err) {
+                quota = null;
+            }
+            renderQuota();
+        }
+
+        function setBusy(on) {
+            busy = on;
+            popup.classList.toggle('ivd-busy', on);
+            render();
+        }
+
+        async function refreshAccount() {
+            try {
+                account = (await sendToBackground('driveAccount')).account;
+            } catch (err) {
+                account = null;
+            }
+            render();
+            refreshQuota();
+        }
+
+        function setOpen(open) {
+            popup.hidden = !open;
+            button.setAttribute('aria-expanded', String(open));
+            if (open) refreshAccount();
+        }
+
+        button.addEventListener('click', () => setOpen(popup.hidden));
+
+        // Close on outside click / Escape, but never in the middle of an upload
+        const onDocClick = (e) => {
+            if (!popup.hidden && !busy && !wrap.contains(e.target)) setOpen(false);
+        };
+        const onKeyDown = (e) => {
+            if (e.key === 'Escape' && !popup.hidden && !busy) setOpen(false);
+        };
+        document.addEventListener('click', onDocClick);
+        document.addEventListener('keydown', onKeyDown);
+        cleanups.push(() => {
+            document.removeEventListener('click', onDocClick);
+            document.removeEventListener('keydown', onKeyDown);
+        });
+
+        // Another tab connected / switched / signed out - stay in sync
+        const onStorage = (changes, area) => {
+            if (area === 'local' && changes.driveAccount) {
+                account = changes.driveAccount.newValue || null;
+                render();
+            }
+        };
+        chrome.storage.onChanged.addListener(onStorage);
+        cleanups.push(() => chrome.storage.onChanged.removeListener(onStorage));
+
+        async function chooseAccount() {
+            setBusy(true);
+            showStatus('ווארט אויפן Google פענצטער…');
+            try {
+                account = (await sendToBackground('driveConnect')).account;
+                quota = null;
+                showStatus('');
+                refreshQuota();
+            } catch (err) {
+                showStatus('❌ ' + err.message, 'error', HOLD_STATUS_MS * 2);
+            } finally {
+                setBusy(false);
+            }
+        }
+
+        connectBtn.addEventListener('click', chooseAccount);
+        switchBtn.addEventListener('click', chooseAccount);
+
+        disconnectBtn.addEventListener('click', async () => {
+            setBusy(true);
+            try {
+                await sendToBackground('driveDisconnect');
+                account = null;
+                showStatus('');
+            } catch (err) {
+                showStatus('❌ ' + err.message, 'error', HOLD_STATUS_MS * 2);
+            } finally {
+                setBusy(false);
+            }
+        });
+
+        pickBtn.addEventListener('click', () => {
+            if (busy || !account) return;
             input.value = '';
             input.click();
         });
@@ -217,19 +401,24 @@
         });
 
         async function uploadAll(files) {
-            busy = true;
-            button.disabled = true;
-            const links = [];
+            const total = files.reduce((sum, f) => sum + f.size, 0);
+            const free = freeSpace();
+            if (free !== null && total > free) {
+                showStatus(`❌ נישט גענוג פלאץ אויף Google Drive: די פיילס זענען ${formatSize(total)}, און עס איז נאר דא ${formatSize(free)}`, 'error', HOLD_STATUS_MS * 3);
+                return;
+            }
+
+            setBusy(true);
             let shareFailed = false;
 
             try {
-                showStatus('Connecting to Google Drive…');
-                let target = await getUploadTarget();
+                showStatus('פארבינדט מיט Google Drive…');
+                let target = await sendToBackground('driveUploadTarget');
 
                 for (let i = 0; i < files.length; i++) {
                     const file = files[i];
                     const prefix = files.length > 1 ? `(${i + 1}/${files.length}) ` : '';
-                    const onProgress = (p) => showStatus(`${prefix}Uploading ${file.name}… ${Math.round(p * 100)}%`);
+                    const onProgress = (p) => showStatus(`${prefix}לייגט ארויף ${file.name}… ${Math.round(p * 100)}%`);
                     onProgress(0);
 
                     let uploaded;
@@ -238,7 +427,7 @@
                     } catch (err) {
                         if (err.status !== 401) throw err;
                         // Token expired between files - refresh and retry this one
-                        target = await getUploadTarget(target.token);
+                        target = await sendToBackground('driveUploadTarget', { staleToken: target.token });
                         uploaded = await uploadFile(file, target.token, target.folderId, onProgress);
                     }
 
@@ -249,28 +438,31 @@
                         shareFailed = true;
                     }
 
-                    links.push(linkBBCode(uploaded));
+                    // Into the post right away, so a later failure never loses it
+                    const textarea = findTextarea();
+                    if (textarea) insertAtCursor(textarea, linkBBCode(uploaded));
                 }
 
                 if (shareFailed) {
-                    showStatus('⚠️ Uploaded, but Google did not allow making some files public', 'warn', HOLD_STATUS_MS * 2);
+                    showStatus('⚠️ ארויפגעלייגט, אבער Google האט נישט ערלויבט צו מאכן אלע פיילס פובליק', 'warn', HOLD_STATUS_MS * 2);
                 } else {
-                    showStatus(`✅ Uploaded ${files.length} file${files.length > 1 ? 's' : ''}`, 'ok', HOLD_STATUS_MS);
+                    showStatus(`✅ ארויפגעלייגט ${files.length} ${files.length > 1 ? 'פיילס' : 'פייל'}, דער לינק איז אריינגעלייגט אין דער תגובה`, 'ok', HOLD_STATUS_MS);
                 }
             } catch (err) {
-                showStatus('❌ ' + err.message, 'error', HOLD_STATUS_MS * 2);
+                if (err.code === 'not_connected' || err.code === 'account_mismatch') await refreshAccount();
+                showStatus('❌ ' + err.message, 'error', HOLD_STATUS_MS * 3);
             } finally {
-                // Insert whatever made it up, even if a later file failed
-                const textarea = findTextarea();
-                if (links.length && textarea) insertAtCursor(textarea, links.join('\n'));
-                busy = false;
-                button.disabled = false;
+                setBusy(false);
+                refreshQuota();
             }
         }
+
+        render();
 
         return {
             destroy() {
                 clearTimeout(statusTimer);
+                cleanups.forEach(fn => fn());
                 wrap.remove();
             }
         };
