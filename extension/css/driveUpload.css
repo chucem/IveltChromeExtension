@@ -19,8 +19,37 @@
 
 /* In the attachments panel: a regular phpBB button next to "add files" */
 .ivd-in-attach { margin-inline-start: 4px; }
+
+/* phpBB only styles input.button2, and these are <button>s (they hold an icon),
+   so give them the same look as the forum's "add files" button by hand */
+.ivd-in-attach #ivd-button,
+#ivd-offer .button2 {
+    height: auto;
+    padding: 1px 5px;
+    border: 1px solid #666;
+    border-radius: 0;
+    background-color: #efefef;
+    background-image: linear-gradient(to bottom, #d2d2d2 0%, #efefef 100%);
+    color: #000;
+    font-family: "Lucida Grande", Verdana, Helvetica, Arial, sans-serif;
+    font-size: 10px;
+    font-weight: normal;
+    line-height: 15px;
+    vertical-align: middle;
+    cursor: pointer;
+}
+.ivd-in-attach #ivd-button:hover,
+#ivd-offer .button2:hover {
+    border-color: #0a8ed0;
+    background-image: linear-gradient(to bottom, #efefef 0%, #d2d2d2 100%);
+}
+.ivd-in-attach #ivd-button:focus-visible,
+#ivd-offer .button2:focus-visible {
+    outline: 2px solid #0a8ed0;
+    outline-offset: 1px;
+}
 .ivd-in-attach #ivd-button svg,
-#ivd-offer .button2 svg { width: 14px; height: 14px; }
+#ivd-offer .button2 svg { width: 12px; height: 12px; }
 
 /* Offer to use Drive after an attachment was too big */
 #ivd-offer {
