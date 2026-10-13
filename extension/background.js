@@ -18,6 +18,7 @@ const defualtPreferences = {
   imageResizer: true,
   driveUpload: true,
   driveButtonPlace: 'attachments',
+  driveButtonPlace: 'attachments',
   driveFolderName: 'Shared on iVelt',
   copyPostLink: true
 };
