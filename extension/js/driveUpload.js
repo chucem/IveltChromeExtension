@@ -1,35 +1,37 @@
 // Google Drive Upload
 //
-// Adds a Google Drive button to the post editor toolbar. It opens a small popup
-// that always shows which Google account the files will go to, so nobody uploads
-// to their own account by mistake. Picked files are uploaded to a folder in that
-// Drive (name set in the settings), shared as "anyone with the link can view",
-// and a link to each one is inserted into the post.
+// Adds a Google Drive button to the attachments panel (or, if chosen in the
+// settings, to the post editor toolbar). It opens a small popup that always
+// shows which Google account the files will go to, so nobody uploads to their
+// own account by mistake. Picked files are uploaded to a folder in that Drive
+// (name set in the settings), shared as "anyone with the link can view", and a
+// link to each one is inserted into the post. When a regular attachment is
+// rejected for being too big, it offers to upload that file to Drive instead.
 //
 // Sign-in and the folder lookup happen in the background (background.drive.js);
 // the upload itself runs here so the file never has to pass through messaging.
 //
 // Runs as a content script (isolated world) and is controlled by the
-// "driveUpload" setting, which can be switched on and off without a reload.
+// "driveUpload" and "driveButtonPlace" settings, which apply without a reload.
 
 (function () {
     'use strict';
 
     const SETTING_KEY = 'driveUpload';
+    const PLACE_KEY = 'driveButtonPlace'; // 'attachments' (default) or 'toolbar'
     const DRIVE_API = 'https://www.googleapis.com/drive/v3';
     const UPLOAD_API = 'https://www.googleapis.com/upload/drive/v3';
     const HOLD_STATUS_MS = 4000;
+    const TOO_BIG_WINDOW_MS = 30000; // how long after picking a file a failure is blamed on its size
 
-    const DRIVE_ICON = '<svg viewBox="0 0 87.3 78" width="16" height="16" aria-hidden="true">'
-        + '<path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/>'
-        + '<path d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0 -1.2 4.5h27.5z" fill="#00ac47"/>'
-        + '<path d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z" fill="#ea4335"/>'
-        + '<path d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.45-4.5 1.2z" fill="#00832d"/>'
-        + '<path d="m59.8 53h-32.3l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z" fill="#2684fc"/>'
-        + '<path d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 28h27.45c0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/>'
+    // Single color, so it sits quietly next to the forum's own grey icons
+    const DRIVE_ICON = '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">'
+        + '<path fill="currentColor" d="M7.71 3.5 1.15 15l3.43 6 6.55-11.5M9.73 15 6.3 21h13.12l3.43-6M22.28 14 15.42 2H8.58l6.85 12z"/>'
         + '</svg>';
 
     let widget = null;
+    let enabled = false;
+    let place = 'attachments';
 
     // ---------------------------------------------------------------------
     // Setting handling: on unless the user explicitly turned it off
@@ -38,14 +40,18 @@
     function init() {
         if (!chrome.storage || !chrome.storage.local) return;
 
-        chrome.storage.local.get([SETTING_KEY], (items) => {
-            if (items[SETTING_KEY] !== false) mount();
+        chrome.storage.local.get([SETTING_KEY, PLACE_KEY], (items) => {
+            enabled = items[SETTING_KEY] !== false;
+            place = items[PLACE_KEY] === 'toolbar' ? 'toolbar' : 'attachments';
+            if (enabled) mount();
         });
 
         chrome.storage.onChanged.addListener((changes, area) => {
-            if (area !== 'local' || !changes[SETTING_KEY]) return;
-            if (changes[SETTING_KEY].newValue === false) unmount();
-            else mount();
+            if (area !== 'local' || (!changes[SETTING_KEY] && !changes[PLACE_KEY])) return;
+            if (changes[SETTING_KEY]) enabled = changes[SETTING_KEY].newValue !== false;
+            if (changes[PLACE_KEY]) place = changes[PLACE_KEY].newValue === 'toolbar' ? 'toolbar' : 'attachments';
+            unmount();
+            if (enabled) mount();
         });
     }
 
@@ -76,6 +82,20 @@
         if (rows.length) return rows[rows.length - 1];
         const stock = document.getElementById('format-buttons');
         return isVisible(stock) ? stock : null;
+    }
+
+    // The row with phpBB's "add files" button; missing when the user can't attach here
+    function findAttachButtons() {
+        return document.getElementById('attach-panel-multi');
+    }
+
+    // The forum's limit as printed in the attachments panel, e.g. "... 400 KiB."
+    function readAttachLimit() {
+        const panel = document.getElementById('attach-panel');
+        const match = panel && panel.textContent.match(/(\d+(?:[.,]\d+)?)\s*(KiB|MiB|GiB|KB|MB|GB)\b/i);
+        if (!match) return null;
+        const power = { k: 1, m: 2, g: 3 }[match[2][0].toLowerCase()];
+        return parseFloat(match[1].replace(',', '.')) * Math.pow(1024, power);
     }
 
     function el(tag, className, text) {
@@ -179,7 +199,14 @@
         const wrap = el('span');
         wrap.id = 'ivd-wrap';
 
-        const button = el('button', 'button button-secondary');
+        // Next to phpBB's "add files" button by default, or with the BBCode buttons.
+        // Falls back to whichever exists, and finally to above the textarea.
+        const attachButtons = findAttachButtons();
+        const toolbar = place === 'toolbar' || !attachButtons ? findToolbar() : null;
+        const inToolbar = !!toolbar;
+
+        // Styled like its neighbours: a bare ABBC3 icon, or a phpBB button with a label
+        const button = el('button', inToolbar ? 'abbc3_button' : 'button2');
         button.id = 'ivd-button';
         button.type = 'button';
         button.title = 'Google Drive';
@@ -187,6 +214,7 @@
         button.setAttribute('aria-haspopup', 'dialog');
         button.setAttribute('aria-expanded', 'false');
         button.innerHTML = DRIVE_ICON;
+        if (!inToolbar) button.append(el('span', '', 'Google Drive'));
 
         // --- Popup: shows the connected account before anything is uploaded ---
         const popup = el('div', 'ivd-popup');
@@ -238,16 +266,36 @@
         popup.append(heading, accountBox, quotaBox, actions, status, disconnectBtn);
         wrap.append(button, popup, input);
 
-        // Next to the BBCode buttons when the page has them, otherwise above the textarea
-        const toolbar = findToolbar();
-        if (toolbar) toolbar.append(wrap);
+        if (inToolbar) toolbar.append(wrap);
+        else if (attachButtons) attachButtons.append(wrap);
         else findTextarea().before(wrap);
+        wrap.classList.add(inToolbar ? 'ivd-in-toolbar' : 'ivd-in-attach');
+
+        // --- Offer shown when a regular attachment is too big for the forum ---
+        const offer = el('div');
+        offer.id = 'ivd-offer';
+        offer.dir = 'rtl';
+        offer.hidden = true;
+        const offerText = el('span', 'ivd-offer-text');
+        const offerBtn = el('button', 'button2');
+        offerBtn.type = 'button';
+        offerBtn.innerHTML = DRIVE_ICON;
+        const offerBtnText = el('span');
+        offerBtn.append(offerBtnText);
+        const offerClose = el('button', 'ivd-offer-close', '×');
+        offerClose.type = 'button';
+        offerClose.title = 'פארמאך';
+        offerClose.setAttribute('aria-label', 'פארמאך');
+        offer.append(offerText, offerBtn, offerClose);
+        if (attachButtons) attachButtons.after(offer);
+        else wrap.after(offer);
 
         // --- State ---
         let account = null;
         let quota = null;
         let busy = false;
         let statusTimer = null;
+        let pending = null; // too-big attachments waiting to go to Drive instead
 
         function showStatus(text, kind, holdMs) {
             clearTimeout(statusTimer);
@@ -266,6 +314,9 @@
             switchBtn.hidden = !connected;
             disconnectBtn.hidden = !connected;
             connectBtn.hidden = connected;
+            pickBtn.textContent = pending
+                ? '⬆ לייגט ארויף: ' + (pending.length > 1 ? `${pending.length} פיילס` : pending[0].name)
+                : '⬆ קלייבט אויס פיילס';
 
             if (connected) {
                 accountName.textContent = account.name || account.email;
@@ -329,14 +380,20 @@
         function setOpen(open) {
             popup.hidden = !open;
             button.setAttribute('aria-expanded', String(open));
-            if (open) refreshAccount();
+            if (open) {
+                refreshAccount();
+                popup.scrollIntoView({ block: 'nearest' });
+            } else if (pending) {
+                pending = null;
+                render();
+            }
         }
 
         button.addEventListener('click', () => setOpen(popup.hidden));
 
         // Close on outside click / Escape, but never in the middle of an upload
         const onDocClick = (e) => {
-            if (!popup.hidden && !busy && !wrap.contains(e.target)) setOpen(false);
+            if (!popup.hidden && !busy && !wrap.contains(e.target) && !offer.contains(e.target)) setOpen(false);
         };
         const onKeyDown = (e) => {
             if (e.key === 'Escape' && !popup.hidden && !busy) setOpen(false);
@@ -391,8 +448,92 @@
 
         pickBtn.addEventListener('click', () => {
             if (busy || !account) return;
+            if (pending) {
+                const files = pending;
+                pending = null;
+                uploadAll(files);
+                return;
+            }
             input.value = '';
             input.click();
+        });
+
+        // --- Too-big attachments: remember what was just picked for the forum's own
+        // uploader, and when the forum then reports an error, offer Drive instead ---
+        const attachLimit = readAttachLimit();
+        let tooBig = [];
+        let tooBigAt = 0;
+        let errorRowsAtPick = 0;
+        let offerFiles = null;
+        const countErrorRows = () => document.querySelectorAll('#file-list .file-error').length;
+
+        const notePicked = (files) => {
+            const big = Array.from(files || []).filter(f => f.size > attachLimit);
+            if (!big.length) return;
+            tooBig = big;
+            tooBigAt = Date.now();
+            errorRowsAtPick = countErrorRows();
+        };
+        const onPickChange = (e) => {
+            const target = e.target;
+            if (target.type === 'file' && !wrap.contains(target) && target.closest('#attach-panel')) notePicked(target.files);
+        };
+        const onDrop = (e) => {
+            if (e.dataTransfer) notePicked(e.dataTransfer.files);
+        };
+
+        // phpBB reports a size error either in its alert box (checked in the browser)
+        // or on the file's row in the attachment list (rejected by the server)
+        const isVisible = (node) => node && node.getClientRects().length > 0;
+        const onPageChange = () => {
+            if (!tooBig.length) return;
+            if (Date.now() - tooBigAt > TOO_BIG_WINDOW_MS) {
+                tooBig = [];
+                return;
+            }
+            const alertShown = isVisible(document.getElementById('phpbb_alert'));
+            const rowFailed = countErrorRows() > errorRowsAtPick;
+            if (alertShown || rowFailed) {
+                showOffer(tooBig);
+                tooBig = [];
+            }
+        };
+
+        if (attachLimit) {
+            document.addEventListener('change', onPickChange, true);
+            document.addEventListener('drop', onDrop, true);
+            const observer = new MutationObserver(onPageChange);
+            observer.observe(document.body, { subtree: true, childList: true, attributes: true, attributeFilter: ['style', 'class'] });
+            cleanups.push(() => {
+                document.removeEventListener('change', onPickChange, true);
+                document.removeEventListener('drop', onDrop, true);
+                observer.disconnect();
+            });
+        }
+
+        function showOffer(files) {
+            offerFiles = files;
+            const what = files.length > 1 ? `${files.length} פיילס זענען` : `"${files[0].name}" איז`;
+            offerText.textContent = `⚠️ ${what} צו גרויס פאר אן אטעטשמענט (ביז ${formatSize(attachLimit)}).`;
+            offerBtnText.textContent = files.length > 1 ? 'לייגט זיי ארויף אויף Google Drive' : 'לייגט עס ארויף אויף Google Drive';
+            offer.hidden = false;
+        }
+
+        offerBtn.addEventListener('click', () => {
+            if (busy || !offerFiles) return;
+            pending = offerFiles;
+            offer.hidden = true;
+            // The button lives in the attachments tab - bring it into view first
+            if (!isVisible(button)) {
+                const tab = document.querySelector('#attach-panel-tab a, a[data-subpanel="attach-panel"]');
+                if (tab) tab.click();
+            }
+            setOpen(true);
+            render();
+        });
+
+        offerClose.addEventListener('click', () => {
+            offer.hidden = true;
         });
 
         input.addEventListener('change', () => {
@@ -464,6 +605,7 @@
                 clearTimeout(statusTimer);
                 cleanups.forEach(fn => fn());
                 wrap.remove();
+                offer.remove();
             }
         };
     }

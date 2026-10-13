@@ -14,6 +14,7 @@ const preferencesOptions = [
 	'upDownArrowKeys',
 	'imageResizer',
 	'driveUpload',
+	'driveButtonPlace',
 	'driveFolderName',
 	'copyPostLink'
 ];
@@ -51,6 +52,7 @@ function postSettingChange(items){
 	}
 
 	if(items.hasOwnProperty('driveUpload')){
+		document.getElementById('driveButtonPlace').disabled = !items.driveUpload;
 		document.getElementById('driveFolderName').disabled = !items.driveUpload;
 	}
 

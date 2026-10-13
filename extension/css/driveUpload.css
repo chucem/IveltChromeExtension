@@ -10,8 +10,47 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 4px;
 }
-#ivd-button svg { display: block; }
+#ivd-button svg { display: block; flex-shrink: 0; }
+
+/* In the ABBC3 toolbar: same grey as the forum's own icons */
+.ivd-in-toolbar #ivd-button { color: #626262; }
+
+/* In the attachments panel: a regular phpBB button next to "add files" */
+.ivd-in-attach { margin-inline-start: 4px; }
+.ivd-in-attach #ivd-button svg,
+#ivd-offer .button2 svg { width: 14px; height: 14px; }
+
+/* Offer to use Drive after an attachment was too big */
+#ivd-offer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    margin: 8px 0;
+    padding: 6px 10px;
+    background: #fff8e1;
+    border: 1px solid #f0d58c;
+    border-radius: 4px;
+    color: #5d4300;
+}
+#ivd-offer[hidden] { display: none; }
+#ivd-offer .button2 {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+#ivd-offer .ivd-offer-close {
+    margin-inline-start: auto;
+    padding: 0 4px;
+    border: none;
+    background: none;
+    color: inherit;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+}
 
 #ivd-wrap .ivd-popup {
     position: absolute;
