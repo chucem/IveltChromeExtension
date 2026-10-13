@@ -516,12 +516,12 @@
         // stays: it still applies to every file that isn't an image.
         const resizeHint = el('span', 'ivr-hint', '📷 גרעסערע בילדער ווערן אויטאמאטיש פארקלענערט');
 
-        // The forum's size-limit paragraph in the attachments panel
+        // The forum's size-limit paragraph ("...ביז: 400 KiB.") is the one right
+        // before its attachment form
         function findLimitLine() {
-            const panel = document.getElementById('attach-panel');
-            if (!panel) return null;
-            return Array.from(panel.querySelectorAll('p'))
-                .find(p => /\d\s*(KiB|MiB|KB|MB)\b/i.test(p.textContent)) || null;
+            const form = document.getElementById('attach-panel-basic');
+            const line = form && form.previousElementSibling;
+            return line && line.tagName === 'P' ? line : null;
         }
 
         function placeZipButton() {
