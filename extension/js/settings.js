@@ -17,6 +17,7 @@ const preferencesOptions = [
 	'driveUpload',
 	'driveButtonPlace',
 	'driveFolderName',
+	'openAttachmentsTab',
 	'copyPostLink'
 ];
 
