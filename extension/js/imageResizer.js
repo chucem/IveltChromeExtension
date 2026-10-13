@@ -1,9 +1,15 @@
 // Image Resizer
 //
-// Adds a small floating button on the post editor that shrinks images under the
-// forum's attachment size limit before they are attached, and can pack a whole
-// folder into a single ZIP attachment. Everything runs locally in the browser -
-// no file ever leaves the page except through the forum's own attachment upload.
+// Hooks into the post editor's own attachment flow, so an image that is too big for
+// the forum (or in a format it doesn't take) is shrunk before it is uploaded - no
+// matter how it arrives:
+//   - picked with the forum's own "add file" button
+//   - dropped on the editor or on the attachments tab
+//   - pasted straight into the post, like in Gmail: the image is attached and placed
+//     inline at the spot it was pasted
+// A dropped folder, or one picked with the "Folder → ZIP" button next to the forum's
+// "add file" button, is packed into a single ZIP attachment. Everything runs locally
+// in the browser - no file ever leaves the page except through the forum's own upload.
 //
 // Runs as a content script (isolated world) and is controlled by the
 // "imageResizer" setting, which can be switched on and off without a reload.
@@ -14,11 +20,15 @@
     const SETTING_KEY = 'imageResizer';
 
     const MAX_ATTACHMENTS = 3;
-    const MAX_BYTES = 390 * 1024;          // the attachment limit we have to stay under
+    const MAX_BYTES = 390 * 1024;          // the image attachment limit (400 KB) with a little room to spare
+    const ZIP_MAX_BYTES = 250 * 1024;      // archives have a lower limit (256 KB)
     const ZIP_SOURCE_LIMIT = 100 * 1024 * 1024; // refuse folders bigger than this - they can never fit anyway
-    const ZIP_MIN_IMAGE_BYTES = 30 * 1024;  // never squeeze a single image below this inside a ZIP
+    const ZIP_MIN_IMAGE_BYTES = 20 * 1024;  // never squeeze a single image below this inside a ZIP
     const ZIP_MAX_IMAGE_BYTES = 400 * 1024;
-    const HOLD_STATUS_MS = 2500;
+    const HOLD_STATUS_MS = 4000;
+    const INPUT_WAIT_MS = 3000;            // how long the forum may take to build its uploader
+    const ROW_WAIT_MS = 15 * 1000;         // a file that never shows up in the list was refused
+    const UPLOAD_WAIT_MS = 3 * 60 * 1000;
 
     // Formats the forum accepts as they are. Anything else has to be converted;
     // anything on this list is only touched when it is over the size limit.
@@ -27,7 +37,7 @@
     const SKIP_NAMES = ['.ds_store', 'thumbs.db', 'desktop.ini'];
     const SKIP_FOLDERS = ['__macosx'];
 
-    let widget = null;
+    let hooks = null;
 
     // ---------------------------------------------------------------------
     // Setting handling: on unless the user explicitly turned it off
@@ -48,14 +58,14 @@
     }
 
     function mount() {
-        if (widget || !document.body) return;
-        widget = createWidget();
+        if (hooks || !getTextarea()) return;
+        hooks = createHooks();
     }
 
     function unmount() {
-        if (!widget) return;
-        widget.destroy();
-        widget = null;
+        if (!hooks) return;
+        hooks.destroy();
+        hooks = null;
     }
 
     // ---------------------------------------------------------------------
@@ -75,13 +85,36 @@
         return node;
     }
 
+    function delay(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function getTextarea() {
+        return document.getElementById('message') || document.querySelector('textarea[name="message"]');
+    }
+
+    // The forum's uploader (plupload) puts its own hidden file input over the "add file"
+    // button, but only once the attachments tab has been opened
+    function findAttachmentInput() {
+        return document.querySelector('#attach-panel-multi .moxie-shim input[type="file"]') ||
+            document.querySelector('.moxie-shim input[type="file"]');
+    }
+
+    function isAttachmentInput(node) {
+        return node instanceof HTMLInputElement && node.type === 'file' && !!node.closest('.moxie-shim');
+    }
+
+    function attachmentRows() {
+        return Array.from(document.querySelectorAll('#file-list .attach-row'));
+    }
+
     // Rows that don't carry an error are attached or still uploading
     function getAttachedFilesCount() {
-        let count = 0;
-        for (const row of document.querySelectorAll('.attach-row')) {
-            if (!row.querySelector('.file-error')) count++;
-        }
-        return count;
+        return attachmentRows().filter(row => !row.querySelector('.file-error')).length;
+    }
+
+    function slotsLeft() {
+        return Math.max(0, MAX_ATTACHMENTS - getAttachedFilesCount());
     }
 
     function isImageFile(file) {
@@ -92,86 +125,37 @@
         return !!event.dataTransfer && Array.from(event.dataTransfer.types || []).includes('Files');
     }
 
+    function plural(n, one, many) {
+        return n + ' ' + (n === 1 ? one : many);
+    }
+
+    // A pasted screenshot is always called "image.png" - give it a name that can
+    // be told apart in the attachment list and inside the post
+    function pastedName(file, index) {
+        const d = new Date();
+        const pad = n => String(n).padStart(2, '0');
+        const stamp = `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+        const ext = ((file.type || '').split('/')[1] || 'png').replace('jpeg', 'jpg').replace(/[^a-z0-9]/gi, '');
+        return `pasted-${stamp}${index ? '-' + (index + 1) : ''}.${ext}`;
+    }
+
     // ---------------------------------------------------------------------
-    // The widget
+    // Hooks into the post editor
     // ---------------------------------------------------------------------
 
-    function createWidget() {
+    function createHooks() {
         const cleanups = [];
+        const textarea = getTextarea();
 
-        // --- Mini button ---
-        const mini = el('button', '', '📷');
-        mini.id = 'ivr-mini';
-        mini.type = 'button';
-        mini.title = 'Open Image Resizer, or drop images / folders here';
-        mini.setAttribute('aria-label', 'Open Image Resizer');
+        let busy = false;
+        let passThrough = false;   // set while we hand our own files to the forum's uploader
+        let statusTimer = null;
 
-        // --- Main box ---
-        const floater = el('div');
-        floater.id = 'ivr-floater';
-        floater.setAttribute('role', 'dialog');
-        floater.setAttribute('aria-label', 'Image Resizer');
-
-        const closeBtn = el('button', 'ivr-close', '×');
-        closeBtn.type = 'button';
-        closeBtn.title = 'Minimize';
-        closeBtn.setAttribute('aria-label', 'Minimize');
-
-        const title = el('div', 'ivr-title', 'Ivelt Image Resizer');
-
-        const pickBtn = el('button', 'ivr-btn');
-        pickBtn.type = 'button';
-
-        const zipBtn = el('button', 'ivr-btn ivr-zip', '🗂️ Folder → ZIP');
-        zipBtn.type = 'button';
-        zipBtn.title = 'Pick a folder, zip it in the browser and attach the ZIP';
-
-        const option = el('label', 'ivr-option');
-        const shrinkChk = el('input');
-        shrinkChk.type = 'checkbox';
-        shrinkChk.checked = true;
-        option.append(shrinkChk, el('span', '', 'Shrink big images inside ZIP'));
-
+        // --- Status line under the editor ---
         const status = el('div', 'ivr-status');
         status.setAttribute('role', 'status');
         status.setAttribute('aria-live', 'polite');
-
-        // Hidden pickers (the image picker allows several files at once)
-        const imageInput = el('input');
-        imageInput.type = 'file';
-        imageInput.accept = 'image/*';
-        imageInput.multiple = true;
-        imageInput.hidden = true;
-
-        const folderInput = el('input');
-        folderInput.type = 'file';
-        folderInput.multiple = true;
-        folderInput.setAttribute('webkitdirectory', '');
-        folderInput.hidden = true;
-
-        floater.append(closeBtn, title, pickBtn, zipBtn, option, status, imageInput, folderInput);
-        document.body.append(mini, floater);
-
-        // --- State ---
-        let busy = false;
-        let statusTimer = null;
-        let renderTimer = null;
-
-        function findAttachmentInput() {
-            for (const input of document.querySelectorAll('input[type="file"]')) {
-                if (!floater.contains(input)) return input;
-            }
-            return null;
-        }
-
-        function slotsLeft() {
-            return Math.max(0, MAX_ATTACHMENTS - getAttachedFilesCount());
-        }
-
-        function setOpen(open) {
-            floater.classList.toggle('ivr-open', open);
-            mini.style.display = open ? 'none' : '';
-        }
+        textarea.insertAdjacentElement('afterend', status);
 
         function showStatus(text, kind, holdMs) {
             clearTimeout(statusTimer);
@@ -182,124 +166,73 @@
             }
         }
 
-        function setBusy(on) {
-            busy = on;
-            floater.classList.toggle('ivr-busy', on);
-            render();
+        function on(target, type, handler, capture) {
+            target.addEventListener(type, handler, capture);
+            cleanups.push(() => target.removeEventListener(type, handler, capture));
         }
 
-        // Single place that decides what every control looks like
-        function render() {
-            const hasInput = !!findAttachmentInput();
-            const slots = slotsLeft();
-            const full = slots === 0;
+        const fullMessage = `עס מעג זיין מאקסימום ${MAX_ATTACHMENTS} עטעטשמענטס. מעקט אויס איינס איידער איר לייגט צו נאך.`;
 
-            mini.classList.toggle('ivr-full', full);
+        // Opens the attachments tab when the uploader isn't there yet, and waits for it
+        async function ensureAttachmentInput() {
+            let input = findAttachmentInput();
+            if (input) return input;
 
-            if (busy) {
-                pickBtn.disabled = true;
-                zipBtn.disabled = true;
-                return;
-            }
+            const tab = document.querySelector('a[data-subpanel="attach-panel"]');
+            if (tab) tab.click();
 
-            if (full) {
-                pickBtn.textContent = `Max ${MAX_ATTACHMENTS} Attachments Reached`;
-            } else if (!hasInput) {
-                pickBtn.textContent = 'Open Attachments Tab';
-            } else {
-                pickBtn.textContent = slots === MAX_ATTACHMENTS
-                    ? `📸 Select Images (Max ${MAX_ATTACHMENTS})`
-                    : `📸 Select Images (${slots} of ${MAX_ATTACHMENTS} left)`;
-            }
-
-            const ready = hasInput && !full;
-            pickBtn.disabled = !ready;
-            zipBtn.disabled = !ready;
+            const until = Date.now() + INPUT_WAIT_MS;
+            while (!(input = findAttachmentInput()) && Date.now() < until) await delay(100);
+            if (!input) throw new Error('קען נישט געפינען וואו מען לייגט צו עטעטשמענטס.');
+            return input;
         }
 
-        function scheduleRender() {
-            clearTimeout(renderTimer);
-            renderTimer = setTimeout(render, 150);
-        }
-
-        // The attachments tab and its rows are built by the page on demand, so watch
-        // for changes instead of polling. Our own widget's changes are ignored.
-        const observer = new MutationObserver((mutations) => {
-            if (mutations.every(m => floater.contains(m.target) || m.target === mini)) return;
-            scheduleRender();
-        });
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true,
-            attributes: true,
-            attributeFilter: ['class', 'disabled']
-        });
-
-        // --- Open / close ---
-        mini.addEventListener('click', () => {
-            if (slotsLeft() === 0) return;
-            setOpen(true);
-            render();
-        });
-        closeBtn.addEventListener('click', () => setOpen(false));
-
-        const onKeyDown = (e) => {
-            if (e.key === 'Escape' && floater.classList.contains('ivr-open') && !busy) setOpen(false);
-        };
-        document.addEventListener('keydown', onKeyDown);
-        cleanups.push(() => document.removeEventListener('keydown', onKeyDown));
-
-        pickBtn.addEventListener('click', () => {
-            if (pickBtn.disabled) return;
-            imageInput.value = '';
-            imageInput.click();
-        });
-
-        zipBtn.addEventListener('click', () => {
-            if (zipBtn.disabled) return;
-            folderInput.value = '';
-            folderInput.click();
-        });
-
-        function minimizeSoon() {
-            setTimeout(() => {
-                if (!busy) setOpen(false);
-            }, HOLD_STATUS_MS);
-        }
-
-        function attach(files) {
-            const input = findAttachmentInput();
-            if (!input) throw new Error('No attachment input found on the page.');
+        // Hand files to the forum's uploader as if the user had picked them there
+        function attach(files, input) {
             const dt = new DataTransfer();
             files.forEach(f => dt.items.add(f));
             input.files = dt.files;
-            input.dispatchEvent(new Event('change', { bubbles: true }));
+            passThrough = true;
+            try {
+                input.dispatchEvent(new Event('change', { bubbles: true }));
+            } finally {
+                passThrough = false;
+            }
         }
 
-        // --- Images ---
-        async function handleFiles(fileList) {
-            if (busy) return;
-            if (!findAttachmentInput()) {
-                showStatus('Open the Attachments tab first.', 'warn', 4000);
-                return;
+        // Shrinks whatever needs it and attaches everything. Files that aren't images are
+        // passed on untouched - the forum decides about those. Returns a Map from each
+        // original file to what was attached for it (missing = skipped or unreadable).
+        async function processAndAttach(fileList) {
+            const result = new Map();
+            if (busy) {
+                showStatus('⏳ ווארט ביז די פריערדיגע בילדער זענען גרייט…', 'warn', HOLD_STATUS_MS);
+                return result;
             }
 
+            let files = Array.from(fileList);
             const slots = slotsLeft();
             if (slots === 0) {
-                showStatus(`Maximum of ${MAX_ATTACHMENTS} attachments reached. Delete one before adding more.`, 'error', 5000);
-                return;
+                showStatus(fullMessage, 'error', HOLD_STATUS_MS * 2);
+                return result;
             }
 
-            const dropped = Array.from(fileList);
-            let files = dropped.filter(isImageFile);
-            if (files.length === 0) {
-                if (dropped.length) showStatus('Only images are supported here. To attach other files, use Folder → ZIP.', 'warn', 5000);
-                return;
+            // More files than the forum lets us attach - offer to pack them all into one ZIP
+            if (files.length > slots) {
+                const zip = confirm(
+                    `איר האט אויסגעקליבן ${files.length} פיילס, אבער עס איז נאר דא פלאץ פאר ${plural(slots, 'עטעטשמענט', 'עטעטשמענטס')}.\n\n` +
+                    `OK - לייג זיי אלע אריין אין איין ZIP פייל (די בילדער ווערן פארקלענערט אז עס זאל אריינפאסן)\n` +
+                    `Cancel - לייג צו נאר די ערשטע ${slots}`
+                );
+                if (zip) {
+                    await zipAndAttach(files.map(f => ({ path: f.name, file: f })), 'files-' + new Date().toLocaleDateString('sv'));
+                    return result;
+                }
             }
 
             let note = '';
             if (files.length > slots) {
-                note = `Only ${slots} slot(s) left - the first ${slots} image(s) were used. `;
+                note = `עס איז נאר געווען פלאץ פאר ${slots}. `;
                 files = files.slice(0, slots);
             }
 
@@ -307,68 +240,266 @@
             // still, so let the user decide before the animation is destroyed
             const animated = [];
             for (const file of files) {
-                if (needsWork(file, MAX_BYTES) && await isAnimated(file)) animated.push(file);
+                if (isImageFile(file) && needsWork(file, MAX_BYTES) && await isAnimated(file)) animated.push(file);
             }
             if (animated.length) {
                 const ok = confirm(
-                    `${animated.length} animated image(s) are over ${formatSize(MAX_BYTES)} or in a format the forum doesn't accept.\n\n` +
-                    `Shrinking turns them into a still image and the animation is lost.\n\n` +
-                    `Shrink them anyway? (Cancel skips them.)`
+                    `${plural(animated.length, 'באוועגלעכער בילד איז', 'באוועגלעכע בילדער זענען')} צו גרויס, אדער אין א פארמאט וואס דער פארום נעמט נישט.\n\n` +
+                    `פארקלענערן מאכט עס א שטילע בילד, און די באוועגונג גייט פארלוירן.\n\n` +
+                    `פארקלענערן סיי ווי? (Cancel לאזט עס אויס)`
                 );
-                if (!ok) {
-                    files = files.filter(f => !animated.includes(f));
-                    if (files.length === 0) return;
-                }
+                if (!ok) files = files.filter(f => !animated.includes(f));
             }
 
-            setBusy(true);
-            const ready = [];
+            const work = files.filter(f => isImageFile(f) && needsWork(f, MAX_BYTES));
             const failed = [];
             const stillTooBig = [];
+            busy = true;
 
             try {
-                for (let i = 0; i < files.length; i++) {
-                    showStatus(`⏳ Processing ${i + 1}/${files.length}...`);
+                let n = 0;
+                for (const file of files) {
+                    if (!work.includes(file)) {
+                        result.set(file, file);
+                        continue;
+                    }
+                    n++;
+                    showStatus(`⏳ פארקלענערט ${work.length > 1 ? `בילד ${n} פון ${work.length}` : 'דאס בילד'}…`);
                     try {
-                        const prepared = await prepareForUpload(files[i]);
+                        const prepared = await prepareForUpload(file);
                         if (prepared.size > MAX_BYTES) stillTooBig.push(prepared.name);
-                        ready.push(prepared);
+                        result.set(file, prepared);
                     } catch (err) {
-                        console.warn('Image Resizer: could not process ' + files[i].name, err);
-                        failed.push(files[i].name);
+                        console.warn('Image Resizer: could not process ' + file.name, err);
+                        failed.push(file.name);
                     }
                 }
 
-                if (ready.length) attach(ready);
+                if (result.size) attach(Array.from(result.values()), await ensureAttachmentInput());
             } catch (err) {
                 console.error(err);
-                setBusy(false);
-                showStatus('❌ ' + err.message, 'error', 6000);
-                return;
-            }
-
-            setBusy(false);
-
-            if (!ready.length) {
-                showStatus('❌ Could not read: ' + failed.join(', '), 'error', 6000);
-                return;
+                showStatus('❌ ' + err.message, 'error', HOLD_STATUS_MS * 2);
+                result.clear();
+                return result;
+            } finally {
+                busy = false;
             }
 
             const problems = [];
-            if (failed.length) problems.push('skipped (unreadable): ' + failed.join(', '));
-            if (stillTooBig.length) problems.push('still over ' + formatSize(MAX_BYTES) + ': ' + stillTooBig.join(', '));
+            if (failed.length) problems.push('קען נישט עפענען: ' + failed.join(', '));
+            if (stillTooBig.length) problems.push(`נאך אלץ גרעסער פון ${formatSize(MAX_BYTES)}: ` + stillTooBig.join(', '));
 
             if (problems.length) {
-                showStatus(`${note}Attached ${ready.length}, but ${problems.join('; ')}`, 'warn', 8000);
-            } else {
-                showStatus(`✅ ${note}${ready.length} image(s) ready (${ready.map(f => formatSize(f.size)).join(', ')})`, 'ok', HOLD_STATUS_MS);
-                minimizeSoon();
+                showStatus('⚠️ ' + note + problems.join('; '), 'warn', HOLD_STATUS_MS * 3);
+            } else if (work.length) {
+                const shrunk = work.filter(f => result.has(f)).map(f => formatSize(result.get(f).size));
+                showStatus(`✅ ${note}${plural(shrunk.length, 'בילד', 'בילדער')} פארקלענערט (${shrunk.join(', ')})`, 'ok', HOLD_STATUS_MS);
+            } else if (note) {
+                showStatus('⚠️ ' + note, 'warn', HOLD_STATUS_MS);
+            }
+            return result;
+        }
+
+        // --- The forum's own "add file" button ---
+        // Catch the pick before the uploader sees it. Picks that need no work go
+        // straight through untouched.
+        on(document, 'change', (e) => {
+            const input = e.target;
+            if (passThrough || !isAttachmentInput(input)) return;
+            const files = Array.from(input.files || []);
+            const tooMany = files.length > slotsLeft();
+            if (!tooMany && !files.some(f => isImageFile(f) && needsWork(f, MAX_BYTES))) return;
+
+            e.stopImmediatePropagation();
+            processAndAttach(files);
+        }, true);
+
+        // --- Paste, like in Gmail ---
+        // The image is attached, and a placeholder holds its spot in the post until the
+        // upload is done; then the forum's own "place inline" puts it right there.
+        on(document, 'paste', (e) => {
+            if (e.target !== textarea || !e.clipboardData) return;
+            const images = Array.from(e.clipboardData.files || []).filter(isImageFile);
+            if (!images.length) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+            pasteImages(images);
+        }, true);
+
+        async function pasteImages(images) {
+            if (busy) {
+                showStatus('⏳ ווארט ביז די פריערדיגע בילדער זענען גרייט…', 'warn', HOLD_STATUS_MS);
+                return;
+            }
+            if (slotsLeft() === 0) {
+                showStatus(fullMessage, 'error', HOLD_STATUS_MS * 2);
+                return;
+            }
+
+            const pasted = images.map((file, i) => {
+                const named = new File([file], pastedName(file, images.length > 1 ? i : 0), { type: file.type, lastModified: Date.now() });
+                return { file: named, marker: `[⏳ ${named.name}]` };
+            });
+            insertAtCursor(pasted.map(p => p.marker).join('\n'));
+
+            const before = new Set(attachmentRows());
+            const attached = await processAndAttach(pasted.map(p => p.file));
+
+            await Promise.all(pasted.map(async (p) => {
+                const file = attached.get(p.file);
+                if (!file) {
+                    removeMarker(p.marker);
+                    return;
+                }
+                try {
+                    const row = await waitForUpload(file.name, before);
+                    if (!placeInline(row, p.marker)) removeMarker(p.marker);
+                } catch (err) {
+                    removeMarker(p.marker);
+                    showStatus(`❌ ${file.name}: ${err.message}`, 'error', HOLD_STATUS_MS * 2);
+                }
+            }));
+        }
+
+        // Like typing it: replaces the selection and keeps the undo history
+        function insertAtCursor(text) {
+            textarea.focus();
+            if (!document.execCommand('insertText', false, text)) {
+                textarea.setRangeText(text, textarea.selectionStart, textarea.selectionEnd, 'end');
             }
         }
 
-        imageInput.addEventListener('change', () => handleFiles(imageInput.files));
+        // Swaps a stretch of the post for other text, keeping the user's caret and
+        // scroll position where they were
+        function replaceRange(start, end, apply) {
+            const active = document.activeElement;
+            const selStart = textarea.selectionStart;
+            const selEnd = textarea.selectionEnd;
+            const scrollTop = textarea.scrollTop;
+            const lengthBefore = textarea.value.length;
+
+            apply();
+
+            const shift = textarea.value.length - lengthBefore;
+            const moved = pos => pos <= start ? pos : pos >= end ? pos + shift : end + shift;
+            if (active && active !== textarea && active.focus) active.focus();
+            textarea.setSelectionRange(moved(selStart), moved(selEnd));
+            textarea.scrollTop = scrollTop;
+        }
+
+        function removeMarker(marker) {
+            const at = textarea.value.indexOf(marker);
+            if (at === -1) return;
+            replaceRange(at, at + marker.length, () => {
+                textarea.value = textarea.value.slice(0, at) + textarea.value.slice(at + marker.length);
+            });
+        }
+
+        // The forum numbers inline attachments itself (and renumbers them when one is
+        // deleted), so let its own "place inline" button write the BBCode
+        function placeInline(row, marker) {
+            const button = row.querySelector('.file-inline-bbcode');
+            const at = textarea.value.indexOf(marker);
+            if (!button || at === -1) return false;
+
+            replaceRange(at, at + marker.length, () => {
+                textarea.value = textarea.value.slice(0, at) + textarea.value.slice(at + marker.length);
+                textarea.setSelectionRange(at, at);
+                button.click();
+            });
+            return true;
+        }
+
+        // Find the new row for this file and wait for its upload to end
+        async function waitForUpload(name, before) {
+            const started = Date.now();
+            while (Date.now() - started < UPLOAD_WAIT_MS) {
+                const row = attachmentRows().find(r => !before.has(r) &&
+                    (r.querySelector('.file-name') || r).textContent.trim() === name);
+
+                if (!row && Date.now() - started > ROW_WAIT_MS) {
+                    throw new Error('דער פארום האט נישט אנגענומען דעם פייל.');
+                }
+                if (row) {
+                    const fileStatus = row.querySelector('.file-status');
+                    if (fileStatus && fileStatus.classList.contains('file-error')) {
+                        throw new Error(fileStatus.title || 'עס איז נישט ארויפגעגאנגען.');
+                    }
+                    if (row.getAttribute('data-attach-id') || (fileStatus && fileStatus.classList.contains('file-uploaded'))) {
+                        return row;
+                    }
+                }
+                await delay(300);
+            }
+            throw new Error('עס האט צו לאנג גענומען.');
+        }
+
+        // --- Drag and drop ---
+        // Files dropped on the editor or the attachments tab are attached; anywhere else
+        // the drop is swallowed, since the browser would otherwise navigate away from
+        // the post being written.
+        on(document, 'dragover', (e) => { if (hasFiles(e)) e.preventDefault(); });
+
+        on(document, 'drop', (e) => {
+            if (!hasFiles(e)) return;
+            e.preventDefault();
+
+            const target = e.target instanceof Element ? e.target : null;
+            if (!target || !target.closest('#message, #attach-panel')) return;
+            e.stopImmediatePropagation();
+            for (const node of document.querySelectorAll('.drag-n-drop-highlight')) {
+                node.classList.remove('drag-n-drop-highlight');
+            }
+
+            // The item list is only readable inside this handler, so grab the entries now
+            const fsEntries = [];
+            for (const item of e.dataTransfer.items || []) {
+                if (item.kind !== 'file' || !item.webkitGetAsEntry) continue;
+                const entry = item.webkitGetAsEntry();
+                if (entry) fsEntries.push(entry);
+            }
+
+            if (fsEntries.some(en => en.isDirectory)) handleDroppedEntries(fsEntries);
+            else processAndAttach(e.dataTransfer.files);
+        }, true);
 
         // --- Folder -> ZIP ---
+        const folderInput = el('input');
+        folderInput.type = 'file';
+        folderInput.multiple = true;
+        folderInput.setAttribute('webkitdirectory', '');
+        folderInput.hidden = true;
+        document.body.append(folderInput);
+
+        const zipButton = el('input', 'button2 ivr-zip');
+        zipButton.type = 'button';
+        zipButton.value = '🗂️ פאלדער → ZIP';
+        zipButton.title = 'קלייבט אויס א פאלדער, און ער ווערט צוגעלייגט אלס איין ZIP פייל';
+
+        function placeZipButton() {
+            const addFiles = document.getElementById('add_files');
+            if (!addFiles || zipButton.isConnected) return !!addFiles;
+            addFiles.insertAdjacentElement('afterend', zipButton);
+            return true;
+        }
+
+        if (!placeZipButton()) {
+            const observer = new MutationObserver(() => { if (placeZipButton()) observer.disconnect(); });
+            observer.observe(document.body, { childList: true, subtree: true });
+            cleanups.push(() => observer.disconnect());
+        }
+
+        zipButton.addEventListener('click', () => {
+            if (busy) return;
+            if (slotsLeft() === 0) {
+                showStatus(fullMessage, 'error', HOLD_STATUS_MS * 2);
+                return;
+            }
+            folderInput.value = '';
+            folderInput.click();
+        });
+
         function isSkipped(path) {
             const parts = path.toLowerCase().split('/');
             return SKIP_NAMES.includes(parts[parts.length - 1]) || parts.some(p => SKIP_FOLDERS.includes(p));
@@ -393,19 +524,19 @@
             if (busy) return;
             const collected = [];
 
-            setBusy(true);
-            showStatus('⏳ Reading folder...');
+            busy = true;
+            showStatus('⏳ לייענט דעם פאלדער…');
             try {
                 for (const entry of fsEntries) {
                     await readEntryRecursive(entry, '', collected);
                 }
             } catch (err) {
                 console.error(err);
-                setBusy(false);
-                showStatus('❌ Could not read the folder: ' + err.message, 'error', 6000);
+                showStatus('❌ קען נישט לייענען דעם פאלדער: ' + err.message, 'error', HOLD_STATUS_MS * 2);
                 return;
+            } finally {
+                busy = false;
             }
-            setBusy(false);
             showStatus('');
 
             const usable = collected.filter(e => !isSkipped(e.path));
@@ -416,143 +547,64 @@
         async function zipAndAttach(entries, zipBaseName) {
             if (busy) return;
 
-            if (!findAttachmentInput()) {
-                showStatus('Open the Attachments tab first.', 'warn', 4000);
-                return;
-            }
             if (slotsLeft() === 0) {
-                showStatus(`Maximum of ${MAX_ATTACHMENTS} attachments reached. Delete one before adding more.`, 'error', 5000);
+                showStatus(fullMessage, 'error', HOLD_STATUS_MS * 2);
                 return;
             }
             if (!entries.length) {
-                showStatus('That folder is empty - nothing to zip.', 'warn', 4000);
+                showStatus('דער פאלדער איז ליידיג.', 'warn', HOLD_STATUS_MS);
                 return;
             }
 
             const sourceBytes = entries.reduce((sum, e) => sum + e.file.size, 0);
             if (sourceBytes > ZIP_SOURCE_LIMIT) {
-                showStatus(`That folder is ${formatSize(sourceBytes)} - far too big to fit in one attachment.`, 'error', 6000);
+                showStatus(`דער פאלדער איז ${formatSize(sourceBytes)} - פיל צו גרויס פאר איין עטעטשמענט.`, 'error', HOLD_STATUS_MS * 2);
                 return;
             }
 
-            setBusy(true);
-
+            busy = true;
             try {
                 let list = entries;
 
                 // Only touch the images when the archive would not fit as it is
-                if (shrinkChk.checked && sourceBytes > MAX_BYTES) {
-                    list = await shrinkEntriesForZip(list, (n, total) => showStatus(`⏳ Shrinking ${n}/${total}...`));
+                if (sourceBytes > ZIP_MAX_BYTES) {
+                    list = await shrinkEntriesForZip(list, ZIP_MAX_BYTES, (n, total) => showStatus(`⏳ פארקלענערט בילד ${n} פון ${total}…`));
                 }
 
-                const blob = await buildZip(list, (done, total) => showStatus(`🗂️ Zipping ${done}/${total}...`));
+                const blob = await buildZip(list, (done, total) => showStatus(`🗂️ מאכט ZIP ${done}/${total}…`));
 
                 const zipFile = new File([blob], sanitizeName(zipBaseName) + '.zip', {
                     type: 'application/zip',
                     lastModified: Date.now()
                 });
 
-                if (zipFile.size > MAX_BYTES) {
-                    setBusy(false);
+                if (zipFile.size > ZIP_MAX_BYTES) {
                     showStatus('');
                     const ok = confirm(
-                        `The ZIP is ${formatSize(zipFile.size)} (${list.length} files).\n\n` +
-                        `Ivelt usually rejects attachments over ${formatSize(MAX_BYTES)}, so the upload may fail.\n\n` +
-                        `Attach it anyway?`
+                        `דער ZIP איז ${formatSize(zipFile.size)} (${plural(list.length, 'פייל', 'פיילס')}).\n\n` +
+                        `אייוועלט נעמט געווענליך נישט אן ZIP פיילס גרעסער פון ${formatSize(256 * 1024)}, איז עס קען נישט ארויפגיין.\n\n` +
+                        `צולייגן סיי ווי?`
                     );
                     if (!ok) return;
-                    setBusy(true);
                 }
 
-                attach([zipFile]);
-                setBusy(false);
-                showStatus(`✅ ${formatSize(zipFile.size)} ZIP attached`, 'ok', HOLD_STATUS_MS);
-                minimizeSoon();
+                attach([zipFile], await ensureAttachmentInput());
+                showStatus(`✅ ZIP פון ${formatSize(zipFile.size)} צוגעלייגט`, 'ok', HOLD_STATUS_MS);
             } catch (err) {
                 console.error(err);
-                setBusy(false);
-                showStatus('❌ Could not build the ZIP: ' + err.message, 'error', 6000);
+                showStatus('❌ קען נישט מאכן דעם ZIP: ' + err.message, 'error', HOLD_STATUS_MS * 2);
+            } finally {
+                busy = false;
             }
         }
 
-        // --- Drag and drop ---
-        function bindDropZone(zone) {
-            let depth = 0;
-
-            const onOver = (e) => {
-                if (!hasFiles(e)) return;
-                e.preventDefault();
-                e.stopPropagation();
-                e.dataTransfer.dropEffect = (slotsLeft() === 0 || busy) ? 'none' : 'copy';
-                if (slotsLeft() > 0 && !busy) zone.classList.add('ivr-dragover');
-            };
-            const onEnter = (e) => { if (hasFiles(e)) depth++; };
-            const onLeave = (e) => {
-                if (!hasFiles(e)) return;
-                depth = Math.max(0, depth - 1);
-                if (depth === 0) zone.classList.remove('ivr-dragover');
-            };
-            const onDrop = (e) => {
-                if (!hasFiles(e)) return;
-                e.preventDefault();
-                e.stopPropagation();
-                depth = 0;
-                mini.classList.remove('ivr-dragover');
-                floater.classList.remove('ivr-dragover');
-
-                if (busy) return;
-                if (slotsLeft() === 0) {
-                    showStatus(`Maximum of ${MAX_ATTACHMENTS} attachments reached. Delete one before adding more.`, 'error', 5000);
-                    setOpen(true);
-                    return;
-                }
-
-                // The item list is only readable inside this handler, so grab the entries now
-                const fsEntries = [];
-                for (const item of e.dataTransfer.items || []) {
-                    if (item.kind !== 'file' || !item.webkitGetAsEntry) continue;
-                    const entry = item.webkitGetAsEntry();
-                    if (entry) fsEntries.push(entry);
-                }
-
-                if (fsEntries.some(en => en.isDirectory)) {
-                    setOpen(true);
-                    handleDroppedEntries(fsEntries);
-                } else {
-                    handleFiles(e.dataTransfer.files);
-                }
-            };
-
-            zone.addEventListener('dragenter', onEnter);
-            zone.addEventListener('dragover', onOver);
-            zone.addEventListener('dragleave', onLeave);
-            zone.addEventListener('drop', onDrop);
-        }
-
-        bindDropZone(mini);
-        bindDropZone(floater);
-
-        // A file dropped anywhere else would make the browser navigate away from the
-        // post being written, so swallow stray file drops while the widget is active
-        const stopStrayDrop = (e) => { if (hasFiles(e)) e.preventDefault(); };
-        document.addEventListener('dragover', stopStrayDrop);
-        document.addEventListener('drop', stopStrayDrop);
-        cleanups.push(() => {
-            document.removeEventListener('dragover', stopStrayDrop);
-            document.removeEventListener('drop', stopStrayDrop);
-        });
-
-        setOpen(false);
-        render();
-
         return {
             destroy() {
-                observer.disconnect();
                 clearTimeout(statusTimer);
-                clearTimeout(renderTimer);
                 cleanups.forEach(fn => fn());
-                mini.remove();
-                floater.remove();
+                status.remove();
+                zipButton.remove();
+                folderInput.remove();
             }
         };
     }
@@ -739,7 +791,7 @@
     // Inside a ZIP the image format doesn't matter to the forum. The images share
     // whatever room the rest of the archive leaves, so a folder with two photos gets
     // more per photo than a folder with twenty.
-    async function shrinkEntriesForZip(entries, onProgress) {
+    async function shrinkEntriesForZip(entries, maxBytes, onProgress) {
         const images = [];
         let otherBytes = 0;
 
@@ -749,7 +801,7 @@
         }
         if (!images.length) return entries;
 
-        const share = (MAX_BYTES * 0.92 - otherBytes) / images.length;
+        const share = (maxBytes * 0.92 - otherBytes) / images.length;
         const budget = Math.min(ZIP_MAX_IMAGE_BYTES, Math.max(ZIP_MIN_IMAGE_BYTES, share));
 
         const replaced = new Map();
