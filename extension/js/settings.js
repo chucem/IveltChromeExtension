@@ -13,6 +13,7 @@ const preferencesOptions = [
 	'ShowMultiNotifs',
 	'upDownArrowKeys',
 	'imageResizer',
+	'pasteImages',
 	'copyPostLink'
 ];
 

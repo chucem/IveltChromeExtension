@@ -16,6 +16,7 @@ const defualtPreferences = {
   ShowMultiNotifs: true,
   upDownArrowKeys: true,
   imageResizer: true,
+  pasteImages: true,
   copyPostLink: true,
   theme: 'default'
 };
