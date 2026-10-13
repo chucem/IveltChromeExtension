@@ -19,7 +19,7 @@ const defualtPreferences = {
   driveUpload: true,
   driveButtonPlace: 'attachments',
   dropboxUpload: true,
-  driveFolderName: 'Shared on iVelt',
+  driveFolderName: 'iVelt Helper',
   copyPostLink: true
 };
 

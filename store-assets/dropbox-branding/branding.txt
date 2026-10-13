@@ -12,7 +12,7 @@ Icons (white background, from extension/img/icon128.png):
   icon-256.png  256 x 256
 
 Settings tab:
-  App folder name:     Shared on iVelt
+  App folder name:     iVelt Helper
   Redirect URIs:       https://ahidenbhdkloaingggdcijofobjboopi.chromiumapp.org/   (Chrome)
                        https://hnklcnfpeamfiflmpnmjphigmbjoeknc.chromiumapp.org/   (Edge)
   Development users:   enable additional users (not "Only you")
