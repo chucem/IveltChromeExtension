@@ -516,12 +516,15 @@
         // stays: it still applies to every file that isn't an image.
         const resizeHint = el('span', 'ivr-hint', '📷 גרעסערע בילדער ווערן אויטאמאטיש פארקלענערט');
 
-        // The forum's size-limit paragraph ("...ביז: 400 KiB.") is the one right
-        // before its attachment form
+        // The forum's size-limit paragraph ("...ביז: 400 KiB.") is the last one before
+        // the row of attachment buttons. (The basic upload form sits in between until
+        // the forum's uploader starts and removes it, so skip anything that isn't a <p>.)
         function findLimitLine() {
-            const form = document.getElementById('attach-panel-basic');
-            const line = form && form.previousElementSibling;
-            return line && line.tagName === 'P' ? line : null;
+            let node = document.getElementById('attach-panel-multi');
+            while (node && (node = node.previousElementSibling)) {
+                if (node.tagName === 'P') return node;
+            }
+            return null;
         }
 
         function placeZipButton() {
