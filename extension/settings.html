@@ -48,6 +48,30 @@
       <h2>אנשטעלונגען</h2>
 
       <div class='settings-group'>
+        <h3>קאלירן</h3>
+        <div class='theme-grid' id='themePicker'></div>
+
+        <div class='theme-editor hidden' id='themeEditor'>
+          <div class='row'>
+            <label for='themeEditorBase' class='label'>אנהייבן פון</label>
+            <select id='themeEditorBase'>
+              <option value=''>-- קלייבט א טעמע --</option>
+            </select>
+          </div>
+          <div class='row'>
+            <input type='checkbox' id='themeEditorDark' />
+            <label for='themeEditorDark' class='label'>טונקעלע טעמע <span style="font-size: 0.8em;">(מאכט ליכטיגער די קאלירן וואס מענטשן שרייבן אין תגובות)</span></label>
+          </div>
+          <div class='theme-colors' id='themeEditorColors'></div>
+          <div class='theme-share'>
+            <a id='themeCopy'>קאפיר די קאלירן</a> <span style="font-size: 0.8em;">(צו טיילן מיט אנדערע)</span>
+            <textarea id='themePaste' rows='3' placeholder='פעיסט דא קאלירן וואס א צווייטער האט געטיילט'></textarea>
+            <a id='themeImport' class='button'>נוץ די קאלירן</a>
+          </div>
+        </div>
+      </div>
+
+      <div class='settings-group'>
         <h3>שרייבן און ציטירן</h3>
         <div class='row'>
           <input type='checkbox' id='alwaysCopyTopic' class='option' />
@@ -175,6 +199,8 @@
   </div>
   </div>
   <div id="notify"></div>
+  <script src="js/themes.data.js"></script>
+  <script src="js/settingsTheme.js"></script>
   <script src="js/settings.js"></script>
 </div>
   </body>

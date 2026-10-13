@@ -37,3 +37,134 @@
     width: 780px;
     padding: 15px;
   }
+  /* theme picker, the previews get their colors from js/themes.data.js */
+  .theme-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+  .theme-card {
+    position: relative;
+    display: block;
+    padding: 4px;
+    border: 2px solid transparent;
+    border-radius: 9px;
+    cursor: pointer;
+  }
+  .theme-card:hover {
+    border-color: #cfe3f1;
+  }
+  .theme-card:has(input:checked) {
+    border-color: #0A8ED0;
+  }
+  .theme-card input {
+    position: absolute;
+    opacity: 0;
+  }
+  .theme-card input:focus-visible + .theme-preview {
+    outline: 2px solid #0A8ED0;
+  }
+  .theme-preview {
+    display: block;
+    padding: 5px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 6px;
+    background: var(--t-bg);
+  }
+  .theme-preview > span {
+    display: block;
+    border-radius: 3px;
+  }
+  .tp-header {
+    height: 12px;
+    margin-bottom: 4px;
+    background: var(--t-accent);
+  }
+  .tp-row {
+    padding: 5px 6px;
+  }
+  .tp-row1 {
+    background: var(--t-row1);
+  }
+  .tp-row2 {
+    background: var(--t-row2);
+  }
+  .tp-row i {
+    display: block;
+    height: 6px;
+    border-radius: 3px;
+    width: 65%;
+    background: var(--t-link);
+  }
+  .tp-row2 i {
+    width: 45%;
+    background: var(--t-text);
+  }
+  .theme-name {
+    display: block;
+    margin-top: 4px;
+    font-size: 13px;
+    text-align: center;
+  }
+  .theme-card-empty .theme-preview {
+    position: relative;
+    border-style: dashed;
+    background: #fafafa;
+  }
+  .theme-card-empty .theme-preview > span {
+    visibility: hidden;
+  }
+  .theme-card-empty .theme-preview::after {
+    content: '+';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: #999;
+  }
+
+  /* custom theme editor */
+  .theme-editor {
+    margin-top: 16px;
+    padding: 16px;
+    border: 1px solid #e7e7e7;
+    border-radius: 8px;
+  }
+  .theme-editor .row {
+    margin-bottom: 14px;
+  }
+  .theme-colors {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px 12px;
+    margin-bottom: 16px;
+  }
+  .theme-color-field {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .theme-color-field input {
+    width: 30px;
+    height: 24px;
+    padding: 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: none;
+    cursor: pointer;
+  }
+  .theme-share {
+    font-size: 14px;
+  }
+  .theme-share textarea {
+    display: block;
+    width: 100%;
+    margin: 10px 0 8px;
+    font-family: monospace;
+    font-size: 12px;
+    direction: ltr;
+  }

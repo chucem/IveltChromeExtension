@@ -103,6 +103,8 @@ function initSettings() {
 
 		postSettingChange(items);
 
+		initThemePicker(items.theme, items.customTheme);
+
 		startListeners();
 	});
 }
