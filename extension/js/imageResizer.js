@@ -15,12 +15,15 @@
 // which can be switched on and off without a reload:
 //   "imageResizer" - the automatic shrinking, the ZIP offer and Folder -> ZIP
 //   "pasteImages"  - pasting images into the post
+// A third one, "openAttachmentsTab", opens the attachments tab instead of the
+// options tab when the editor loads, so "add file" is right there.
 
 (function () {
     'use strict';
 
     const RESIZE_KEY = 'imageResizer';
     const PASTE_KEY = 'pasteImages';
+    const ATTACH_TAB_KEY = 'openAttachmentsTab';
 
     const MAX_ATTACHMENTS = 3;
     const MAX_BYTES = 399 * 1024;          // the image attachment limit (400 KB), just under it
@@ -57,9 +60,10 @@
     function init() {
         if (!chrome.storage || !chrome.storage.local) return;
 
-        chrome.storage.local.get([RESIZE_KEY, PASTE_KEY], (items) => {
+        chrome.storage.local.get([RESIZE_KEY, PASTE_KEY, ATTACH_TAB_KEY], (items) => {
             enabled.resize = items[RESIZE_KEY] !== false;
             enabled.paste = items[PASTE_KEY] !== false;
+            if (items[ATTACH_TAB_KEY] !== false) openAttachmentsTab();
             apply();
         });
 
@@ -84,6 +88,12 @@
         if (!hooks) return;
         hooks.destroy();
         hooks = null;
+    }
+
+    // Only when the page loads - flipping the setting later shouldn't switch tabs under the user
+    function openAttachmentsTab() {
+        const tab = document.querySelector('a[data-subpanel="attach-panel"]');
+        if (tab && !tab.closest('.activetab')) tab.click();
     }
 
     // ---------------------------------------------------------------------
@@ -238,12 +248,14 @@
                 return result;
             }
 
-            // More files than the forum lets us attach - offer to pack them all into one ZIP
+            // More files than the forum lets us attach - offer to pack them all into one ZIP.
+            // The dialog picks each line's direction from its first letter, so every line
+            // has to start with Yiddish - a line starting with "OK" comes out scrambled.
             if (resize && files.length > slots) {
                 const zip = confirm(
                     `איר האט אויסגעקליבן ${files.length} פיילס, אבער עס איז נאר דא פלאץ פאר ${plural(slots, 'עטעטשמענט', 'עטעטשמענטס')}.\n\n` +
-                    `OK - לייג זיי אלע אריין אין איין ZIP פייל (די בילדער ווערן פארקלענערט אז עס זאל אריינפאסן)\n` +
-                    `Cancel - לייג צו נאר די ערשטע ${slots}`
+                    `• דרוקט OK צו לייגן זיי אלע אריין אין איין ZIP פייל (די בילדער ווערן פארקלענערט אז עס זאל אריינפאסן)\n` +
+                    `• דרוקט Cancel צו צולייגן נאר די ערשטע ${slots}`
                 );
                 if (zip) {
                     await zipAndAttach(files.map(f => ({ path: f.name, file: f })), 'files-' + new Date().toLocaleDateString('sv'));
@@ -495,13 +507,19 @@
 
         const zipButton = el('input', 'button2 ivr-zip');
         zipButton.type = 'button';
-        zipButton.value = '🗂️ פאלדער → ZIP';
+        // The page is right-to-left, so the arrow has to point left to read "folder to ZIP"
+        zipButton.value = '🗂️ פאלדער ← ZIP';
         zipButton.title = 'קלייבט אויס א פאלדער, און ער ווערט צוגעלייגט אלס איין ZIP פייל';
+
+        // Without the old floating button nothing shows that big images are fine to add,
+        // so say so next to the forum's own "add file" button
+        const resizeHint = el('span', 'ivr-hint', '📷 בילדער גרעסער ווי 400 KiB ווערן אויטאמאטיש פארקלענערט');
 
         function placeZipButton() {
             const addFiles = document.getElementById('add_files');
             if (!addFiles || zipButton.isConnected) return !!addFiles;
             addFiles.insertAdjacentElement('afterend', zipButton);
+            zipButton.insertAdjacentElement('afterend', resizeHint);
             return true;
         }
 
@@ -620,15 +638,17 @@
         }
 
         return {
-            // Folder -> ZIP belongs to the resizer, so it only shows while that is on
+            // Folder -> ZIP and the hint belong to the resizer, so they only show while that is on
             refresh() {
                 zipButton.hidden = !enabled.resize;
+                resizeHint.hidden = !enabled.resize;
             },
             destroy() {
                 clearTimeout(statusTimer);
                 cleanups.forEach(fn => fn());
                 status.remove();
                 zipButton.remove();
+                resizeHint.remove();
                 folderInput.remove();
             }
         };

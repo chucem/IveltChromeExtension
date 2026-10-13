@@ -14,6 +14,7 @@ const preferencesOptions = [
 	'upDownArrowKeys',
 	'imageResizer',
 	'pasteImages',
+	'openAttachmentsTab',
 	'copyPostLink'
 ];
 

@@ -17,6 +17,7 @@ const defualtPreferences = {
   upDownArrowKeys: true,
   imageResizer: true,
   pasteImages: true,
+  openAttachmentsTab: true,
   copyPostLink: true
 };
 
