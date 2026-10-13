@@ -63,6 +63,11 @@ function open_settings() {
     window.close();
 }
 
+function open_colors() {
+    chrome.tabs.create({url: chrome.runtime.getURL('settings.html#colors')});
+    window.close();
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('open_home_page').addEventListener('click', open_home_page);
 });
@@ -85,4 +90,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('open_settings').addEventListener('click', open_settings);
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('open_colors').addEventListener('click', open_colors);
 });

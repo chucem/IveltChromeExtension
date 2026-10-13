@@ -44,11 +44,14 @@
   </div>
 
   <div class='content'>
-    <div class='sub-section'>
-      <h2>אנשטעלונגען</h2>
+    <nav class='page-tabs'>
+      <a href='#settings' data-tab='settings'>אנשטעלונגען</a>
+      <a href='#colors' data-tab='colors'>קאלירן</a>
+    </nav>
 
-      <div class='settings-group'>
-        <h3>קאלירן</h3>
+    <div class='tab-panel hidden' id='tab-colors'>
+    <div class='sub-section'>
+      <h2>קאלירן</h2>
         <div class='theme-grid' id='themePicker'></div>
 
         <div class='theme-editor hidden' id='themeEditor'>
@@ -64,12 +67,17 @@
           </div>
           <div class='theme-colors' id='themeEditorColors'></div>
           <div class='theme-share'>
-            <a id='themeCopy'>קאפיר די קאלירן</a> <span style="font-size: 0.8em;">(צו טיילן מיט אנדערע)</span>
+            <a id='themeCopy'>קאפיר די קאלירן</a> <span style="font-size: 0.8em;">(צו טיילן מיט אנדערע, אדער מיט AI 😉)</span>
             <textarea id='themePaste' rows='3' placeholder='פעיסט דא קאלירן וואס א צווייטער האט געטיילט'></textarea>
             <a id='themeImport' class='button'>נוץ די קאלירן</a>
           </div>
         </div>
-      </div>
+    </div>
+    </div>
+
+    <div class='tab-panel' id='tab-settings'>
+    <div class='sub-section'>
+      <h2>אנשטעלונגען</h2>
 
       <div class='settings-group'>
         <h3>שרייבן און ציטירן</h3>
@@ -194,6 +202,8 @@
         </ul>
       </div>
 
+    </div>
+  </div>
     </div>
   </div>
   </div>

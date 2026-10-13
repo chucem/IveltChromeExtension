@@ -168,3 +168,28 @@
     font-size: 12px;
     direction: ltr;
   }
+
+  /* tabs at the top of the settings page */
+  .page-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #e7e7e7;
+  }
+  .page-tabs a {
+    margin-bottom: -2px;
+    padding: 6px 16px;
+    border-bottom: 2px solid transparent;
+    color: #444;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .page-tabs a:hover {
+    color: #0A8ED0;
+    text-decoration: none;
+  }
+  .page-tabs a.active {
+    border-bottom-color: #0A8ED0;
+    color: #0A8ED0;
+    pointer-events: auto;
+  }

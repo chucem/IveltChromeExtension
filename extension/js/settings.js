@@ -109,4 +109,18 @@ function initSettings() {
 	});
 }
 
+// The page has tabs, the hash picks one (settings.html#colors) so it can be linked to
+function showTab(){
+	const tabName = document.getElementById('tab-' + location.hash.slice(1)) ? location.hash.slice(1) : 'settings';
+
+	document.querySelectorAll('.tab-panel').forEach(panel => {
+		panel.classList.toggle('hidden', panel.id !== 'tab-' + tabName);
+	});
+	document.querySelectorAll('.page-tabs a').forEach(link => {
+		link.classList.toggle('active', link.dataset.tab === tabName);
+	});
+}
+
+window.addEventListener('hashchange', showTab);
+document.addEventListener('DOMContentLoaded', showTab);
 document.addEventListener('DOMContentLoaded', initSettings);
