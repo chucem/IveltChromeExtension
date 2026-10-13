@@ -104,6 +104,7 @@ function initSettings() {
 		postSettingChange(items);
 
 		initThemePicker(items.theme, items.customTheme);
+		initThemesToggle(items.themesEnabled);
 
 		startListeners();
 	});
@@ -111,7 +112,8 @@ function initSettings() {
 
 // The page has tabs, the hash picks one (settings.html#colors) so it can be linked to
 function showTab(){
-	const tabName = document.getElementById('tab-' + location.hash.slice(1)) ? location.hash.slice(1) : 'settings';
+	const tabsShown = !document.querySelector('.page-tabs').classList.contains('hidden');
+	const tabName = tabsShown && document.getElementById('tab-' + location.hash.slice(1)) ? location.hash.slice(1) : 'settings';
 
 	document.querySelectorAll('.tab-panel').forEach(panel => {
 		panel.classList.toggle('hidden', panel.id !== 'tab-' + tabName);

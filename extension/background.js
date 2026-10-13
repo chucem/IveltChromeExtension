@@ -17,6 +17,7 @@ const defualtPreferences = {
   upDownArrowKeys: true,
   imageResizer: true,
   copyPostLink: true,
+  themesEnabled: false,
   theme: 'default'
 };
 
