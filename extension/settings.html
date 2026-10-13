@@ -112,10 +112,18 @@
       </div>
 
       <div class='settings-group'>
-        <h3>Google Drive</h3>
+        <h3>Google Drive / Dropbox</h3>
         <div class='row'>
           <input type='checkbox' id='driveUpload' class='option' />
           <label for='driveUpload' class='label'>ווייז א Google Drive קנעפל ביים שרייבן א תגובה, צו ארויפלייגן פיילס און אריינלייגן א פובליק לינק אין דער תגובה</label>
+        </div>
+        <div class='row row-field'>
+          <label for='driveFolderName' class='label'>נאמען פונעם פאלדער אויף Google Drive</label>
+          <input type='text' id='driveFolderName' class='option text-input' dir='auto' placeholder='Shared on iVelt' spellcheck='false' />
+        </div>
+        <div class='row'>
+          <input type='checkbox' id='dropboxUpload' class='option' />
+          <label for='dropboxUpload' class='label'>ווייז אויך Dropbox <span style="font-size: 0.8em;">(די פיילס גייען אין <bdi dir='ltr'>Apps/Shared on iVelt</bdi> אויף אייער Dropbox)</span></label>
         </div>
         <div class='row row-field'>
           <label for='driveButtonPlace' class='label'>וואו צו ווייזן דעם קנעפל</label>
@@ -123,10 +131,6 @@
             <option value="attachments">ביי די אטעטשמענטס</option>
             <option value="toolbar">צווישן די קנעפלעך איבער דער תגובה</option>
           </select>
-        </div>
-        <div class='row row-field'>
-          <label for='driveFolderName' class='label'>נאמען פונעם פאלדער</label>
-          <input type='text' id='driveFolderName' class='option text-input' dir='auto' placeholder='Shared on iVelt' spellcheck='false' />
         </div>
       </div>
 

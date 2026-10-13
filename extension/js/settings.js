@@ -15,6 +15,7 @@ const preferencesOptions = [
 	'imageResizer',
 	'pasteImages',
 	'driveUpload',
+	'dropboxUpload',
 	'driveButtonPlace',
 	'driveFolderName',
 	'openAttachmentsTab',
@@ -53,9 +54,11 @@ function postSettingChange(items){
 		document.getElementById('backgroundSyncNotif').disabled = !items.backgroundSync;
 	}
 
-	if(items.hasOwnProperty('driveUpload')){
-		document.getElementById('driveButtonPlace').disabled = !items.driveUpload;
-		document.getElementById('driveFolderName').disabled = !items.driveUpload;
+	if(items.hasOwnProperty('driveUpload') || items.hasOwnProperty('dropboxUpload')){
+		const drive = document.getElementById('driveUpload').checked;
+		const dropbox = document.getElementById('dropboxUpload').checked;
+		document.getElementById('driveFolderName').disabled = !drive;
+		document.getElementById('driveButtonPlace').disabled = !drive && !dropbox;
 	}
 
 	if(items.hasOwnProperty('debugMode')){

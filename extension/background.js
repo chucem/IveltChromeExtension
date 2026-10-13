@@ -19,6 +19,7 @@ const defualtPreferences = {
   pasteImages: true,
   driveUpload: true,
   driveButtonPlace: 'attachments',
+  dropboxUpload: true,
   driveFolderName: 'Shared on iVelt',
   openAttachmentsTab: true,
   copyPostLink: true,
@@ -183,4 +184,4 @@ function commitDebugLog(name, values){
   })
 }
 
-importScripts('./background.notifications.js', './background.drive.js')
+importScripts('./background.notifications.js', './background.drive.js', './background.dropbox.js')

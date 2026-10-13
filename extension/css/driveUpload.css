@@ -103,6 +103,44 @@
 #ivd-wrap .ivd-popup[hidden],
 #ivd-wrap .ivd-popup [hidden] { display: none !important; }
 
+/* Google Drive | Dropbox switch at the top of the popup */
+#ivd-wrap .ivd-switch {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 10px;
+    padding: 3px;
+    background: #eef2f6;
+    border-radius: 6px;
+}
+
+#ivd-wrap .ivd-switch[hidden] { display: none; }
+
+#ivd-wrap .ivd-switch-tab {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 5px 6px;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: #555;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+#ivd-wrap .ivd-switch-tab svg { width: 14px; height: 14px; flex-shrink: 0; }
+#ivd-wrap .ivd-switch-tab:hover { color: #105289; }
+
+#ivd-wrap .ivd-switch-tab.ivd-active {
+    background: #fff;
+    color: #105289;
+    font-weight: bold;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}
+
 #ivd-wrap .ivd-heading {
     margin-bottom: 8px;
     font-weight: bold;
