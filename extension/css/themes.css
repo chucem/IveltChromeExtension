@@ -184,6 +184,26 @@
 :root[data-ivh-theme] .minitabs .activetab > a,
 :root[data-ivh-theme] .minitabs .activetab > a:hover { background-color: var(--t-panel); border-color: var(--t-border); box-shadow: none; color: var(--t-strong); }
 
+/* User control panel and private messages */
+:root[data-ivh-theme] .cp-main .pm,
+:root[data-ivh-theme] .cp-main .pm-message { background-color: var(--t-row1); border-color: var(--t-border); }
+:root[data-ivh-theme] .cp-mini { background-color: var(--t-panel); }
+:root[data-ivh-theme] a.current { color: var(--t-strong); }
+:root[data-ivh-theme] dl.mini dt { color: var(--t-strong); }
+:root[data-ivh-theme] .panel-container .panel li.header dt,
+:root[data-ivh-theme] .panel-container .panel li.header dd { color: var(--t-strong); }
+:root[data-ivh-theme] .panel-container .panel li.row { border-bottom-color: var(--t-border); border-top-color: var(--t-surface); }
+:root[data-ivh-theme] .panel-container h3,
+:root[data-ivh-theme] .panel-container hr,
+:root[data-ivh-theme] .cp-menu hr,
+:root[data-ivh-theme] ul.cplist { border-color: var(--t-border); }
+:root[data-ivh-theme] #navigation a,
+:root[data-ivh-theme] .navigation a { background: var(--t-row2); color: var(--t-text); }
+:root[data-ivh-theme] #navigation a:hover,
+:root[data-ivh-theme] .navigation a:hover { background: var(--t-accent); color: var(--t-on-accent); }
+:root[data-ivh-theme] #navigation #active-subsection a,
+:root[data-ivh-theme] .navigation .active-subsection a { background: var(--t-surface); color: var(--t-link-hover); }
+
 /* Forum extensions: BBCode toolbar (abbc3) and ad blocks */
 :root[data-ivh-theme] .abbc3_buttons_row { background-color: var(--t-row3); background-image: none; border-color: var(--t-border); }
 :root[data-ivh-theme] #abbc3_buttons select { background-color: var(--t-input-bg); border-color: var(--t-input-border); color: var(--t-strong); }
@@ -205,4 +225,6 @@
 :root[data-ivh-theme] .postbody [style*="color"]:not(.postbody [style*="color"] *) img { filter: var(--t-ink-filter); }
 
 /* This extension's own additions */
+/* the extra post buttons (and the marked quote button) get an inline beige background in addTopicButtons.js */
+:root[data-ivh-theme] .post-buttons .button[style*="background"] { background: var(--t-row3) !important; }
 :root[data-ivh-theme] .sticky-post { background-color: color-mix(in srgb, var(--t-row3) 70%, transparent); border-color: var(--t-border); }
