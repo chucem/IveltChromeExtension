@@ -18,7 +18,7 @@ const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
 
 const DRIVE_API = 'https://www.googleapis.com/drive/v3';
 const DRIVE_FOLDER_MIME = 'application/vnd.google-apps.folder';
-const DRIVE_DEFAULT_FOLDER = 'Shared on iVelt';
+const DRIVE_DEFAULT_FOLDER = 'iVelt Helper';
 const DRIVE_TOKEN_KEY = 'driveToken';     // chrome.storage.session: { token, expiresAt }
 const DRIVE_ACCOUNT_KEY = 'driveAccount'; // chrome.storage.local: { email, name, photo }
 
