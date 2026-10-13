@@ -23,11 +23,18 @@
     const PASTE_KEY = 'pasteImages';
 
     const MAX_ATTACHMENTS = 3;
-    const MAX_BYTES = 390 * 1024;          // the image attachment limit (400 KB) with a little room to spare
+    const MAX_BYTES = 399 * 1024;          // the image attachment limit (400 KB), just under it
     const ZIP_MAX_BYTES = 250 * 1024;      // archives have a lower limit (256 KB)
     const ZIP_SOURCE_LIMIT = 100 * 1024 * 1024; // refuse folders bigger than this - they can never fit anyway
     const ZIP_MIN_IMAGE_BYTES = 20 * 1024;  // never squeeze a single image below this inside a ZIP
     const ZIP_MAX_IMAGE_BYTES = 400 * 1024;
+    // Shrinking keeps as much of the image as fits: the largest of these sizes
+    // (longest side, px) at the best quality that fits under the limit
+    const PNG_SIZES = [2560, 2048, 1800, 1600];
+    const JPEG_SIZES = [2560, 2048, 1800, 1600, 1440, 1280, 1024, 800, 640, 480];
+    const JPEG_TOP_QUALITY = 0.92;
+    const JPEG_GOOD_QUALITY = 0.7;
+    const JPEG_LOWEST_QUALITY = 0.4;
     const HOLD_STATUS_MS = 4000;
     const INPUT_WAIT_MS = 3000;            // how long the forum may take to build its uploader
     const ROW_WAIT_MS = 15 * 1000;         // a file that never shows up in the list was refused
@@ -736,22 +743,22 @@
         return [first, ...steps.filter(s => s < first)];
     }
 
-    // Best JPEG for one canvas size: highest quality that still fits, or null if even
-    // the lowest quality is too big at this size
-    async function jpegAtSize(source, size, maxBytes) {
+    // Best JPEG for one canvas size: the highest quality between minQuality and
+    // JPEG_TOP_QUALITY that still fits. `fits` is false when even minQuality is too big.
+    async function jpegAtSize(source, size, maxBytes, minQuality) {
         const cvs = drawScaled(source, size, true);
         try {
-            let blob = await canvasToBlob(cvs, 'image/jpeg', 0.85);
-            if (!blob) return { blob: null, fits: false };
-            if (blob.size <= maxBytes) return { blob, fits: true };
+            const top = await canvasToBlob(cvs, 'image/jpeg', JPEG_TOP_QUALITY);
+            if (!top) return { blob: null, fits: false };
+            if (top.size <= maxBytes) return { blob: top, fits: true };
 
-            const floor = await canvasToBlob(cvs, 'image/jpeg', 0.5);
-            if (!floor) return { blob, fits: false };
+            const floor = await canvasToBlob(cvs, 'image/jpeg', minQuality);
+            if (!floor) return { blob: top, fits: false };
             if (floor.size > maxBytes) return { blob: floor, fits: false };
 
-            // somewhere between 0.5 and 0.85 - home in on the best quality that fits
-            let best = floor, lo = 0.5, hi = 0.85;
-            for (let i = 0; i < 4; i++) {
+            // somewhere in between - home in on the best quality that fits
+            let best = floor, lo = minQuality, hi = JPEG_TOP_QUALITY;
+            for (let i = 0; i < 5; i++) {
                 const mid = (lo + hi) / 2;
                 const candidate = await canvasToBlob(cvs, 'image/jpeg', mid);
                 if (candidate && candidate.size <= maxBytes) { best = candidate; lo = mid; }
@@ -763,8 +770,10 @@
         }
     }
 
-    // Bring a file under maxBytes, keeping its own format when that is enough.
-    // PNG first stays PNG (transparency survives); otherwise we land on JPG.
+    // Bring a file under maxBytes while keeping as much of it as fits: the largest
+    // size and the highest quality the limit allows, so text in a screenshot stays
+    // readable. A PNG stays PNG when that fits at (close to) full size - transparency
+    // survives; otherwise we land on JPG.
     // If nothing fits, the smallest attempt is returned and the caller can tell by its size.
     async function shrinkImage(file, maxBytes) {
         const decoded = await decodeImage(file);
@@ -773,22 +782,26 @@
             const longest = Math.max(source.width, source.height);
 
             if ((file.type || '').toLowerCase() === 'image/png') {
-                for (const size of sizeLadder(longest, 1600, [1280, 1024, 800])) {
+                for (const size of sizeLadder(longest, longest, PNG_SIZES)) {
                     const cvs = drawScaled(source, size, false);
                     const blob = await canvasToBlob(cvs, 'image/png');
                     freeCanvas(cvs);
                     if (!blob) break;
                     if (blob.size <= maxBytes) return withExtension(blob, file.name, '.png', 'image/png');
                     // a photo saved as PNG will never get close - stop wasting time on it
-                    if (size === Math.min(longest, 1600) && blob.size > maxBytes * 3) break;
+                    if (size === longest && blob.size > maxBytes * 3) break;
                 }
             }
 
+            // First look for the largest size that still fits at a good quality; only
+            // when nothing does (a tiny budget inside a ZIP) accept a lower quality
             let smallest = null;
-            for (const size of sizeLadder(longest, 2000, [1600, 1280, 1024, 800, 640, 480])) {
-                const result = await jpegAtSize(source, size, maxBytes);
-                if (result.blob && (!smallest || result.blob.size < smallest.size)) smallest = result.blob;
-                if (result.fits) return withExtension(result.blob, file.name, '.jpg', 'image/jpeg');
+            for (const minQuality of [JPEG_GOOD_QUALITY, JPEG_LOWEST_QUALITY]) {
+                for (const size of sizeLadder(longest, JPEG_SIZES[0], JPEG_SIZES)) {
+                    const result = await jpegAtSize(source, size, maxBytes, minQuality);
+                    if (result.blob && (!smallest || result.blob.size < smallest.size)) smallest = result.blob;
+                    if (result.fits) return withExtension(result.blob, file.name, '.jpg', 'image/jpeg');
+                }
             }
 
             if (!smallest) throw new Error('Could not re-encode ' + file.name);
