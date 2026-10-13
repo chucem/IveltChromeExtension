@@ -784,7 +784,12 @@
                 }
             } catch (err) {
                 if (err.code === 'not_connected' || err.code === 'account_mismatch') await refreshAccount();
-                showStatus('❌ ' + err.message, 'error', HOLD_STATUS_MS * 3);
+                if (/missing_scope/.test(err.message)) {
+                    // Connected before a permission was added - only a fresh connect picks it up
+                    showStatus(`❌ די ${provider.accountWord} פארבינדונג פעלט א ערלויבעניש. דרוקט "ארויסלאגן" און פארבינדט נאכאמאל.`, 'error', HOLD_STATUS_MS * 4);
+                } else {
+                    showStatus('❌ ' + err.message, 'error', HOLD_STATUS_MS * 3);
+                }
             } finally {
                 setBusy(false);
                 refreshQuota();

@@ -16,6 +16,10 @@
 // https://<extension id>.chromiumapp.org/ for every store the extension ships in.
 const DROPBOX_APP_KEY = 'ftcvnf4s6jhnetx';
 
+// Asked for explicitly, so a connection always carries all of them. Each one must
+// also be ticked on the app's Permissions tab in the Dropbox App Console.
+const DROPBOX_SCOPES = 'account_info.read files.content.write sharing.read sharing.write';
+
 const DROPBOX_API = 'https://api.dropboxapi.com';
 const DROPBOX_AUTH_KEY = 'dropboxAuth';       // chrome.storage.local: { refreshToken }
 const DROPBOX_TOKEN_KEY = 'dropboxToken';     // chrome.storage.session: { token, expiresAt }
@@ -69,6 +73,7 @@ async function dropboxConnect(switchAccount) {
     code_challenge: challenge,
     code_challenge_method: 'S256',
     token_access_type: 'offline',
+    scope: DROPBOX_SCOPES,
     force_reapprove: 'true'
   });
   if (switchAccount) params.set('force_reauthentication', 'true');
