@@ -1,0 +1,21 @@
+Dropbox App Console - Branding tab for "iVelt Helper"
+
+App name:      iVelt Helper
+Publisher:     chucem
+Description:   Upload files from the iVelt forum post editor to your own Dropbox and insert a share link into the post.
+App website:   https://chucem.github.io/
+Privacy policy: https://chucem.github.io/privacy.html
+
+Icons (white background, from extension/img/icon128.png):
+  icon-64.png    64 x 64
+  icon-128.png  128 x 128
+  icon-256.png  256 x 256
+
+Settings tab:
+  App folder name:     Shared on iVelt
+  Redirect URIs:       https://ahidenbhdkloaingggdcijofobjboopi.chromiumapp.org/   (Chrome)
+                       https://hnklcnfpeamfiflmpnmjphigmbjoeknc.chromiumapp.org/   (Edge)
+  Development users:   enable additional users (not "Only you")
+
+Permissions tab (then click Submit):
+  account_info.read, files.content.write, sharing.read, sharing.write
