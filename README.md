@@ -41,7 +41,7 @@ Extra buttons next to the regular quote button on every post:
 ### Writing posts
 * Warning before leaving a page with an unsent post.
 * **Image Resizer** on the post editor: shrinks images to fit under the attachment size limit, and packs a whole folder into a single ZIP attachment.
-* **Google Drive upload** (Chrome only): uploads files to a folder in your own Google Drive, makes them viewable by anyone with the link, and inserts the link into the post.
+* **Google Drive upload**: shows which Google account it will use, then uploads files to a folder in your own Google Drive, makes them viewable by anyone with the link, and inserts the link into the post.
 
 ### Other
 * Google search within the current topic, or across the whole site.
