@@ -141,8 +141,23 @@
         });
     }
 
-    function httpError(status, what) {
-        const error = new Error(`${what} failed (${status})`);
+    // The service's own explanation, e.g. Dropbox's "path/malformed_path/" or
+    // Google's "File not found", so a failure says more than just a number
+    function errorDetail(text) {
+        if (!text) return '';
+        try {
+            const body = JSON.parse(text);
+            const detail = body.error_summary || (body.error && (body.error.message || body.error_description)) || body.error;
+            if (typeof detail === 'string') return detail;
+        } catch (err) {
+            // not JSON - use the text as it is
+        }
+        return String(text).slice(0, 200);
+    }
+
+    function httpError(status, what, text) {
+        const detail = errorDetail(text);
+        const error = new Error(`${what} failed (${status})` + (detail ? ': ' + detail : ''));
         error.status = status;
         return error;
     }
@@ -159,7 +174,7 @@
             },
             body: JSON.stringify({ name: file.name, parents: [folderId] })
         });
-        if (!start.ok) throw httpError(start.status, 'Upload');
+        if (!start.ok) throw httpError(start.status, 'Upload', await start.text().catch(() => ''));
 
         const sessionUrl = start.headers.get('Location');
         if (!sessionUrl) throw new Error('Google Drive did not return an upload address');
@@ -172,7 +187,7 @@
             };
             xhr.onload = () => {
                 if (xhr.status >= 200 && xhr.status < 300) resolve(JSON.parse(xhr.responseText));
-                else reject(httpError(xhr.status, 'Upload'));
+                else reject(httpError(xhr.status, 'Upload', xhr.responseText));
             };
             xhr.onerror = () => reject(new Error('Network error while uploading'));
             xhr.send(file);
@@ -185,7 +200,7 @@
             headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
             body: JSON.stringify({ role: 'reader', type: 'anyone' })
         });
-        if (!response.ok) throw httpError(response.status, 'Sharing');
+        if (!response.ok) throw httpError(response.status, 'Sharing', await response.text().catch(() => ''));
     }
 
     // Dropbox-API-Arg is an HTTP header, so anything outside ASCII (e.g. a Yiddish
@@ -208,7 +223,7 @@
             };
             xhr.onload = () => {
                 if (xhr.status >= 200 && xhr.status < 300) resolve(xhr.responseText ? JSON.parse(xhr.responseText) : null);
-                else reject(httpError(xhr.status, 'Upload'));
+                else reject(httpError(xhr.status, 'Upload', xhr.responseText));
             };
             xhr.onerror = () => reject(new Error('Network error while uploading'));
             xhr.send(body);
@@ -254,11 +269,13 @@
         if (created.ok) {
             link = await created.json();
         } else {
-            const answer = await created.json().catch(() => null);
+            const text = await created.text().catch(() => '');
+            let answer = null;
+            try { answer = JSON.parse(text); } catch (err) { /* plain-text error */ }
             const tag = answer && answer.error && answer.error['.tag'];
-            if (tag !== 'shared_link_already_exists') throw httpError(created.status, 'Sharing');
+            if (tag !== 'shared_link_already_exists') throw httpError(created.status, 'Sharing', text);
             const listed = await call('list_shared_links', { path, direct_only: true });
-            if (!listed.ok) throw httpError(listed.status, 'Sharing');
+            if (!listed.ok) throw httpError(listed.status, 'Sharing', await listed.text().catch(() => ''));
             link = ((await listed.json()).links || [])[0];
             if (!link) throw httpError(409, 'Sharing');
         }
