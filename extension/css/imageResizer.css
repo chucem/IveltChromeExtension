@@ -21,3 +21,12 @@
 
 /* "Folder -> ZIP" next to the forum's own "add file" button */
 input.ivr-zip { margin-inline-start: 6px; }
+
+/* Next to it: tells the user that big images are fine to add */
+.ivr-hint {
+    margin-inline-start: 10px;
+    color: #546E7A;
+    font-size: 11px;
+}
+
+.ivr-hint[hidden] { display: none; }

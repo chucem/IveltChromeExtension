@@ -501,10 +501,15 @@
         zipButton.value = '🗂️ פאלדער ← ZIP';
         zipButton.title = 'קלייבט אויס א פאלדער, און ער ווערט צוגעלייגט אלס איין ZIP פייל';
 
+        // Without the old floating button nothing shows that big images are fine to add,
+        // so say so next to the forum's own "add file" button
+        const resizeHint = el('span', 'ivr-hint', '📷 בילדער גרעסער ווי 400 KiB ווערן אויטאמאטיש פארקלענערט');
+
         function placeZipButton() {
             const addFiles = document.getElementById('add_files');
             if (!addFiles || zipButton.isConnected) return !!addFiles;
             addFiles.insertAdjacentElement('afterend', zipButton);
+            zipButton.insertAdjacentElement('afterend', resizeHint);
             return true;
         }
 
@@ -623,15 +628,17 @@
         }
 
         return {
-            // Folder -> ZIP belongs to the resizer, so it only shows while that is on
+            // Folder -> ZIP and the hint belong to the resizer, so they only show while that is on
             refresh() {
                 zipButton.hidden = !enabled.resize;
+                resizeHint.hidden = !enabled.resize;
             },
             destroy() {
                 clearTimeout(statusTimer);
                 cleanups.forEach(fn => fn());
                 status.remove();
                 zipButton.remove();
+                resizeHint.remove();
                 folderInput.remove();
             }
         };
