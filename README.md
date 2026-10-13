@@ -43,6 +43,7 @@ Extra buttons next to the regular quote button on every post:
 * **Image Resizer** on the post editor: images that are too big for an attachment are shrunk automatically, whether they are picked, dropped or pasted.
 * **Paste images** straight into a post (like in Gmail): the image is attached and placed inline where you pasted it. This is a separate setting, so pasting can be on with the resizer off.
 * Pack a whole folder into a single ZIP attachment (drop it on the editor, or use the **Folder → ZIP** button).
+* The editor opens on the **Attachments** tab instead of **Options**, so adding a file is one click (can be turned off).
 
 ### Other
 * Google search within the current topic, or across the whole site.

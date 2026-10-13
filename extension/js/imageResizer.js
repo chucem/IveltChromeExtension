@@ -15,12 +15,15 @@
 // which can be switched on and off without a reload:
 //   "imageResizer" - the automatic shrinking, the ZIP offer and Folder -> ZIP
 //   "pasteImages"  - pasting images into the post
+// A third one, "openAttachmentsTab", opens the attachments tab instead of the
+// options tab when the editor loads, so "add file" is right there.
 
 (function () {
     'use strict';
 
     const RESIZE_KEY = 'imageResizer';
     const PASTE_KEY = 'pasteImages';
+    const ATTACH_TAB_KEY = 'openAttachmentsTab';
 
     const MAX_ATTACHMENTS = 3;
     const MAX_BYTES = 399 * 1024;          // the image attachment limit (400 KB), just under it
@@ -57,9 +60,10 @@
     function init() {
         if (!chrome.storage || !chrome.storage.local) return;
 
-        chrome.storage.local.get([RESIZE_KEY, PASTE_KEY], (items) => {
+        chrome.storage.local.get([RESIZE_KEY, PASTE_KEY, ATTACH_TAB_KEY], (items) => {
             enabled.resize = items[RESIZE_KEY] !== false;
             enabled.paste = items[PASTE_KEY] !== false;
+            if (items[ATTACH_TAB_KEY] !== false) openAttachmentsTab();
             apply();
         });
 
@@ -84,6 +88,12 @@
         if (!hooks) return;
         hooks.destroy();
         hooks = null;
+    }
+
+    // Only when the page loads - flipping the setting later shouldn't switch tabs under the user
+    function openAttachmentsTab() {
+        const tab = document.querySelector('a[data-subpanel="attach-panel"]');
+        if (tab && !tab.closest('.activetab')) tab.click();
     }
 
     // ---------------------------------------------------------------------
