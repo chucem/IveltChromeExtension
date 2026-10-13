@@ -176,6 +176,10 @@
     margin-bottom: 25px;
     border-bottom: 2px solid #e7e7e7;
   }
+  /* hidden while themes are turned off, .hidden alone loses to display: flex above */
+  .page-tabs.hidden {
+    display: none;
+  }
   .page-tabs a {
     margin-bottom: -2px;
     padding: 6px 16px;
