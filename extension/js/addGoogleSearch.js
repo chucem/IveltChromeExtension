@@ -1,8 +1,13 @@
 function addGoogleSearch(){
     if (window.location.href.includes("viewtopic.php")) {
-        let topicTitle = document.querySelectorAll('.topic-title > a')[0].text;
+        // Not every page has these (e.g. Cloudflare's "checking your browser" page)
+        let titleLink = document.querySelector('.topic-title > a');
+        let topicSearch = document.getElementById('search_keywords');
+        if (!titleLink || !topicSearch) return;
+
+        let topicTitle = titleLink.text;
         let searchUrl = `https://www.google.com/search?q=intitle%3A"${topicTitle}"+site%3Awww.ivelt.com+`
-        document.getElementById('search_keywords').insertAdjacentHTML('beforebegin', 
+        topicSearch.insertAdjacentHTML('beforebegin', 
             '<input class="inputbox search tiny" style="border-width:1px;border-radius:4px" type="search" id="g_search_keywords" size="20" placeholder="גוגל זוך אין דעם אשכול…">'
         ) 
 
@@ -19,8 +24,12 @@ function addGoogleSearch(){
 addGoogleSearch();
 
 function addGoogleSiteSearch(){
+    // Missing on pages without the forum's search box (e.g. Cloudflare's check page)
+    let siteSearch = document.getElementById('search');
+    if (!siteSearch) return;
+
     let searchUrl = `https://www.google.com/search?q=site%3Awww.ivelt.com+`
-        document.getElementById('search').insertAdjacentHTML('beforebegin', 
+        siteSearch.insertAdjacentHTML('beforebegin', 
             '<input id="g_site_search_keywords" type="search" class="inputbox search" style="border-radius:4px;margin-bottom: 5px;" placeholder="גוגל זוך אין אייוועלט">'
         ) 
 
