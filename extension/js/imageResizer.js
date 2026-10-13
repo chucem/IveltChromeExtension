@@ -11,13 +11,16 @@
 // "add file" button, is packed into a single ZIP attachment. Everything runs locally
 // in the browser - no file ever leaves the page except through the forum's own upload.
 //
-// Runs as a content script (isolated world) and is controlled by the
-// "imageResizer" setting, which can be switched on and off without a reload.
+// Runs as a content script (isolated world) and is controlled by two settings,
+// which can be switched on and off without a reload:
+//   "imageResizer" - the automatic shrinking, the ZIP offer and Folder -> ZIP
+//   "pasteImages"  - pasting images into the post
 
 (function () {
     'use strict';
 
-    const SETTING_KEY = 'imageResizer';
+    const RESIZE_KEY = 'imageResizer';
+    const PASTE_KEY = 'pasteImages';
 
     const MAX_ATTACHMENTS = 3;
     const MAX_BYTES = 390 * 1024;          // the image attachment limit (400 KB) with a little room to spare
@@ -38,28 +41,36 @@
     const SKIP_FOLDERS = ['__macosx'];
 
     let hooks = null;
+    const enabled = { resize: false, paste: false };
 
     // ---------------------------------------------------------------------
-    // Setting handling: on unless the user explicitly turned it off
+    // Setting handling: each part is on unless the user explicitly turned it off
     // ---------------------------------------------------------------------
 
     function init() {
         if (!chrome.storage || !chrome.storage.local) return;
 
-        chrome.storage.local.get([SETTING_KEY], (items) => {
-            if (items[SETTING_KEY] !== false) mount();
+        chrome.storage.local.get([RESIZE_KEY, PASTE_KEY], (items) => {
+            enabled.resize = items[RESIZE_KEY] !== false;
+            enabled.paste = items[PASTE_KEY] !== false;
+            apply();
         });
 
         chrome.storage.onChanged.addListener((changes, area) => {
-            if (area !== 'local' || !changes[SETTING_KEY]) return;
-            if (changes[SETTING_KEY].newValue === false) unmount();
-            else mount();
+            if (area !== 'local' || (!changes[RESIZE_KEY] && !changes[PASTE_KEY])) return;
+            if (changes[RESIZE_KEY]) enabled.resize = changes[RESIZE_KEY].newValue !== false;
+            if (changes[PASTE_KEY]) enabled.paste = changes[PASTE_KEY].newValue !== false;
+            apply();
         });
     }
 
-    function mount() {
-        if (hooks || !getTextarea()) return;
-        hooks = createHooks();
+    function apply() {
+        if (!enabled.resize && !enabled.paste) {
+            unmount();
+            return;
+        }
+        if (!hooks && getTextarea()) hooks = createHooks();
+        if (hooks) hooks.refresh();
     }
 
     function unmount() {
@@ -201,9 +212,12 @@
         }
 
         // Shrinks whatever needs it and attaches everything. Files that aren't images are
-        // passed on untouched - the forum decides about those. Returns a Map from each
-        // original file to what was attached for it (missing = skipped or unreadable).
+        // passed on untouched - the forum decides about those. With the resizer turned
+        // off (only pasting is on) nothing is shrunk or zipped, just attached.
+        // Returns a Map from each original file to what was attached for it
+        // (missing = skipped or unreadable).
         async function processAndAttach(fileList) {
+            const resize = enabled.resize;
             const result = new Map();
             if (busy) {
                 showStatus('⏳ ווארט ביז די פריערדיגע בילדער זענען גרייט…', 'warn', HOLD_STATUS_MS);
@@ -218,7 +232,7 @@
             }
 
             // More files than the forum lets us attach - offer to pack them all into one ZIP
-            if (files.length > slots) {
+            if (resize && files.length > slots) {
                 const zip = confirm(
                     `איר האט אויסגעקליבן ${files.length} פיילס, אבער עס איז נאר דא פלאץ פאר ${plural(slots, 'עטעטשמענט', 'עטעטשמענטס')}.\n\n` +
                     `OK - לייג זיי אלע אריין אין איין ZIP פייל (די בילדער ווערן פארקלענערט אז עס זאל אריינפאסן)\n` +
@@ -239,7 +253,7 @@
             // An oversized animated image can only be shrunk by flattening it to a
             // still, so let the user decide before the animation is destroyed
             const animated = [];
-            for (const file of files) {
+            for (const file of resize ? files : []) {
                 if (isImageFile(file) && needsWork(file, MAX_BYTES) && await isAnimated(file)) animated.push(file);
             }
             if (animated.length) {
@@ -251,7 +265,7 @@
                 if (!ok) files = files.filter(f => !animated.includes(f));
             }
 
-            const work = files.filter(f => isImageFile(f) && needsWork(f, MAX_BYTES));
+            const work = resize ? files.filter(f => isImageFile(f) && needsWork(f, MAX_BYTES)) : [];
             const failed = [];
             const stillTooBig = [];
             busy = true;
@@ -305,7 +319,7 @@
         // straight through untouched.
         on(document, 'change', (e) => {
             const input = e.target;
-            if (passThrough || !isAttachmentInput(input)) return;
+            if (passThrough || !enabled.resize || !isAttachmentInput(input)) return;
             const files = Array.from(input.files || []);
             const tooMany = files.length > slotsLeft();
             if (!tooMany && !files.some(f => isImageFile(f) && needsWork(f, MAX_BYTES))) return;
@@ -318,7 +332,7 @@
         // The image is attached, and a placeholder holds its spot in the post until the
         // upload is done; then the forum's own "place inline" puts it right there.
         on(document, 'paste', (e) => {
-            if (e.target !== textarea || !e.clipboardData) return;
+            if (!enabled.paste || e.target !== textarea || !e.clipboardData) return;
             const images = Array.from(e.clipboardData.files || []).filter(isImageFile);
             if (!images.length) return;
 
@@ -439,10 +453,10 @@
         // Files dropped on the editor or the attachments tab are attached; anywhere else
         // the drop is swallowed, since the browser would otherwise navigate away from
         // the post being written.
-        on(document, 'dragover', (e) => { if (hasFiles(e)) e.preventDefault(); });
+        on(document, 'dragover', (e) => { if (enabled.resize && hasFiles(e)) e.preventDefault(); });
 
         on(document, 'drop', (e) => {
-            if (!hasFiles(e)) return;
+            if (!enabled.resize || !hasFiles(e)) return;
             e.preventDefault();
 
             const target = e.target instanceof Element ? e.target : null;
@@ -599,6 +613,10 @@
         }
 
         return {
+            // Folder -> ZIP belongs to the resizer, so it only shows while that is on
+            refresh() {
+                zipButton.hidden = !enabled.resize;
+            },
             destroy() {
                 clearTimeout(statusTimer);
                 cleanups.forEach(fn => fn());

@@ -41,7 +41,7 @@ Extra buttons next to the regular quote button on every post:
 ### Writing posts
 * Warning before leaving a page with an unsent post.
 * **Image Resizer** on the post editor: images that are too big for an attachment are shrunk automatically, whether they are picked, dropped or pasted.
-* Paste an image straight into a post (like in Gmail): it is attached and placed inline where you pasted it.
+* **Paste images** straight into a post (like in Gmail): the image is attached and placed inline where you pasted it. This is a separate setting, so pasting can be on with the resizer off.
 * Pack a whole folder into a single ZIP attachment (drop it on the editor, or use the **Folder → ZIP** button).
 
 ### Other
