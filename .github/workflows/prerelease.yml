@@ -4,6 +4,10 @@
 # release marked "Pre-release", so it never shows as the latest release.
 # If that pre-release already exists, it does nothing - bump version_name for a new one.
 #
+# The notes start with a summary written by AI (Google Gemini, free tier) from the
+# commits since the previous release, when the GEMINI_API_KEY secret is set - see
+# .github/scripts/ai-release-notes.sh. Without it the release gets the usual notes.
+#
 # Unlike release.yml, the zip keeps the manifest "key", so a copy installed from this
 # zip gets the same extension ID as the store version. Google and Dropbox sign-in
 # only accept that ID (their redirect URIs are tied to it).
@@ -35,6 +39,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 0 # full history and tags, so the AI notes can see what changed since the last release
 
       - name: Read version
         id: version
@@ -62,10 +67,17 @@ jobs:
           cd extension
           zip -r -X "../${{ steps.version.outputs.zip }}" . -x '_metadata/*'
 
+      - name: Write release notes with AI
+        if: steps.version.outputs.skip == 'false' && steps.version.outputs.exists == 'false'
+        continue-on-error: true # never let this block the release
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: bash .github/scripts/ai-release-notes.sh test
+
       - name: Create GitHub pre-release
         if: steps.version.outputs.skip == 'false' && steps.version.outputs.exists == 'false'
         run: |
-          cat > notes.md <<'EOF'
+          cat > install.md <<'EOF'
           **Test version** - for trying out new features before they go to the Chrome Web Store.
 
           ### How to install
@@ -78,6 +90,12 @@ jobs:
 
           ---
           EOF
+          # The AI summary (if there is one) goes first, then the install steps
+          if [ -s ai-notes.md ]; then
+            { cat ai-notes.md; printf '\n---\n\n'; cat install.md; } > notes.md
+          else
+            cp install.md notes.md
+          fi
           gh release create "${{ steps.version.outputs.tag }}" "${{ steps.version.outputs.zip }}" \
             --prerelease \
             --target "$GITHUB_SHA" \
