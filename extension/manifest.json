@@ -26,8 +26,7 @@
       "js": [
         "js/settingsHandler.js",
         "js/contentScript.js",
-        "js/refreshNotificationCount.js",
-        "js/netfreeLinks.js"
+        "js/refreshNotificationCount.js"
       ]
     },
     {
