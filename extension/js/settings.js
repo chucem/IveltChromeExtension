@@ -17,7 +17,8 @@ const preferencesOptions = [
 	'dropboxUpload',
 	'driveButtonPlace',
 	'driveFolderName',
-	'copyPostLink'
+	'copyPostLink',
+	'netfreeLinks'
 ];
 
 // Listen to settings changes
