@@ -18,14 +18,46 @@ kind="${1:-release}"
 out=ai-notes.md
 rm -f "$out"
 
+# Adds lines to the run's Summary page (Actions -> the run -> Summary)
+summary() {
+  if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then printf '%s\n' "$@" >> "$GITHUB_STEP_SUMMARY"; fi
+}
+
+# Shows the problem as a red error in the run, and on its Summary page
+fail() {
+  echo "::error title=AI release notes::$1"
+  summary "" "**❌ $1**"
+  exit 1
+}
+
+# What an HTTP answer from Gemini means, in plain words, and what to do about it
+explain() {
+  local code="$1" msg="$2"
+  case "$code" in
+    000) echo "Couldn't reach Google (network problem on GitHub's side). Re-run the job." ;;
+    400) if grep -qi 'api key' <<<"$msg"; then
+           echo "The GEMINI_API_KEY secret is not a valid key. Create a new key and update the secret (Settings -> Secrets and variables -> Actions)."
+         else
+           echo "Google rejected the request."
+         fi ;;
+    401|403) echo "The key isn't allowed to use Gemini. In the key's Google Cloud project, enable \"Gemini API\", and make sure the key's API restrictions include it." ;;
+    404) echo "The model \"$model\" doesn't exist (any more). Update the model names in .github/scripts/ai-release-notes.sh." ;;
+    429) echo "The Gemini free limit is used up for now. Re-run the job later (limits reset every minute and every day)." ;;
+    500|502|503|504) echo "Gemini is busy or down. Re-run the job later." ;;
+    200) echo "Gemini answered, but without notes." ;;
+    *) echo "Unexpected answer from Google (HTTP $code)." ;;
+  esac
+}
+
 if [ "${SKIP_AI_NOTES:-}" = "true" ]; then
   echo "::notice::Skipping the AI release notes (SKIP_AI_NOTES)"
   exit 0
 fi
 
+summary "### AI release notes" ""
+
 if [ -z "${GEMINI_API_KEY:-}" ]; then
-  echo "::error::No GEMINI_API_KEY secret. Add it in Settings -> Secrets and variables -> Actions, or skip the AI notes (Run workflow -> \"Skip AI release notes\", or the SKIP_AI_NOTES=true repository variable)."
-  exit 1
+  fail "No GEMINI_API_KEY secret. Add it in Settings -> Secrets and variables -> Actions, or skip the AI notes (Run workflow -> \"Skip AI release notes\", or the SKIP_AI_NOTES=true repository variable)."
 fi
 
 # A real release covers everything since the previous real release (skipping test
@@ -73,30 +105,54 @@ EOF
 body=$(jq -n --arg p "$prompt" '{contents: [{parts: [{text: $p}]}], generationConfig: {temperature: 0.3}}')
 
 # Gemini's free tier is sometimes "experiencing high demand": wait and retry, then
-# fall back to the lighter model
+# fall back to the lighter model. A wrong key or a missing permission won't fix itself,
+# so those stop right away.
 models="${GEMINI_MODEL:-gemini-flash-latest gemini-flash-lite-latest}"
+answer=$(mktemp)
 text=""
+last_problem=""
+last_detail=""
+summary "| Model | Try | HTTP | Result |" "|---|---|---|---|"
+
 for model in $models; do
   for attempt in 1 2 3; do
-    resp=$(curl -sS --max-time 120 \
+    code=$(curl -sS --max-time 120 -o "$answer" -w '%{http_code}' \
         -H "x-goog-api-key: $GEMINI_API_KEY" \
         -H 'Content-Type: application/json' \
         -d "$body" \
-        "https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent" 2>&1) || true
-    text=$(jq -r '.candidates[0].content.parts[0].text // empty' <<<"$resp" 2>/dev/null)
-    if [ -n "$text" ]; then
-      echo "Notes written by $model (attempt $attempt)"
+        "https://generativelanguage.googleapis.com/v1beta/models/$model:generateContent" 2>"$answer.err") || code=000
+    text=$(jq -r '.candidates[0].content.parts[0].text // empty' "$answer" 2>/dev/null)
+    if [ "$code" = "200" ] && [ -n "$text" ]; then
+      echo "Notes written by $model (try $attempt)"
+      summary "| $model | $attempt | $code | ✅ notes written |"
       break 2
     fi
-    reason=$(jq -r '.error.message // .promptFeedback.blockReason // empty' <<<"$resp" 2>/dev/null)
-    echo "::notice::$model attempt $attempt: ${reason:-$(head -c 200 <<<"$resp")}"
+
+    # The complete answer from the API, as Google sent it (collapsible in the log)
+    echo "::group::Gemini answer - $model, try $attempt (HTTP $code)"
+    cat "$answer.err" "$answer" 2>/dev/null
+    echo
+    echo "::endgroup::"
+
+    # Google's own words, if it sent any
+    detail=$(jq -r '.error.message // .promptFeedback.blockReason // empty' "$answer" 2>/dev/null)
+    [ -z "$detail" ] && detail=$(head -c 200 "$answer.err" "$answer" 2>/dev/null | tr '\n' ' ')
+    last_problem=$(explain "$code" "$detail")
+    last_detail="$detail"
+    echo "::warning title=Gemini $model, try $attempt::HTTP $code - $last_problem ${detail:+Google said: $detail}"
+    summary "| $model | $attempt | $code | ${detail:-no details} |"
+
+    case "$code" in
+      400|401|403) break 2 ;;  # wrong key / not allowed - the same for every model
+      404) break ;;            # this model is gone - try the next one
+    esac
     [ "$attempt" -lt 3 ] && sleep $((attempt * 30))
   done
 done
+rm -f "$answer" "$answer.err"
 
 if [ -z "$text" ]; then
-  echo "::error::Gemini didn't write the release notes (busy or unavailable). Nothing was published: re-run the failed job later, or run the workflow with \"Skip AI release notes\"."
-  exit 1
+  fail "The release notes couldn't be written: ${last_problem:-unknown problem}${last_detail:+ (Google said: $last_detail)} Nothing was published. Fix it and re-run the failed job, or run the workflow with \"Skip AI release notes\"."
 fi
 
 # Drop a code fence in case the model wrapped its answer in one anyway
@@ -106,3 +162,4 @@ fi
   echo '<!-- /ai-notes -->'
 } > "$out"
 echo "Wrote AI release notes ($(wc -c < "$out") bytes) from the changes since ${prev:-the beginning}"
+summary "" "**✅ Release notes written** from the changes since ${prev:-the beginning}."
