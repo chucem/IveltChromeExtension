@@ -45,6 +45,15 @@ function startListeners(){
 		});
 	});
 	document.querySelector('.js-copy-logs').addEventListener('click', copyLogs);
+	document.getElementById('resetSettings').addEventListener('click', resetSettings);
+}
+
+// The defaults live in background.js, so it does the reset
+function resetSettings(){
+	if(!confirm('זענט איר זיכער אז איר ווילט צוריקשטעלן אלע אנשטעלונגען ווי זיי זענען געווען פון אנהייב?'))
+		return;
+
+	chrome.runtime.sendMessage({ type: 'resetSettings' }, () => location.reload());
 }
 
 // update fields after a related setting has been changed

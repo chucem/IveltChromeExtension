@@ -112,7 +112,15 @@ chrome.runtime.onInstalled.addListener((details) => {
   });
 });
 
-chrome.runtime.onMessage.addListener(function (request) {
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  if(request.type === 'resetSettings'){
+    chrome.storage.local.set(defualtPreferences, () => {
+      alarmToFetch(defualtPreferences.backgroundSync, defualtPreferences.backgroundSyncNotif);
+      sendResponse();
+    });
+    return true;
+  }
+
   if(request.type === 'badgeText'){
     chrome.action.setBadgeText({ text: request.text });
   }
