@@ -209,6 +209,19 @@
 
 #ivd-wrap .ivd-quota-low .ivd-quota-text { color: #B71C1C; }
 
+/* "Also a NetFree link" checkbox */
+#ivd-wrap .ivd-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: -2px 0 10px;
+    font-size: 12px;
+    color: #444;
+    cursor: pointer;
+}
+
+#ivd-wrap .ivd-option input { margin: 0; flex-shrink: 0; }
+
 #ivd-wrap .ivd-actions {
     display: flex;
     flex-wrap: wrap;
