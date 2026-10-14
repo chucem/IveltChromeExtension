@@ -8,11 +8,6 @@
 // a real Drive link. Works for links in any post, not just ones made by this
 // extension.
 //
-// The opened-up links also send no Referer: otherwise a click would tell NetFree
-// (which sees all traffic) that the Drive file was linked from a public site -
-// exactly what its robot looks for. This way a click looks the same as pasting the
-// link by hand, which is what people already do.
-//
 // Runs as a content script on every forum page and is controlled by the
 // "netfreeLinks" setting, which can be switched on and off without a reload
 // (switching it off puts the links back as they were).
@@ -23,7 +18,6 @@
     const SETTING_KEY = 'netfreeLinks';
     const MASKED = /^(https?:\/\/)dr123ive\.google\.com\//i;
     const ORIGINAL = 'ivhNetfreeHref'; // data-ivh-netfree-href keeps the posted address
-    const ORIGINAL_REL = 'ivhNetfreeRel';
 
     let enabled = false;
     let observer = null;
@@ -31,9 +25,6 @@
     function fixLink(link) {
         if (!enabled || !link || !link.href || !MASKED.test(link.href)) return;
         link.dataset[ORIGINAL] = link.getAttribute('href');
-        link.dataset[ORIGINAL_REL] = link.getAttribute('rel') || '';
-        link.rel = (link.dataset[ORIGINAL_REL] + ' noreferrer noopener').trim();
-        link.referrerPolicy = 'no-referrer';
         link.href = link.href.replace(MASKED, '$1drive.google.com/');
     }
 
@@ -44,11 +35,7 @@
     function restoreAll() {
         document.querySelectorAll('a[data-ivh-netfree-href]').forEach(link => {
             link.setAttribute('href', link.dataset[ORIGINAL]);
-            if (link.dataset[ORIGINAL_REL]) link.setAttribute('rel', link.dataset[ORIGINAL_REL]);
-            else link.removeAttribute('rel');
-            link.removeAttribute('referrerpolicy');
             delete link.dataset[ORIGINAL];
-            delete link.dataset[ORIGINAL_REL];
         });
     }
 
