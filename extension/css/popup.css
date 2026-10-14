@@ -1,3 +1,14 @@
+/* Follows the forum's color theme, like the settings page (see css/style.css) */
+:root {
+  --ui-surface: var(--t-surface, #fff);
+  --ui-text: var(--t-text, #444);
+  --ui-muted: var(--t-muted, #888);
+  --ui-link: var(--t-link, #0000ff);
+  --ui-error: var(--t-error, #FF0000);
+  --ui-border: var(--t-border, #ccc);
+  --ui-accent: var(--t-accent, #0A8ED0);
+  color-scheme: var(--t-scheme, light);
+}
 ::selection {
   background: transparent;
 }
@@ -17,10 +28,10 @@ html {
 body {
   margin: 0;
   padding: 0;
-  color: #444;
+  color: var(--ui-text);
   font-size: 15px;
   min-width: 200px;
-  background: #fff;
+  background: var(--ui-surface);
   position: relative;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',Helvetica, Arial, sans-serif;
 }
@@ -35,22 +46,22 @@ body {
 }
 #quick_sign_in {
   display: none;
-  color: #0000ff;
+  color: var(--ui-link);
   font-weight: bold
 }
 #emergency_sign_out {
   display: none;
-  color: #FF0000;
+  color: var(--ui-error);
   font-weight: bold
 }
 .settings_divider {
   padding-bottom: 3px;
-  border-top: 1px solid #ccc;
+  border-top: 1px solid var(--ui-border);
 }
 .popup_themes_title {
   margin: 8px 12px 6px;
   font-size: 13px;
-  color: #888;
+  color: var(--ui-muted);
   text-align: right;
 }
 /* theme swatches, colors come from js/themes.data.js */
@@ -68,16 +79,16 @@ body {
   padding: 4px;
   border: 2px solid transparent;
   border-radius: 7px;
-  outline: 1px solid rgba(0, 0, 0, 0.1);
+  outline: 1px solid color-mix(in srgb, var(--ui-text) 15%, transparent);
   background: var(--t-bg);
   font: inherit;
   cursor: pointer;
 }
 .theme-swatch:hover {
-  border-color: #9cc9e6;
+  border-color: color-mix(in srgb, var(--ui-accent) 45%, var(--ui-surface));
 }
 .theme-swatch.selected {
-  border-color: #0A8ED0;
+  border-color: var(--ui-accent);
 }
 .sw-header {
   height: 7px;

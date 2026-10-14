@@ -106,6 +106,9 @@
 :root[data-ivh-theme] .last-edit,
 :root[data-ivh-theme] .notice { border-top-color: var(--t-border); }
 :root[data-ivh-theme] .error { color: var(--t-error); }
+/* the pinned first post (the forum draws it white with a thick light blue frame) */
+:root[data-ivh-theme] .post.pinned { background-color: var(--t-surface); border-color: var(--t-row3); }
+:root[data-ivh-theme] .pinned div .postbody { color: var(--t-text); }
 
 /* Quotes, code and attachments */
 :root[data-ivh-theme] blockquote { background-color: var(--t-quote-bg); border-color: var(--t-quote-border); }
@@ -150,6 +153,13 @@
 :root[data-ivh-theme] .button-secondary:hover { color: var(--t-link); }
 :root[data-ivh-theme] .caret { border-color: var(--t-button-border); }
 
+/* Icon colors (the black and grey ones disappear on dark themes); green, red and orange keep their meaning */
+:root[data-ivh-theme] .icon.icon-black, :root[data-ivh-theme] a:hover .icon.icon-black { color: var(--t-strong); }
+:root[data-ivh-theme] .icon.icon-blue, :root[data-ivh-theme] a:hover .icon.icon-blue { color: var(--t-link); }
+:root[data-ivh-theme] .icon.icon-bluegray, :root[data-ivh-theme] a:hover .icon.icon-bluegray { color: var(--t-text); }
+:root[data-ivh-theme] .icon.icon-gray, :root[data-ivh-theme] a:hover .icon.icon-gray { color: var(--t-muted); }
+:root[data-ivh-theme] .icon.icon-lightgray, :root[data-ivh-theme] a:hover .icon.icon-lightgray { color: color-mix(in srgb, var(--t-muted) 75%, var(--t-surface)); }
+
 /* Dropdowns and notifications */
 :root[data-ivh-theme] .dropdown .dropdown-contents { background-color: var(--t-dropdown); border-color: var(--t-border); box-shadow: 1px 3px 5px rgba(0, 0, 0, 0.3); }
 :root[data-ivh-theme] .dropdown .pointer { border-color: var(--t-border) transparent; }
@@ -188,7 +198,8 @@
 :root[data-ivh-theme] .cp-main .pm,
 :root[data-ivh-theme] .cp-main .pm-message { background-color: var(--t-row1); border-color: var(--t-border); }
 :root[data-ivh-theme] .cp-mini { background-color: var(--t-panel); }
-:root[data-ivh-theme] a.current { color: var(--t-strong); }
+/* prosilver forces .current to black with !important (e.g. the title of an open private message) */
+:root[data-ivh-theme] a.current { color: var(--t-strong) !important; }
 :root[data-ivh-theme] dl.mini dt { color: var(--t-strong); }
 :root[data-ivh-theme] .panel-container .panel li.header dt,
 :root[data-ivh-theme] .panel-container .panel li.header dd { color: var(--t-strong); }
@@ -201,6 +212,11 @@
 :root[data-ivh-theme] .navigation a { background: var(--t-row2); color: var(--t-text); }
 :root[data-ivh-theme] #navigation a:hover,
 :root[data-ivh-theme] .navigation a:hover { background: var(--t-accent); color: var(--t-on-accent); }
+/* the colored markers of private messages, replied (light grey) and foe (black) disappear on some themes */
+:root[data-ivh-theme] .pmlist li.pm_replied_colour,
+:root[data-ivh-theme] .pm_replied_colour { border-color: var(--t-muted); }
+:root[data-ivh-theme] .pmlist li.pm_foe_colour,
+:root[data-ivh-theme] .pm_foe_colour { border-color: var(--t-strong); }
 :root[data-ivh-theme] #navigation #active-subsection a,
 :root[data-ivh-theme] .navigation .active-subsection a { background: var(--t-surface); color: var(--t-link-hover); }
 
@@ -214,17 +230,64 @@
 /* the off-topic BBCode sets its colors inline */
 :root[data-ivh-theme] .offtopic { background: var(--t-row1) !important; border-color: var(--t-border) !important; }
 :root[data-ivh-theme] .offtopic_title { background: var(--t-row3) !important; color: var(--t-strong) !important; }
+/* the spoiler BBCode sets its colors inline too */
+:root[data-ivh-theme] .spoilwrapper { background-color: var(--t-row1) !important; border-color: var(--t-border) !important; color: var(--t-text) !important; }
+:root[data-ivh-theme] .spoilbtn,
+:root[data-ivh-theme] .spoilcontent { color: var(--t-text) !important; }
+:root[data-ivh-theme] .spoilcontent { border-top-color: var(--t-border) !important; }
 
 /*
- * Group colors (e.g. #AA0000) and colors in posts are set inline and chosen for a
- * white page. On dark themes --t-ink-filter flips their lightness while keeping the
- * hue. Only the outermost colored element gets it, a nested one would flip back.
+ * Group colors (e.g. #AA0000), colored forum titles and colors in posts are set inline
+ * and chosen for a white page. On dark themes --t-ink-filter flips their lightness while
+ * keeping the hue. Only the outermost colored element gets it, a nested one would flip back.
+ * The spoiler box is themed above, so it's skipped here (and the colors inside it still flip).
  */
 :root[data-ivh-theme] .username-coloured,
-:root[data-ivh-theme] .postbody [style*="color"]:not(.postbody [style*="color"] *) { filter: var(--t-ink-filter); }
-:root[data-ivh-theme] .postbody [style*="color"]:not(.postbody [style*="color"] *) img { filter: var(--t-ink-filter); }
+:root[data-ivh-theme] a[style*="color"]:not(.postbody *),
+:root[data-ivh-theme] .postbody [style*="color"]:not([class^="spoil"]):not(.postbody [style*="color"]:not([class^="spoil"]) *) { filter: var(--t-ink-filter); }
+:root[data-ivh-theme] .postbody [style*="color"]:not([class^="spoil"]):not(.postbody [style*="color"]:not([class^="spoil"]) *) img { filter: var(--t-ink-filter); }
 
 /* This extension's own additions */
 /* the extra post buttons (and the marked quote button) get an inline beige background in addTopicButtons.js */
 :root[data-ivh-theme] .post-buttons .button[style*="background"] { background: var(--t-row3) !important; }
 :root[data-ivh-theme] .sticky-post { background-color: color-mix(in srgb, var(--t-row3) 70%, transparent); border-color: var(--t-border); }
+/* "new replies" bar (js/newResponseNotification.js) and the small notices (js/addTopicButtons.js) */
+:root[data-ivh-theme] #ivelt-new-response-notification { background-color: var(--t-row3); color: var(--t-link); }
+:root[data-ivh-theme] #ivelt-notify { background-color: var(--t-dropdown); border-color: var(--t-border); color: var(--t-strong); }
+
+/* image resizer messages under the editor (css/imageResizer.css) */
+:root[data-ivh-theme] .ivr-status { background-color: var(--t-row2); color: var(--t-text); }
+:root[data-ivh-theme] .ivr-status.ivr-ok { background-color: color-mix(in srgb, var(--t-success) 18%, var(--t-row1)); color: var(--t-strong); }
+:root[data-ivh-theme] .ivr-status.ivr-error { background-color: color-mix(in srgb, var(--t-error) 18%, var(--t-row1)); color: var(--t-strong); }
+:root[data-ivh-theme] .ivr-status.ivr-warn { background-color: color-mix(in srgb, var(--t-warn) 18%, var(--t-row1)); color: var(--t-strong); }
+:root[data-ivh-theme] .ivr-hint { color: var(--t-success); }
+
+/* Google Drive / Dropbox button and popup (css/driveUpload.css) */
+:root[data-ivh-theme] .ivd-in-toolbar #ivd-button { color: var(--t-muted); }
+:root[data-ivh-theme] .ivd-in-attach #ivd-button,
+:root[data-ivh-theme] #ivd-offer .button2 { background-color: var(--t-button-bg); background-image: none; border-color: var(--t-button-border); color: var(--t-text); }
+:root[data-ivh-theme] .ivd-in-attach #ivd-button:hover,
+:root[data-ivh-theme] #ivd-offer .button2:hover { background-color: var(--t-button-hover); background-image: none; border-color: var(--t-accent); color: var(--t-link); }
+:root[data-ivh-theme] #ivd-offer { background-color: color-mix(in srgb, var(--t-warn) 15%, var(--t-row1)); border-color: color-mix(in srgb, var(--t-warn) 45%, var(--t-border)); color: var(--t-strong); }
+:root[data-ivh-theme] #ivd-wrap .ivd-popup { background-color: var(--t-dropdown); border-color: var(--t-border); color: var(--t-text); }
+:root[data-ivh-theme] #ivd-wrap .ivd-switch { background-color: var(--t-row2); }
+:root[data-ivh-theme] #ivd-wrap .ivd-switch-tab { color: var(--t-muted); }
+:root[data-ivh-theme] #ivd-wrap .ivd-switch-tab:hover { color: var(--t-link); }
+:root[data-ivh-theme] #ivd-wrap .ivd-switch-tab.ivd-active { background-color: var(--t-dropdown); color: var(--t-link); }
+:root[data-ivh-theme] #ivd-wrap .ivd-heading { color: var(--t-link); }
+:root[data-ivh-theme] #ivd-wrap .ivd-account { background-color: var(--t-row1); border-color: var(--t-border); }
+:root[data-ivh-theme] #ivd-wrap .ivd-account-email,
+:root[data-ivh-theme] #ivd-wrap .ivd-quota-text,
+:root[data-ivh-theme] #ivd-wrap .ivd-link { color: var(--t-muted); }
+:root[data-ivh-theme] #ivd-wrap .ivd-quota-bar { background-color: var(--t-row3); }
+:root[data-ivh-theme] #ivd-wrap .ivd-quota-fill { background-color: var(--t-accent); }
+:root[data-ivh-theme] #ivd-wrap .ivd-quota-low .ivd-quota-fill { background-color: var(--t-error); }
+:root[data-ivh-theme] #ivd-wrap .ivd-quota-low .ivd-quota-text { color: var(--t-error); }
+:root[data-ivh-theme] #ivd-wrap .ivd-btn { background-color: var(--t-button-bg); border-color: var(--t-button-border); color: var(--t-link); }
+:root[data-ivh-theme] #ivd-wrap .ivd-btn:hover { background-color: var(--t-button-hover); }
+:root[data-ivh-theme] #ivd-wrap .ivd-btn.ivd-primary { background-color: var(--t-accent); border-color: var(--t-accent); color: var(--t-on-accent); }
+:root[data-ivh-theme] #ivd-wrap .ivd-btn.ivd-primary:hover { background-color: var(--t-accent-dark); }
+:root[data-ivh-theme] #ivd-wrap .ivd-status { color: var(--t-text); }
+:root[data-ivh-theme] #ivd-wrap .ivd-status.ivd-ok { color: var(--t-success); }
+:root[data-ivh-theme] #ivd-wrap .ivd-status.ivd-warn { color: var(--t-warn); }
+:root[data-ivh-theme] #ivd-wrap .ivd-status.ivd-error { color: var(--t-error); }

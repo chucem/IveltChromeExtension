@@ -1,11 +1,16 @@
 .header {
-    background-color: #12A3EB;
+    background-color: var(--ui-header);
     background-image: linear-gradient(to bottom, #6ACEFF 0%, #0076B1 2px, #12A3EB 92px, #12A3EB 100%);
     background-repeat: repeat-x;
-    color: #FFFFFF;
+    color: var(--ui-on-header);
     margin-bottom: 4px;
     padding: 15px;
     border-radius: 10px;
+  }
+
+  /* with a theme the header is drawn like the forum's (.headerbar in css/themes.css) */
+  :root[data-ivh-theme] .header {
+    background-image: linear-gradient(to bottom, var(--t-accent-dark) 0%, var(--t-accent) 92px);
   }
 
   #logo {
@@ -15,21 +20,18 @@
 
 
   .aaa {
-    border-top: 15px solid #0A8ED0;
-    border-bottom: 3px solid #0A8ED0;
-    border-right: 1px solid #0A8ED0;
-    border-left: 1px solid #0A8ED0;
+    border-top: 15px solid var(--ui-accent-dark);
+    border-bottom: 3px solid var(--ui-accent-dark);
+    border-right: 1px solid var(--ui-accent-dark);
+    border-left: 1px solid var(--ui-accent-dark);
     border-radius: 7px;
     padding: 15px;
     width: 750px;
     margin: 50px auto;
 
   }
-  body{
-    background-color: #F5F7FA
-  }
   .wrap{
-    background-color: #fff;
+    background-color: var(--ui-surface);
 
     border-radius: 8px;
     margin: 0 auto;
@@ -52,22 +54,22 @@
     cursor: pointer;
   }
   .theme-card:hover {
-    border-color: #cfe3f1;
+    border-color: color-mix(in srgb, var(--ui-accent) 35%, var(--ui-surface));
   }
   .theme-card:has(input:checked) {
-    border-color: #0A8ED0;
+    border-color: var(--ui-accent);
   }
   .theme-card input {
     position: absolute;
     opacity: 0;
   }
   .theme-card input:focus-visible + .theme-preview {
-    outline: 2px solid #0A8ED0;
+    outline: 2px solid var(--ui-accent);
   }
   .theme-preview {
     display: block;
     padding: 5px;
-    border: 1px solid rgba(0, 0, 0, 0.12);
+    border: 1px solid color-mix(in srgb, var(--ui-text) 15%, transparent);
     border-radius: 6px;
     background: var(--t-bg);
   }
@@ -109,7 +111,7 @@
   .theme-card-empty .theme-preview {
     position: relative;
     border-style: dashed;
-    background: #fafafa;
+    background: var(--ui-bg);
   }
   .theme-card-empty .theme-preview > span {
     visibility: hidden;
@@ -122,14 +124,14 @@
     align-items: center;
     justify-content: center;
     font-size: 28px;
-    color: #999;
+    color: var(--ui-muted);
   }
 
   /* custom theme editor */
   .theme-editor {
     margin-top: 16px;
     padding: 16px;
-    border: 1px solid #e7e7e7;
+    border: 1px solid var(--ui-border);
     border-radius: 8px;
   }
   .theme-editor .row {
@@ -152,7 +154,7 @@
     width: 30px;
     height: 24px;
     padding: 0;
-    border: 1px solid #ccc;
+    border: 1px solid var(--ui-input-border);
     border-radius: 4px;
     background: none;
     cursor: pointer;
@@ -167,6 +169,9 @@
     font-family: monospace;
     font-size: 12px;
     direction: ltr;
+    border: 1px solid var(--ui-input-border);
+    background: var(--ui-input-bg);
+    color: var(--ui-input-text);
   }
 
   /* tabs at the top of the settings page */
@@ -174,7 +179,7 @@
     display: flex;
     gap: 4px;
     margin-bottom: 25px;
-    border-bottom: 2px solid #e7e7e7;
+    border-bottom: 2px solid var(--ui-border);
   }
   /* hidden while themes are turned off, .hidden alone loses to display: flex above */
   .page-tabs.hidden {
@@ -184,16 +189,16 @@
     margin-bottom: -2px;
     padding: 6px 16px;
     border-bottom: 2px solid transparent;
-    color: #444;
+    color: var(--ui-text);
     font-size: 16px;
     font-weight: 600;
   }
   .page-tabs a:hover {
-    color: #0A8ED0;
+    color: var(--ui-heading);
     text-decoration: none;
   }
   .page-tabs a.active {
-    border-bottom-color: #0A8ED0;
-    color: #0A8ED0;
+    border-bottom-color: var(--ui-accent);
+    color: var(--ui-heading);
     pointer-events: auto;
   }
