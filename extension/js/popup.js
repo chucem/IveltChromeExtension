@@ -63,6 +63,47 @@ function open_settings() {
     window.close();
 }
 
+function open_colors() {
+    chrome.tabs.create({url: chrome.runtime.getURL('settings.html#colors')});
+    window.close();
+}
+
+// A click switches the theme right away, the forum tab behind the popup repaints live (js/theme.js)
+function initThemeSwatches() {
+    const container = document.getElementById('themeSwatches');
+
+    chrome.storage.local.get(['themesEnabled', 'theme', 'customTheme'], function (items) {
+        // the colors section is only shown when themes are turned on in the settings
+        if (!items.themesEnabled)
+            return;
+        document.getElementById('themesSection').hidden = false;
+
+        const current = items.theme || 'default';
+        const custom = sanitizeTheme(items.customTheme);
+        const themes = custom ? themePresets.concat({ ...custom, name: custom.name || 'אייגענע' }) : themePresets;
+
+        themes.forEach(function (theme) {
+            const swatch = document.createElement('button');
+            swatch.className = 'theme-swatch';
+            swatch.title = theme.name;
+            swatch.innerHTML = '<span class="sw-header"></span><span class="sw-rows"></span><span class="sw-name"></span>';
+            swatch.querySelector('.sw-name').textContent = theme.name;
+            swatch.classList.toggle('selected', theme.id === current);
+
+            const vars = themeVars(theme);
+            Object.keys(vars).forEach(name => swatch.style.setProperty(name, vars[name]));
+
+            swatch.addEventListener('click', function () {
+                container.querySelectorAll('.theme-swatch').forEach(s => s.classList.remove('selected'));
+                swatch.classList.add('selected');
+                chrome.storage.local.set({ theme: theme.id });
+            });
+
+            container.appendChild(swatch);
+        });
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('open_home_page').addEventListener('click', open_home_page);
 });
@@ -86,3 +127,9 @@ document.addEventListener('DOMContentLoaded', function () {
 document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('open_settings').addEventListener('click', open_settings);
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('open_colors').addEventListener('click', open_colors);
+});
+
+document.addEventListener('DOMContentLoaded', initThemeSwatches);

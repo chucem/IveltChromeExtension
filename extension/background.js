@@ -16,7 +16,15 @@ const defualtPreferences = {
   ShowMultiNotifs: true,
   upDownArrowKeys: true,
   imageResizer: true,
-  copyPostLink: true
+  pasteImages: true,
+  driveUpload: true,
+  driveButtonPlace: 'attachments',
+  dropboxUpload: true,
+  driveFolderName: 'iVelt Helper',
+  openAttachmentsTab: true,
+  copyPostLink: true,
+  themesEnabled: false,
+  theme: 'default'
 };
 
 let debugQueue = {};
@@ -176,4 +184,4 @@ function commitDebugLog(name, values){
   })
 }
 
-importScripts('./background.notifications.js')
+importScripts('./background.notifications.js', './background.drive.js', './background.dropbox.js')

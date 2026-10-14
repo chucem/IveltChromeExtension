@@ -1,0 +1,104 @@
+# Publishes a test build from dev as a GitHub pre-release, for users to try before
+# a real release. It runs when dev's manifest has a version_name with a dash in it
+# (e.g. "2.6.0-beta.1"): it tags v<version_name>, builds the zip and attaches it to a
+# release marked "Pre-release", so it never shows as the latest release.
+# If that pre-release already exists, it does nothing - bump version_name for a new one.
+#
+# The notes start with a summary written by AI (Google Gemini, free tier) from the
+# commits since the previous release, when the GEMINI_API_KEY secret is set - see
+# .github/scripts/ai-release-notes.sh. Without it the release gets the usual notes.
+#
+# Unlike release.yml, the zip keeps the manifest "key", so a copy installed from this
+# zip gets the same extension ID as the store version. Google and Dropbox sign-in
+# only accept that ID (their redirect URIs are tied to it).
+
+name: Pre-release
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - extension/manifest.json
+      - .github/workflows/prerelease.yml
+  workflow_dispatch:
+
+concurrency:
+  group: prerelease
+
+permissions:
+  contents: write
+
+jobs:
+  prerelease:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0 # full history and tags, so the AI notes can see what changed since the last release
+
+      - name: Read version
+        id: version
+        run: |
+          name=$(jq -r '.version_name // empty' extension/manifest.json)
+          if ! [[ "$name" =~ ^[0-9]+(\.[0-9]+){0,3}-[0-9A-Za-z.]+$ ]]; then
+            echo "::notice::version_name is \"$name\", not a test version like 2.6.0-beta.1 - nothing to publish"
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+          echo "tag=v$name" >> "$GITHUB_OUTPUT"
+          echo "zip=dist/ivelt-helper-$name.zip" >> "$GITHUB_OUTPUT"
+          if gh release view "v$name" > /dev/null 2>&1; then
+            echo "::notice::Pre-release v$name already exists, nothing to do"
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build zip
+        if: steps.version.outputs.skip == 'false' && steps.version.outputs.exists == 'false'
+        run: |
+          mkdir -p dist
+          cd extension
+          zip -r -X "../${{ steps.version.outputs.zip }}" . -x '_metadata/*'
+
+      - name: Write release notes with AI
+        if: steps.version.outputs.skip == 'false' && steps.version.outputs.exists == 'false'
+        continue-on-error: true # never let this block the release
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: bash .github/scripts/ai-release-notes.sh test
+
+      - name: Create GitHub pre-release
+        if: steps.version.outputs.skip == 'false' && steps.version.outputs.exists == 'false'
+        run: |
+          cat > install.md <<'EOF'
+          **Test version** - for trying out new features before they go to the Chrome Web Store.
+
+          ### How to install
+          1. If you have iVelt Helper from the Chrome Web Store, **remove it first** (`chrome://extensions` → Remove). This test version uses the same extension ID, so both can't be installed at once. Removing it resets the extension's settings, so you'll need to set them again.
+          2. Download the **ivelt-helper-…zip** below and extract it to a folder you'll keep (Chrome runs the extension from there).
+          3. Open `chrome://extensions`, turn on **Developer mode** (top right), click **Load unpacked** and pick that folder.
+          4. To go back to the normal version later: remove this one and install again from the [Chrome Web Store](https://chromewebstore.google.com/detail/ivelt-helper-v2/ahidenbhdkloaingggdcijofobjboopi).
+
+          Please report problems in [Issues](https://github.com/chucem/IveltChromeExtension/issues) or in the iVelt extension topic.
+
+          ---
+          EOF
+          # The AI summary (if there is one) goes first, then the install steps
+          if [ -s ai-notes.md ]; then
+            { cat ai-notes.md; printf '\n---\n\n'; cat install.md; } > notes.md
+          else
+            cp install.md notes.md
+          fi
+          gh release create "${{ steps.version.outputs.tag }}" "${{ steps.version.outputs.zip }}" \
+            --prerelease \
+            --target "$GITHUB_SHA" \
+            --title "${{ steps.version.outputs.tag }} (test version)" \
+            --notes-file notes.md \
+            --generate-notes

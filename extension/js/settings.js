@@ -13,6 +13,12 @@ const preferencesOptions = [
 	'ShowMultiNotifs',
 	'upDownArrowKeys',
 	'imageResizer',
+	'pasteImages',
+	'driveUpload',
+	'dropboxUpload',
+	'driveButtonPlace',
+	'driveFolderName',
+	'openAttachmentsTab',
 	'copyPostLink'
 ];
 
@@ -46,6 +52,13 @@ function postSettingChange(items){
 	if(items.hasOwnProperty('backgroundSync')){
 		document.getElementById('backgroundSyncPosts').disabled = !items.backgroundSync;
 		document.getElementById('backgroundSyncNotif').disabled = !items.backgroundSync;
+	}
+
+	if(items.hasOwnProperty('driveUpload') || items.hasOwnProperty('dropboxUpload')){
+		const drive = document.getElementById('driveUpload').checked;
+		const dropbox = document.getElementById('dropboxUpload').checked;
+		document.getElementById('driveFolderName').disabled = !drive;
+		document.getElementById('driveButtonPlace').disabled = !drive && !dropbox;
 	}
 
 	if(items.hasOwnProperty('debugMode')){
@@ -103,8 +116,26 @@ function initSettings() {
 
 		postSettingChange(items);
 
+		initThemePicker(items.theme, items.customTheme);
+		initThemesToggle(items.themesEnabled);
+
 		startListeners();
 	});
 }
 
+// The page has tabs, the hash picks one (settings.html#colors) so it can be linked to
+function showTab(){
+	const tabsShown = !document.querySelector('.page-tabs').classList.contains('hidden');
+	const tabName = tabsShown && document.getElementById('tab-' + location.hash.slice(1)) ? location.hash.slice(1) : 'settings';
+
+	document.querySelectorAll('.tab-panel').forEach(panel => {
+		panel.classList.toggle('hidden', panel.id !== 'tab-' + tabName);
+	});
+	document.querySelectorAll('.page-tabs a').forEach(link => {
+		link.classList.toggle('active', link.dataset.tab === tabName);
+	});
+}
+
+window.addEventListener('hashchange', showTab);
+document.addEventListener('DOMContentLoaded', showTab);
 document.addEventListener('DOMContentLoaded', initSettings);

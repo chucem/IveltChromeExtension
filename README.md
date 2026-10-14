@@ -40,7 +40,11 @@ Extra buttons next to the regular quote button on every post:
 
 ### Writing posts
 * Warning before leaving a page with an unsent post.
-* **Image Resizer** on the post editor: shrinks images to fit under the attachment size limit, and packs a whole folder into a single ZIP attachment.
+* **Image Resizer** on the post editor: images that are too big for an attachment are shrunk automatically, whether they are picked, dropped or pasted.
+* **Paste images** straight into a post (like in Gmail): the image is attached and placed inline where you pasted it. This is a separate setting, so pasting can be on with the resizer off.
+* Pack a whole folder into a single ZIP attachment (drop it on the editor, or use the **Folder → ZIP** button).
+* **Google Drive upload**: shows which Google account it will use, then uploads files to a folder in your own Google Drive, makes them viewable by anyone with the link, and inserts the link into the post.
+* The editor opens on the **Attachments** tab instead of **Options**, so adding a file is one click (can be turned off).
 
 ### Other
 * Google search within the current topic, or across the whole site.
@@ -68,6 +72,9 @@ Extra buttons next to the regular quote button on every post:
 2. To publish to the stores, go to **Actions → Store upload → Run workflow**, pick the release (blank = latest) and the store. The [Store upload workflow](.github/workflows/store-upload.yml) uploads that release's zip and, unless you uncheck it, submits it for review.
 
 The store upload needs these repository secrets: `CWS_SERVICE_ACCOUNT_KEY` (a Google Cloud service account JSON key) and `CWS_PUBLISHER_ID` for the Chrome Web Store, and `EDGE_PRODUCT_ID`, `EDGE_CLIENT_ID`, `EDGE_API_KEY` for Edge Add-ons.
+
+## Website and privacy policy
+The extension's [website](https://chucem.github.io/) and [privacy policy](https://chucem.github.io/privacy.html) live in the [chucem.github.io](https://github.com/chucem/chucem.github.io) repo.
 
 ## Credits
 Made by members of אייוועלט; the full list is on the extension's settings page.

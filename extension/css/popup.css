@@ -47,3 +47,53 @@ body {
   padding-bottom: 3px;
   border-top: 1px solid #ccc;
 }
+.popup_themes_title {
+  margin: 8px 12px 6px;
+  font-size: 13px;
+  color: #888;
+  text-align: right;
+}
+/* theme swatches, colors come from js/themes.data.js */
+.theme-swatches {
+  display: grid;
+  grid-template-columns: repeat(4, 84px);
+  gap: 6px;
+  padding: 0 12px;
+  direction: rtl;
+}
+.theme-swatch {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 4px;
+  border: 2px solid transparent;
+  border-radius: 7px;
+  outline: 1px solid rgba(0, 0, 0, 0.1);
+  background: var(--t-bg);
+  font: inherit;
+  cursor: pointer;
+}
+.theme-swatch:hover {
+  border-color: #9cc9e6;
+}
+.theme-swatch.selected {
+  border-color: #0A8ED0;
+}
+.sw-header {
+  height: 7px;
+  border-radius: 2px;
+  background: var(--t-accent);
+}
+.sw-rows {
+  height: 14px;
+  border-radius: 2px;
+  background: linear-gradient(var(--t-row1) 50%, var(--t-row2) 50%);
+}
+.sw-name {
+  overflow: hidden;
+  font-size: 10px;
+  line-height: 1.2;
+  color: var(--t-text);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}

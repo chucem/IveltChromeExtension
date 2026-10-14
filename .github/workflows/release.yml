@@ -3,6 +3,10 @@
 # builds the zip and attaches it to the release.
 # If a release for that version already exists, it does nothing.
 #
+# The notes start with a summary written by AI (Google Gemini, free tier) from the
+# commits since the previous release, when the GEMINI_API_KEY secret is set - see
+# .github/scripts/ai-release-notes.sh. Without it the release gets GitHub's usual notes.
+#
 # Store uploads are a separate, manual step: see store-upload.yml.
 
 name: Release
@@ -31,6 +35,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 0 # full history and tags, so the AI notes can see what changed since the last release
 
       - name: Read version
         id: version
@@ -54,12 +59,25 @@ jobs:
         run: |
           mkdir -p dist
           cd extension
+          # The "key" only pins the extension ID for local unpacked testing; the store rejects it
+          jq 'del(.key)' manifest.json > manifest.tmp && mv manifest.tmp manifest.json
           zip -r -X "../${{ steps.version.outputs.zip }}" . -x '_metadata/*'
+
+      - name: Write release notes with AI
+        if: steps.version.outputs.exists == 'false'
+        continue-on-error: true # never let this block the release
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: bash .github/scripts/ai-release-notes.sh release
 
       - name: Create GitHub release
         if: steps.version.outputs.exists == 'false'
         run: |
+          # The AI summary (if there is one) goes before GitHub's list of changes
+          notes=()
+          if [ -s ai-notes.md ]; then notes=(--notes-file ai-notes.md); fi
           gh release create "${{ steps.version.outputs.tag }}" "${{ steps.version.outputs.zip }}" \
             --target "$GITHUB_SHA" \
             --title "${{ steps.version.outputs.tag }}" \
+            "${notes[@]}" \
             --generate-notes
