@@ -1,6 +1,8 @@
 // Applies the color theme chosen in settings (palettes in js/themes.data.js, styles in css/themes.css).
-// Runs at document_start. chrome.storage is async, so the last applied variables are also
-// cached in the site's localStorage, letting us set them before the first paint.
+// Runs at document_start on the forum, and in the <head> of the settings page and the popup,
+// which use the same --t-* variables for their own colors.
+// chrome.storage is async, so the last applied variables are also cached in localStorage
+// (the forum's, or the extension's own), letting us set them before the first paint.
 (function(){
 	const root = document.documentElement;
 	const cacheKey = 'iveltHelperTheme';

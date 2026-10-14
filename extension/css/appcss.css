@@ -41,3 +41,36 @@
 .ext-copied-tip.ext-copied-tip-hide {
     opacity: 0;
 }
+
+/* "new replies" bar under the last post (js/newResponseNotification.js) */
+#ivelt-new-response-notification {
+    margin: 4px auto;
+    text-align: center;
+    background: #cadceb;
+    padding: 7px 5px 5px 5px;
+    border: none;
+    border-radius: 7px;
+    user-select: none;
+}
+#ivelt-new-response-notification .button {
+    width: 150px;
+    margin: 5px auto;
+    display: block;
+}
+
+/* small notices like "copied" (iveltNotify in js/addTopicButtons.js) */
+#ivelt-notify {
+    position: fixed;
+    top: 30%;
+    left: 50%;
+    z-index: 9999;
+    background: #eee;
+    text-align: center;
+    padding: 5px 25px 7px 25px;
+    transform: translateX(-50%);
+    border: 2px solid #999;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    transition: opacity 0.75s linear;
+    font-size: 1rem;
+}

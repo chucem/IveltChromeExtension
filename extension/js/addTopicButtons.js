@@ -393,22 +393,7 @@ function iveltNotify(message){
     let fadeTarget = document.querySelector('#ivelt-notify');
     if (!fadeTarget) {
         fadeTarget = document.createElement('div');
-        fadeTarget.id = 'ivelt-notify';
-        fadeTarget.style.position = "fixed";
-        fadeTarget.style.top = "30%";
-        fadeTarget.style.left = "50%";
-        fadeTarget.style.zIndex = "9999"; // Keep this on top
-        fadeTarget.style.background = "#eee";
-        fadeTarget.style.textAlign = "center";
-        fadeTarget.style.padding = "5px 25px 7px 25px";
-        fadeTarget.style.transform = "translateX(-50%)";
-        fadeTarget.style.borderLeft = "2px solid #999";
-        fadeTarget.style.borderRight = "2px solid #999";
-        fadeTarget.style.borderBottom = "2px solid #999";
-        fadeTarget.style.borderBottomLeftRadius = "4px";
-        fadeTarget.style.borderBottomRightRadius = "4px";
-        fadeTarget.style.transition = "opacity 0.75s linear";
-        fadeTarget.style.fontSize = "1rem";
+        fadeTarget.id = 'ivelt-notify'; // styled in css/appcss.css
 
         const container = document.querySelector('#page-body')
         container.insertBefore(fadeTarget, container.firstChild);

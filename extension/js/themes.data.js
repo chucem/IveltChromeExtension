@@ -164,6 +164,8 @@ function themeVars(theme){
 		dropdown: c.surface,
 		highlight: mix(c.accent, c.surface, 35),
 		error: theme.dark ? '#F07A62' : '#B5452C',
+		success: theme.dark ? '#56D364' : '#2E7D32',
+		warn: theme.dark ? '#E3B341' : '#7A4F01',
 		...c
 	};
 
