@@ -21,7 +21,6 @@
 
     const PLACE_KEY = 'driveButtonPlace'; // 'attachments' (default) or 'toolbar'
     const PROVIDER_KEY = 'cloudProvider';  // the service picked last time
-    const NETFREE_KEY = 'driveNetfree';    // also make a NetFree link (Google Drive only)
     const DRIVE_API = 'https://www.googleapis.com/drive/v3';
     const UPLOAD_API = 'https://www.googleapis.com/upload/drive/v3';
     const DROPBOX_API = 'https://api.dropboxapi.com/2';
@@ -323,14 +322,6 @@
     };
     const PROVIDER_ORDER = ['drive', 'dropbox'];
 
-    // NetFree's robot blocks every Google Drive link it finds on a public site, and a
-    // blocked file stays blocked. The ivelt custom is to post the link with "123" inside
-    // "drive" (https://dr123ive.google.com/...), which the robot doesn't recognize;
-    // js/netfreeLinks.js takes the 123 out again when a reader clicks it.
-    function netfreeUrl(url) {
-        return url.replace('://drive.google.com/', '://dr123ive.google.com/');
-    }
-
     // Square brackets in the name would break the BBCode
     function linkBBCode(name, url) {
         const label = (name || 'file').replace(/\[/g, '(').replace(/\]/g, ')');
@@ -439,14 +430,7 @@
         input.multiple = true;
         input.hidden = true;
 
-        // NetFree: a second copy whose link is only ever posted as dr123ive
-        const netfreeOption = el('label', 'ivd-option');
-        const netfreeCheck = el('input');
-        netfreeCheck.type = 'checkbox';
-        netfreeOption.title = 'לייגט ארויף נאך א קאפיע פון יעדע פייל, און לייגט אריין איר לינק מיט 123 (dr123ive), אז נעטפרי זאל עס נישט בלאקירן';
-        netfreeOption.append(netfreeCheck, el('span', '', 'אויך א נעטפרי לינק (א צווייטע קאפיע מיט 123)'));
-
-        popup.append(switcher, heading, accountBox, quotaBox, netfreeOption, actions, status, disconnectBtn);
+        popup.append(switcher, heading, accountBox, quotaBox, actions, status, disconnectBtn);
         wrap.append(button, popup, input);
 
         if (inToolbar) toolbar.append(wrap);
@@ -481,7 +465,6 @@
         let busy = false;
         let statusTimer = null;
         let pending = null; // too-big attachments waiting to be uploaded instead
-        let netfree = false;
         const message = (action) => providerKey + action; // e.g. "dropboxAccount"
 
         function showStatus(text, kind, holdMs) {
@@ -503,8 +486,6 @@
             accountBox.hidden = !connected;
             renderQuota();
             pickBtn.hidden = !connected;
-            netfreeOption.hidden = !connected || providerKey !== 'drive';
-            netfreeCheck.checked = netfree;
             switchBtn.hidden = !connected;
             disconnectBtn.hidden = !connected;
             connectBtn.hidden = connected;
@@ -663,15 +644,6 @@
             }
         });
 
-        chrome.storage.local.get(NETFREE_KEY, (items) => {
-            netfree = items[NETFREE_KEY] === true;
-            render();
-        });
-        netfreeCheck.addEventListener('change', () => {
-            netfree = netfreeCheck.checked;
-            chrome.storage.local.set({ [NETFREE_KEY]: netfree });
-        });
-
         pickBtn.addEventListener('click', () => {
             if (busy || !account) return;
             if (pending) {
@@ -768,8 +740,7 @@
         });
 
         async function uploadAll(files) {
-            const withNetfree = netfree && providerKey === 'drive';
-            const total = files.reduce((sum, f) => sum + f.size, 0) * (withNetfree ? 2 : 1);
+            const total = files.reduce((sum, f) => sum + f.size, 0);
             const free = freeSpace();
             if (free !== null && total > free) {
                 showStatus(`❌ נישט גענוג פלאץ אויף ${provider.name}: די פיילס זענען ${formatSize(total)}, און עס איז נאר דא ${formatSize(free)}`, 'error', HOLD_STATUS_MS * 3);
@@ -784,38 +755,26 @@
                 const upload = provider.upload;
                 let target = await sendToBackground(message('UploadTarget'));
 
-                const uploadOne = async (file, onProgress) => {
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const prefix = files.length > 1 ? `(${i + 1}/${files.length}) ` : '';
+                    const onProgress = (p) => showStatus(`${prefix}לייגט ארויף ${file.name}… ${Math.round(p * 100)}%`);
+                    onProgress(0);
+
+                    let uploaded;
                     try {
-                        return await upload(file, target, onProgress);
+                        uploaded = await upload(file, target, onProgress);
                     } catch (err) {
                         if (err.status !== 401) throw err;
                         // Token expired between files - refresh and retry this one
                         target = await sendToBackground(message('UploadTarget'), { staleToken: target.token });
-                        return upload(file, target, onProgress);
+                        uploaded = await upload(file, target, onProgress);
                     }
-                };
-
-                for (let i = 0; i < files.length; i++) {
-                    const file = files[i];
-                    const prefix = files.length > 1 ? `(${i + 1}/${files.length}) ` : '';
-                    const progress = (label) => (p) => showStatus(`${prefix}${label} ${file.name}… ${Math.round(p * 100)}%`);
-                    progress('לייגט ארויף')(0);
-
-                    const uploaded = await uploadOne(file, progress('לייגט ארויף'));
                     if (!uploaded.shared) shareFailed = true;
-
-                    // The NetFree copy is a separate file, so its id never appears as a
-                    // plain drive.google.com link that the robot could block
-                    let bbcode = linkBBCode(uploaded.name, uploaded.url);
-                    if (withNetfree) {
-                        const copy = await uploadOne(file, progress('נעטפרי קאפיע:'));
-                        if (!copy.shared) shareFailed = true;
-                        bbcode += ` ([url=${netfreeUrl(copy.url)}]נעטפרי לינק[/url])`;
-                    }
 
                     // Into the post right away, so a later failure never loses it
                     const textarea = findTextarea();
-                    if (textarea) insertAtCursor(textarea, bbcode);
+                    if (textarea) insertAtCursor(textarea, linkBBCode(uploaded.name, uploaded.url));
                 }
 
                 if (shareFailed) {
