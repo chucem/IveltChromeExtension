@@ -19,8 +19,7 @@ const preferencesOptions = [
 	'driveButtonPlace',
 	'driveFolderName',
 	'openAttachmentsTab',
-	'copyPostLink',
-	'netfreeLinks'
+	'copyPostLink'
 ];
 
 // Listen to settings changes

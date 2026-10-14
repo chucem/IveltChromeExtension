@@ -23,7 +23,6 @@ const defualtPreferences = {
   driveFolderName: 'iVelt Helper',
   openAttachmentsTab: true,
   copyPostLink: true,
-  netfreeLinks: true,
   themesEnabled: false,
   theme: 'default'
 };
