@@ -45,6 +45,8 @@ jobs:
             echo "::error::There is no release \"$tag\""
             exit 1
           fi
+          # Keep this workflow's own (current) script: the release's commit may have an older one
+          cp .github/scripts/ai-release-notes.sh "$RUNNER_TEMP/ai-release-notes.sh"
           git checkout -q "$tag"
           case "$tag" in *-*) kind=test ;; *) kind=release ;; esac
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
@@ -54,7 +56,7 @@ jobs:
       - name: Write release notes with AI
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: bash .github/scripts/ai-release-notes.sh "${{ steps.release.outputs.kind }}"
+        run: bash "$RUNNER_TEMP/ai-release-notes.sh" "${{ steps.release.outputs.kind }}"
 
       - name: Update the release
         run: |
