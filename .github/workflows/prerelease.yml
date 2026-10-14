@@ -6,7 +6,10 @@
 #
 # The notes start with a summary written by AI (Google Gemini, free tier) from the
 # commits since the previous release, when the GEMINI_API_KEY secret is set - see
-# .github/scripts/ai-release-notes.sh. Without it the release gets the usual notes.
+# .github/scripts/ai-release-notes.sh. If the AI notes can't be written, the run fails
+# and nothing is published: re-run the failed job, or skip them with "Run workflow ->
+# Skip AI release notes" (or the SKIP_AI_NOTES=true repository variable), which
+# publishes with the usual notes.
 #
 # Unlike release.yml, the zip keeps the manifest "key", so a copy installed from this
 # zip gets the same extension ID as the store version. Google and Dropbox sign-in
@@ -22,6 +25,11 @@ on:
       - extension/manifest.json
       - .github/workflows/prerelease.yml
   workflow_dispatch:
+    inputs:
+      skip_ai_notes:
+        description: 'Skip AI release notes (publish with the usual notes)'
+        type: boolean
+        default: false
 
 concurrency:
   group: prerelease
@@ -69,9 +77,9 @@ jobs:
 
       - name: Write release notes with AI
         if: steps.version.outputs.skip == 'false' && steps.version.outputs.exists == 'false'
-        continue-on-error: true # never let this block the release
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          SKIP_AI_NOTES: ${{ github.event.inputs.skip_ai_notes == 'true' || vars.SKIP_AI_NOTES == 'true' }}
         run: bash .github/scripts/ai-release-notes.sh test
 
       - name: Create GitHub pre-release

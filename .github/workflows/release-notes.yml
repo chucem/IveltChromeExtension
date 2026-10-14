@@ -1,0 +1,71 @@
+# Manual button (Actions -> Release notes -> Run workflow): (re)writes the AI part of
+# an existing release's notes, e.g. when Gemini was too busy during the release.
+# Everything else in the notes (install steps, GitHub's "What's Changed") stays.
+#
+# Needs the GEMINI_API_KEY repository secret - see .github/scripts/ai-release-notes.sh.
+
+name: Release notes
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag, e.g. v2.6.0 (blank = the latest release)'
+        required: false
+        default: ''
+
+concurrency:
+  group: release-notes
+
+permissions:
+  contents: write
+
+jobs:
+  notes:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Find the release
+        id: release
+        env:
+          TAG_INPUT: ${{ github.event.inputs.tag }}
+        run: |
+          tag="$TAG_INPUT"
+          if [ -z "$tag" ]; then
+            tag=$(gh release view --json tagName -q .tagName)
+          fi
+          if ! gh release view "$tag" > /dev/null 2>&1; then
+            echo "::error::There is no release \"$tag\""
+            exit 1
+          fi
+          git checkout -q "$tag"
+          case "$tag" in *-*) kind=test ;; *) kind=release ;; esac
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "kind=$kind" >> "$GITHUB_OUTPUT"
+          echo "Release $tag ($kind)"
+
+      - name: Write release notes with AI
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: bash .github/scripts/ai-release-notes.sh "${{ steps.release.outputs.kind }}"
+
+      - name: Update the release
+        run: |
+          if [ ! -s ai-notes.md ]; then
+            echo "::error::No AI notes were written - see the previous step"
+            exit 1
+          fi
+          tag="${{ steps.release.outputs.tag }}"
+          gh release view "$tag" --json body -q .body > old.md
+          # Drop the previous AI part (between the markers), keep the rest
+          sed '/<!-- ai-notes -->/,/<!-- \/ai-notes -->/d' old.md > rest.md
+          { cat ai-notes.md; printf '\n---\n\n'; cat rest.md; } > notes.md
+          gh release edit "$tag" --notes-file notes.md
+          echo "Updated the notes of $tag"
