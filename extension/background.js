@@ -20,8 +20,7 @@ const defualtPreferences = {
   driveButtonPlace: 'attachments',
   dropboxUpload: true,
   driveFolderName: 'iVelt Helper',
-  copyPostLink: true,
-  netfreeLinks: true
+  copyPostLink: true
 };
 
 let debugQueue = {};
