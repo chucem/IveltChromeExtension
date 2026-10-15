@@ -48,6 +48,15 @@
       ],
       "css": ["css/imageResizer.css", "css/driveUpload.css"],
       "js": ["js/imageResizer.js", "js/driveUpload.js"]
+    },
+    {
+      "matches": [
+        "*://*.ivelt.com/*",
+        "*://*.yiddishworld.com/*",
+        "*://*.198.153.76.147/*"
+      ],
+      "css": ["css/quoteSelection.css"],
+      "js": ["js/quoteSelection.js"]
     }
   ],
   "background": {
