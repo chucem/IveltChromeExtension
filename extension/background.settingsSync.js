@@ -35,6 +35,7 @@ const SYNCED_SETTINGS = [
   'dropboxUpload',
   'driveButtonPlace',
   'driveFolderName',
+  'printShowLikes',
   'themesEnabled',
   'theme',
   'customTheme'

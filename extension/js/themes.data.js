@@ -111,7 +111,7 @@ const hexColorPattern = /^#[0-9a-f]{6}$/i;
 // every color a theme can set: the base colors, and the derived ones a preset can fine tune (keep in line with themeVars)
 const themeColorKeys = themeBaseColors.map(base => base.key).concat([
 	'accentDark', 'row3', 'hover', 'panel', 'inputBg', 'inputBorder', 'buttonBg', 'buttonBorder', 'buttonHover',
-	'quoteBg', 'quoteBorder', 'codeBg', 'codeText', 'dropdown', 'highlight', 'error'
+	'quoteBg', 'quoteBorder', 'codeBg', 'codeText', 'dropdown', 'highlight', 'error', 'success', 'warn'
 ]);
 
 // Returns the theme object to apply, or null for the forum's own look.
