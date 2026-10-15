@@ -9,7 +9,7 @@
     const QUOTE_MAX_PX = 250; // long quotes are cut to this height (site uses 550 on screen)
     const REQUEST_DELAY_MS = 400; // small pause between pages, to be gentle on the server
 
-    let showLikes, printTag, totalPages, on_page, lastPage, baseUrl;
+    let showLikes, likeNames, printTag, totalPages, on_page, lastPage, baseUrl;
     let running = false;
 
     function ltr(t) { return '⁦' + t + '⁩'; } // keep number ranges like 4–6 in order in RTL text
@@ -82,7 +82,7 @@
     }
 
     // a "באדאנקט דורך: name, name" line under each liked post, from the like count's tooltip
-    // (postlove puts the names in its title, e.g. "תגובה באדאנקט דורך: name1, name2")
+    // (postlove puts the names in its title, e.g. "תגובה באדאנקט דורך: name1, name2"), or just "באדאנקט: N"
     function addLikedBy() {
         $('.post').each(function () {
             let likes = $(this).find('.postlove-count:first');
@@ -90,9 +90,10 @@
             if (!count) return;
             let title = likes.attr('title') || '';
             let names = title.indexOf(':') >= 0 ? title.slice(title.indexOf(':') + 1).trim() : '';
+            let text = likeNames ? 'באדאנקט דורך (' + count + '): ' + (names || '—') : 'באדאנקט: ' + count;
             $('<div>').addClass('print-liked-by')
                 .append($('<i>').addClass('icon fa-thumbs-o-up fa-fw').attr('aria-hidden', 'true'))
-                .append(document.createTextNode('באדאנקט דורך (' + count + '): ' + (names || '—')))
+                .append(document.createTextNode(text))
                 .appendTo($(this).find('.postbody:first'));
         });
     }
@@ -212,6 +213,7 @@
 
         let settings = document.getElementById('iveltHelperSettings');
         showLikes = !!settings && settings.getAttribute('data-print-show-likes') === 'true';
+        likeNames = !settings || settings.getAttribute('data-print-likes-style') !== 'count';
         printTag = 'פרינט אשכול ' + PRINT_VERSION + (showLikes ? '-L · מיט לייקס' : '');
 
         totalPages = Number($('.pagination li:not(.next):last').text()) || 1;
