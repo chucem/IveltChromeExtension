@@ -21,6 +21,7 @@ const defualtPreferences = {
   driveButtonPlace: 'attachments',
   dropboxUpload: true,
   driveFolderName: 'iVelt Helper',
+  customLinks: [],
   openAttachmentsTab: true,
   copyPostLink: true,
   printShowLikes: false,

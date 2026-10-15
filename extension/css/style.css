@@ -211,6 +211,32 @@ input[type='checkbox']:checked + label:before {
     background: var(--ui-panel);
     color: var(--ui-muted);
 }
+/* the user's own links for the popup (js/settings.js) */
+#customLinkName,
+#customLinkUrl {
+    display: block;
+    margin-bottom: 6px;
+}
+.custom-links {
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+}
+.custom-links li {
+    margin: 6px 0;
+}
+.custom-link-url,
+.custom-link-remove {
+    margin-inline-start: 10px;
+    font-size: 0.85em;
+}
+.custom-link-url {
+    color: var(--ui-muted);
+}
+.custom-link-remove {
+    color: var(--ui-error);
+    cursor: pointer;
+}
 select {
     min-height: 1em;
     height: 1.3em;

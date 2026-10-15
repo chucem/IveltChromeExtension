@@ -120,9 +120,73 @@ function initSettings() {
 		initThemePicker(items.theme, items.customTheme);
 		initThemesToggle(items.themesEnabled);
 		initSettingsSyncToggle(items.settingsSync);
+		initCustomLinks(items.customLinks);
 
 		startListeners();
 	});
+}
+
+// The user's own links for the toolbar popup (js/popup.js), each one a name and an address
+function initCustomLinks(savedLinks){
+	const links = Array.isArray(savedLinks) ? savedLinks : [];
+	const nameInput = document.getElementById('customLinkName');
+	const urlInput = document.getElementById('customLinkUrl');
+	const list = document.getElementById('customLinksList');
+
+	function save(){
+		commitNewSetting({ customLinks: links });
+		showLinks();
+	}
+
+	function showLinks(){
+		list.textContent = '';
+		links.forEach((link, index) => {
+			const item = document.createElement('li');
+
+			const url = document.createElement('span');
+			url.className = 'custom-link-url';
+			url.dir = 'ltr';
+			url.textContent = link.url;
+
+			const remove = document.createElement('a');
+			remove.className = 'custom-link-remove';
+			remove.textContent = 'אויסמעקן';
+			remove.addEventListener('click', () => {
+				links.splice(index, 1);
+				save();
+			});
+
+			item.append(link.name, url, remove);
+			list.appendChild(item);
+		});
+	}
+
+	document.getElementById('customLinkAdd').addEventListener('click', () => {
+		const name = nameInput.value.trim();
+		let url = urlInput.value.trim();
+		if(url && !/^https?:\/\//i.test(url))
+			url = 'https://' + url;
+
+		if(!name || !isWebAddress(url)){
+			notify('שרייבט א נאמען און א ריכטיגן לינק');
+			return;
+		}
+
+		links.push({ name, url });
+		nameInput.value = '';
+		urlInput.value = '';
+		save();
+	});
+
+	showLinks();
+}
+
+function isWebAddress(text){
+	try {
+		return ['http:', 'https:'].includes(new URL(text).protocol);
+	} catch(e) {
+		return false;
+	}
 }
 
 // The syncing itself is done in the background. Turning it on may bring in the settings

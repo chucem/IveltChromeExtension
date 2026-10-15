@@ -1,12 +1,17 @@
-/* Follows the forum's color theme, like the settings page (see css/style.css) */
+/* Follows the forum's color theme, like the settings page (see css/style.css).
+   The fallbacks are the forum's own blue look, used when no theme is picked */
 :root {
   --ui-surface: var(--t-surface, #fff);
+  --ui-bg: var(--t-bg, #ECF1F2);
   --ui-text: var(--t-text, #444);
   --ui-muted: var(--t-muted, #888);
-  --ui-link: var(--t-link, #0000ff);
+  --ui-link: var(--t-link, #105289);
   --ui-error: var(--t-error, #FF0000);
-  --ui-border: var(--t-border, #ccc);
-  --ui-accent: var(--t-accent, #0A8ED0);
+  --ui-border: var(--t-border, #B9C2C9);
+  --ui-accent: var(--t-accent, #12A3EB);
+  --ui-accent-dark: var(--t-accent-dark, #1675B9);
+  --ui-on-accent: var(--t-on-accent, #fff);
+  --ui-hover: var(--t-hover, #DCE8F0);
   color-scheme: var(--t-scheme, light);
 }
 ::selection {
@@ -29,20 +34,73 @@ body {
   margin: 0;
   padding: 0;
   color: var(--ui-text);
-  font-size: 15px;
-  min-width: 200px;
-  background: var(--ui-surface);
+  font-size: 12px;
+  min-width: 270px;
+  background: var(--ui-bg);
   position: relative;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',Helvetica, Arial, sans-serif;
+  direction: rtl;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+
+/* header bar, like the forum's own */
+.popup_header {
+  padding: 10px 14px;
+  background: linear-gradient(180deg, var(--ui-accent) 0%, var(--ui-accent-dark) 100%);
+  color: var(--ui-on-accent);
+  text-align: center;
+}
+.popup_title {
+  font-size: 14px;
+  font-weight: bold;
+}
+.popup_version {
+  margin-top: 2px;
+  font-size: 10px;
+  opacity: 0.85;
+}
+
+/* the big "active topics" button and the settings button at the bottom */
+.popup_main,
+.popup_button {
+  margin: 8px;
+  padding: 7px 10px;
+  border: 1px solid var(--ui-border);
+  border-radius: 4px;
+  background: linear-gradient(180deg, var(--ui-surface) 0%, color-mix(in srgb, var(--ui-accent) 10%, var(--ui-surface)) 100%);
+  color: var(--ui-link);
+  text-align: center;
+  cursor: pointer;
+}
+.popup_main {
+  font-weight: bold;
+}
+.popup_main:hover,
+.popup_button:hover {
+  border-color: var(--ui-link);
+  background: color-mix(in srgb, var(--ui-accent) 18%, var(--ui-surface));
+}
+
+.popup_list {
+  padding: 0 6px;
 }
 .popup_options {
-  padding: 2px;
-  cursor: pointer;
-  margin: 6px 12px;
+  margin: 2px 0;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  border-radius: 3px;
   text-align: right;
+  cursor: pointer;
 }
 .popup_options:hover {
-  text-decoration: underline;
+  border-color: var(--ui-border);
+  background: var(--ui-hover);
+  color: var(--ui-link);
+}
+.popup_icon {
+  display: inline-block;
+  width: 18px;
+  margin-inline-end: 8px;
+  text-align: center;
 }
 #quick_sign_in {
   display: none;
@@ -54,57 +112,8 @@ body {
   color: var(--ui-error);
   font-weight: bold
 }
-.settings_divider {
+.popup_footer {
+  margin-top: 6px;
   padding-bottom: 3px;
   border-top: 1px solid var(--ui-border);
-}
-.popup_themes_title {
-  margin: 8px 12px 6px;
-  font-size: 13px;
-  color: var(--ui-muted);
-  text-align: right;
-}
-/* theme swatches, colors come from js/themes.data.js */
-.theme-swatches {
-  display: grid;
-  grid-template-columns: repeat(4, 84px);
-  gap: 6px;
-  padding: 0 12px;
-  direction: rtl;
-}
-.theme-swatch {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  padding: 4px;
-  border: 2px solid transparent;
-  border-radius: 7px;
-  outline: 1px solid color-mix(in srgb, var(--ui-text) 15%, transparent);
-  background: var(--t-bg);
-  font: inherit;
-  cursor: pointer;
-}
-.theme-swatch:hover {
-  border-color: color-mix(in srgb, var(--ui-accent) 45%, var(--ui-surface));
-}
-.theme-swatch.selected {
-  border-color: var(--ui-accent);
-}
-.sw-header {
-  height: 7px;
-  border-radius: 2px;
-  background: var(--t-accent);
-}
-.sw-rows {
-  height: 14px;
-  border-radius: 2px;
-  background: linear-gradient(var(--t-row1) 50%, var(--t-row2) 50%);
-}
-.sw-name {
-  overflow: hidden;
-  font-size: 10px;
-  line-height: 1.2;
-  color: var(--t-text);
-  white-space: nowrap;
-  text-overflow: ellipsis;
 }

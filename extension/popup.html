@@ -8,16 +8,20 @@
   <script type="text/javascript" src="js/popup.js"></script>
   </head>
   <body>
-  <div class="popup_options" id="open_home_page">הויפט בלאט</div>
-  <div class="popup_options" id="open_pm_inbox">פאסט קעסטל</div>
-  <div class="popup_options" id="open_active_topics">אקטיווע אשכולות</div>
-  <div class="popup_options" id="quick_sign_in">לאג אריין</div>
-  <div class="popup_options" id="emergency_sign_out">עמערזשענסי סיין ארויס</div>
-  <div class="settings_divider"><div class="popup_options" id="open_settings">עקסטענשען אנשטעלונגען</div></div>
-  <div class="settings_divider" id="themesSection" hidden>
-    <div class="popup_themes_title">קאלירן</div>
-    <div class="theme-swatches" id="themeSwatches"></div>
-    <div class="popup_options" id="open_colors">מאך דיין אייגענע קאלירן</div>
+  <div class="popup_header">
+    <div class="popup_title">iVelt Helper</div>
+    <div class="popup_version" id="popup_version"></div>
+  </div>
+  <div class="popup_main" id="open_active_topics"><span class="popup_icon">📋</span>אקטיווע אשכולות</div>
+  <div class="popup_list">
+    <div class="popup_options" id="open_home_page"><span class="popup_icon">🏠</span>הויפט בלאט</div>
+    <div class="popup_options" id="open_pm_inbox"><span class="popup_icon">✉️</span>פאסט קעסטל</div>
+    <div id="customLinksSection"></div>
+    <div class="popup_options" id="quick_sign_in"><span class="popup_icon">🔑</span>לאג אריין</div>
+    <div class="popup_options" id="emergency_sign_out"><span class="popup_icon">🚪</span>עמערזשענסי סיין ארויס</div>
+  </div>
+  <div class="popup_footer">
+    <div class="popup_button" id="open_settings"><span class="popup_icon">⚙️</span>עקסטענשען אנשטעלונגען</div>
   </div>
   </body>
 </html>

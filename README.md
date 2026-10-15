@@ -49,7 +49,7 @@ Extra buttons next to the regular quote button on every post:
 ### Other
 * Google search within the current topic, or across the whole site.
 * Print several pages, or a whole topic, at once (forked from [bookmarkify.it/47839](https://bookmarkify.it/47839)).
-* Toolbar popup with quick links (home page, inbox, active topics), quick sign-in, and emergency sign-out.
+* Toolbar popup with quick links (home page, inbox, active topics), quick sign-in, and emergency sign-out, plus links of your own, added on the settings page. When the current tab is already on אייוועלט, the links open in it instead of a new tab.
 
 ## Install from the Chrome Web Store
 1. Open the **[Chrome Web Store](https://chromewebstore.google.com/detail/ivelt-helper-v2/ahidenbhdkloaingggdcijofobjboopi)** page.
