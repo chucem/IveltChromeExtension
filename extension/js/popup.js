@@ -31,19 +31,40 @@ function checkLoginState() {
 
 getUserId('https://www.ivelt.com', 'phpbb3_sw7kk_u');
 
+// The forum's addresses; the extension can see the address of a tab on one of them
+const FORUM_HOSTS = /(^|\.)(ivelt\.com|yiddishworld\.com|198\.153\.76\.147)$/;
+
+function isForumUrl(url) {
+    try {
+        return FORUM_HOSTS.test(new URL(url).hostname);
+    } catch (e) {
+        return false;
+    }
+}
+
+// A link to the forum opens in the current tab when that tab is already on the forum,
+// anything else in a new tab
+function openLink(url) {
+    chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+        const tab = tabs[0];
+        if (tab && tab.url && isForumUrl(tab.url) && isForumUrl(url))
+            chrome.tabs.update(tab.id, {url: url});
+        else
+            chrome.tabs.create({url: url});
+        window.close();
+    });
+}
+
 function open_home_page() {
-    chrome.tabs.create({url: 'https://www.ivelt.com/forum/'});
-    window.close();
+    openLink('https://www.ivelt.com/forum/');
 }
 
 function open_pm_inbox() {
-    chrome.tabs.create({url: 'https://www.ivelt.com/forum/ucp.php?i=pm&folder=inbox'});
-    window.close();
+    openLink('https://www.ivelt.com/forum/ucp.php?i=pm&folder=inbox');
 }
 
 function open_active_topics() {
-    chrome.tabs.create({url: 'https://www.ivelt.com/forum/search.php?search_id=active_topics'});
-    window.close();
+    openLink('https://www.ivelt.com/forum/search.php?search_id=active_topics');
 }
 
 function quick_sign_in() {
@@ -79,8 +100,7 @@ function initCustomLinks() {
             option.innerHTML = '<span class="popup_icon">🔗</span>';
             option.append(link.name);
             option.addEventListener('click', function () {
-                chrome.tabs.create({url: link.url});
-                window.close();
+                openLink(link.url);
             });
             section.appendChild(option);
         });
