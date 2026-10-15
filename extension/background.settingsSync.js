@@ -36,7 +36,6 @@ const SYNCED_SETTINGS = [
   'driveButtonPlace',
   'driveFolderName',
   'printShowLikes',
-  'themesEnabled',
   'theme',
   'customTheme'
 ];

@@ -23,7 +23,7 @@ const themeBaseColors = [
 ];
 
 const themePresets = [
-	{ id: 'default', name: 'נארמאל', colors: {
+	{ id: 'default', name: 'אריגינעל', colors: {
 		bg: '#F5F7FA', surface: '#FFFFFF', text: '#536482', strong: '#28313F', muted: '#6A7A90',
 		link: '#105289', linkHover: '#D31141', accent: '#12A3EB', onAccent: '#FFFFFF',
 		row1: '#ECF3F7', row2: '#E1EBF2', border: '#CCCCCC' } },

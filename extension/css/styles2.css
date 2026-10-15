@@ -195,7 +195,3 @@
     font-weight: bold;
     pointer-events: auto;
   }
-  /* the colors tab is only there while themes are turned on */
-  .page-tabs a.hidden {
-    display: none;
-  }
