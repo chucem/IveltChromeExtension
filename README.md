@@ -47,6 +47,7 @@ Extra buttons next to the regular quote button on every post:
 * The editor opens on the **Attachments** tab instead of **Options**, so adding a file is one click (can be turned off).
 
 ### Other
+* **Media player**: a link to a video or audio file on Google Drive or Dropbox gets a player right under it, with a download button, so it plays inside the topic. A video starts small and grows to the full width of the post once you click or play it.
 * Google search within the current topic, or across the whole site.
 * Print several pages, or a whole topic, at once (forked from [bookmarkify.it/47839](https://bookmarkify.it/47839)).
 * Toolbar popup with quick links (home page, inbox, active topics), quick sign-in, and emergency sign-out.

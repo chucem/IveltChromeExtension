@@ -42,6 +42,15 @@
     },
     {
       "matches": [
+        "*://*.ivelt.com/*",
+        "*://*.yiddishworld.com/*",
+        "*://*.198.153.76.147/*"
+      ],
+      "css": ["css/mediaPlayer.css"],
+      "js": ["js/mediaPlayer.js"]
+    },
+    {
+      "matches": [
         "*://*.ivelt.com/forum/posting.php*",
         "*://*.yiddishworld.com/forum/posting.php*",
         "*://*.198.153.76.147/forum/posting.php*"
