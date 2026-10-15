@@ -33,27 +33,16 @@
         $('.post').removeClass('online'); // remove online-status indicator
         $('.postbody').width('100%');
         if (showLikes) {
-            // the "sticky post buttons" setting pins one bar with position:fixed and keeps doing so on scroll;
-            // swap in plain copies, so the like box stays with its post (the scroll listener only knows the old nodes)
-            $('.post-buttons').each(function () {
-                let copy = this.cloneNode(true);
-                copy.classList.remove('sticky-post');
-                copy.style.left = '';
-                this.replaceWith(copy);
-            });
-            // keep only the Like count from the post buttons
-            $('.post-buttons > li:not(.postlove-li)').remove();
-            $('.postlove-button, .postlove-button i').removeAttr('href data-ajax');
-            $('.postlove-button').css('pointer-events', 'none');
-        } else {
-            $('.post-buttons').remove();
+            addLikedBy();
         }
+        $('.post-buttons').remove();
         // expand all spoilers
         $('.spoilcontent').css('display', 'block');
         $('.spoilbtn').text('▼ ספוילער');
-        // like symbol for print + attachment/print layout fixes
+        // attachment/print layout fixes
         $('<style>').text(
-            '.postlove-button .like::before,.postlove-button .liked::before{font-family:FontAwesome;content:"\\f087";font-style:normal;font-size:1em;color:#555;padding-right:3px}' +
+            '.print-liked-by{clear:both;margin-top:6px;padding-top:4px;border-top:1px dotted #ccc;font-size:11px;color:#555}' +
+            '.print-liked-by .icon{padding-left:3px}' +
             '.postbody .content{overflow:visible!important;max-height:none!important}' +
             // long quotes: cut cleanly at QUOTE_MAX_PX, hide the "ווייז מער..." button/fade
             '.imcger-quote-text{height:auto!important}' +
@@ -90,6 +79,22 @@
             }
         });
         addPrintInfo();
+    }
+
+    // a "באדאנקט דורך: name, name" line under each liked post, from the like count's tooltip
+    // (postlove puts the names in its title, e.g. "תגובה באדאנקט דורך: name1, name2")
+    function addLikedBy() {
+        $('.post').each(function () {
+            let likes = $(this).find('.postlove-count:first');
+            let count = Number(likes.text()) || 0;
+            if (!count) return;
+            let title = likes.attr('title') || '';
+            let names = title.indexOf(':') >= 0 ? title.slice(title.indexOf(':') + 1).trim() : '';
+            $('<div>').addClass('print-liked-by')
+                .append($('<i>').addClass('icon fa-thumbs-o-up fa-fw').attr('aria-hidden', 'true'))
+                .append(document.createTextNode('באדאנקט דורך (' + count + '): ' + (names || '—')))
+                .appendTo($(this).find('.postbody:first'));
+        });
     }
 
     function addPrintInfo() {
