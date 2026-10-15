@@ -68,6 +68,29 @@ function open_colors() {
     window.close();
 }
 
+// The user's own links, added on the settings page
+function initCustomLinks() {
+    const section = document.getElementById('customLinksSection');
+
+    chrome.storage.local.get(['customLinks'], function (items) {
+        const links = items.customLinks || [];
+        if (!links.length)
+            return;
+
+        links.forEach(function (link) {
+            const option = document.createElement('div');
+            option.className = 'popup_options';
+            option.textContent = link.name;
+            option.addEventListener('click', function () {
+                chrome.tabs.create({url: link.url});
+                window.close();
+            });
+            section.appendChild(option);
+        });
+        section.hidden = false;
+    });
+}
+
 // A click switches the theme right away, the forum tab behind the popup repaints live (js/theme.js)
 function initThemeSwatches() {
     const container = document.getElementById('themeSwatches');
@@ -131,5 +154,7 @@ document.addEventListener('DOMContentLoaded', function () {
 document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('open_colors').addEventListener('click', open_colors);
 });
+
+document.addEventListener('DOMContentLoaded', initCustomLinks);
 
 document.addEventListener('DOMContentLoaded', initThemeSwatches);
