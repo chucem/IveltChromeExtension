@@ -13,6 +13,7 @@ const defualtPreferences = {
   cachedTopicMappingExpire: 3600,
   forceUpdateTopicMapCache: false,
   stickyPostButtons: false,
+  titleOpensUnread: true,
   ShowMultiNotifs: true,
   upDownArrowKeys: true,
   imageResizer: true,
