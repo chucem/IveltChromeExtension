@@ -19,7 +19,9 @@ const preferencesOptions = [
 	'driveButtonPlace',
 	'driveFolderName',
 	'openAttachmentsTab',
-	'copyPostLink'
+	'copyPostLink',
+	'printShowLikes',
+	'printLikesStyle'
 ];
 
 // Listen to settings changes
@@ -59,6 +61,10 @@ function postSettingChange(items){
 		const dropbox = document.getElementById('dropboxUpload').checked;
 		document.getElementById('driveFolderName').disabled = !drive;
 		document.getElementById('driveButtonPlace').disabled = !drive && !dropbox;
+	}
+
+	if(items.hasOwnProperty('printShowLikes')){
+		document.getElementById('printLikesStyle').disabled = !items.printShowLikes;
 	}
 
 	if(items.hasOwnProperty('debugMode')){

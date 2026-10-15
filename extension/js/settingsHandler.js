@@ -1,7 +1,7 @@
 (function(){
 
 	if(chrome.storage){
-		chrome.storage.local.get(['alwaysCopyTopic', 'stickyPostButtons', 'copyAttachments', 'forceUpdateTopicMapCache', 'cachedTopicMappingExpire', 'hideUserName', 'warnOnLosingPost','backgroundSync', 'backgroundSyncPosts', 'ShowMultiNotifs', 'upDownArrowKeys', 'copyPostLink'], function(items){
+		chrome.storage.local.get(['alwaysCopyTopic', 'stickyPostButtons', 'copyAttachments', 'forceUpdateTopicMapCache', 'cachedTopicMappingExpire', 'hideUserName', 'warnOnLosingPost','backgroundSync', 'backgroundSyncPosts', 'ShowMultiNotifs', 'upDownArrowKeys', 'copyPostLink', 'printShowLikes', 'printLikesStyle'], function(items){
 			if(items.hideUserName){
 				let userName = document.querySelector('.header-avatar .username');
 				if (userName)
@@ -53,6 +53,8 @@
 			e.setAttribute('data-show-multi-notifs',items.ShowMultiNotifs);
 			e.setAttribute('data-up-down-arrow-keys',items.upDownArrowKeys);
 			e.setAttribute('data-copy-post-link',items.copyPostLink);
+			e.setAttribute('data-print-show-likes',items.printShowLikes);
+			e.setAttribute('data-print-likes-style',items.printLikesStyle);
 			document.body.appendChild(e);
 
 			if(items.forceUpdateTopicMapCache === true){
