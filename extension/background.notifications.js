@@ -24,7 +24,7 @@ function parseAndSendNotifications(data){
   var unreadElements = getTagContent(data, 'li', 'row bg3');
   var storeOnly = false;
 
-  chrome.storage.local.get(['notificationsSent', 'isFreshInstall'], items => {
+  chrome.storage.local.get(['notificationsSent', 'isFreshInstall'], async items => {
 
     debugLog('isFreshInstall', items.isFreshInstall);
 
@@ -36,6 +36,9 @@ function parseAndSendNotifications(data){
     if(!unreadElements.length){
       return;
     }
+
+    // already shown on another computer (with settings sync on)
+    const sentElsewhere = await getNotificationsSentElsewhere();
 
     var unread = unreadElements.map(item => {
 
@@ -94,7 +97,16 @@ function parseAndSendNotifications(data){
         return;
       }
 
-      unread.forEach(u => queueNotification(u));
+      // saved above as sent, so they're not checked again, but not shown twice
+      const toSend = unread.filter(u => {
+        const shownElsewhere = sentElsewhere.includes(u.id);
+        if(shownElsewhere)
+          debugLog(u.id, 'Was sent on another computer');
+        return !shownElsewhere;
+      });
+
+      toSend.forEach(u => queueNotification(u));
+      shareSentNotifications(toSend.map(u => u.id));
     });
   });
 }
