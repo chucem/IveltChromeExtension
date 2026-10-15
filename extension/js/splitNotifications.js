@@ -60,6 +60,9 @@ function splitNotifications() {
       const dropdown = li.querySelector('.dropdown-extended');
       if (dropdown) {
         dropdown.id = `${type}_notification_list`;
+        // phpBB's own toggle lifts the dropdown it opens; ours only flip display,
+        // so without this the pinned first post is drawn over them
+        dropdown.style.zIndex = '1000';
 
         // Update header
         const header = dropdown.querySelector('.header');
