@@ -1,4 +1,4 @@
-const notificationUrl = "http://www.ivelt.com/forum/ucp.php?i=ucp_notifications";
+const notificationUrl = "https://www.ivelt.com/forum/ucp.php?i=ucp_notifications";
 
 const defualtPreferences = {
   hideUserName: false,
@@ -32,8 +32,11 @@ let debugQueueTimeout;
 const debugLogPrefix = 'debug-';
 
 let checkNewNotification = function () {
-    fetch(notificationUrl)
-      .then((response) => response.text())
+    fetch(notificationUrl, { headers: { 'X-Requested-With': chrome.runtime.id } })
+      .then((response) => {
+        if (!response.ok) throw new Error(response.status);
+        return response.text();
+      })
       .then((data) => {
 
       let matches =
@@ -55,7 +58,8 @@ let checkNewNotification = function () {
 
       const debugDate = new Date();
       debugLog('backgroundSync', `checkNewNotification: newCount(${newCount}), ${debugDate.getUTCMinutes()}:${debugDate.getUTCSeconds()})`);
-    });
+    })
+    .catch((e) => debugLog('backgroundSync', `checkNewNotification failed: ${e.message}`));
 };
 
 chrome.alarms.onAlarm.addListener(() => {
@@ -112,7 +116,15 @@ chrome.runtime.onInstalled.addListener((details) => {
   });
 });
 
-chrome.runtime.onMessage.addListener(function (request) {
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  if(request.type === 'resetSettings'){
+    chrome.storage.local.set(defualtPreferences, () => {
+      alarmToFetch(defualtPreferences.backgroundSync, defualtPreferences.backgroundSyncNotif);
+      sendResponse();
+    });
+    return true;
+  }
+
   if(request.type === 'badgeText'){
     chrome.action.setBadgeText({ text: request.text });
   }

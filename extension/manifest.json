@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "iVelt Helper v2",
   "description": "Adds accessibility and usability improvements to אייוועלט.",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAhcvRhavqG/7V9ar6NLXtvHS1fgBfhNdHk+zkkYQYkhEwF9ZoRF2V2+RZA3bl/VpSwSDjp4wPXxfbMomNOobCy/FhBGgn9DPINnFHFdbw6wLnL57f/5dDPXoP9anuTw5/RFbBZtBI+0SHeR5+28lCvbYQjmHPzfq+Hwrdu7BCDMIdaNLVs8BQaxn/FFzTPPyetEj94XYfEX/w+VXD+riN41bgXf0t2dS+buMHTNKHAdQ9eIEXu6i02bVjPhkcyjyEGzVO8nQ1/jHhBjqA/a23q1JPWAfiW9FV71coi5FCR18eTKyvpMDvDw7cvoaoFnK0VjYks87hyJ9zackMNOZyGQIDAQAB",
   "icons": {
     "48": "img/icon48.png",
