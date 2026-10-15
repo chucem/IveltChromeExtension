@@ -73,22 +73,22 @@ function initCustomLinks() {
     const section = document.getElementById('customLinksSection');
 
     chrome.storage.local.get(['customLinks'], function (items) {
-        const links = items.customLinks || [];
-        if (!links.length)
-            return;
-
-        links.forEach(function (link) {
+        (items.customLinks || []).forEach(function (link) {
             const option = document.createElement('div');
             option.className = 'popup_options';
-            option.textContent = link.name;
+            option.innerHTML = '<span class="popup_icon">🔗</span>';
+            option.append(link.name);
             option.addEventListener('click', function () {
                 chrome.tabs.create({url: link.url});
                 window.close();
             });
             section.appendChild(option);
         });
-        section.hidden = false;
     });
+}
+
+function showVersion() {
+    document.getElementById('popup_version').textContent = 'v' + chrome.runtime.getManifest().version;
 }
 
 // A click switches the theme right away, the forum tab behind the popup repaints live (js/theme.js)
@@ -156,5 +156,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 document.addEventListener('DOMContentLoaded', initCustomLinks);
+
+document.addEventListener('DOMContentLoaded', showVersion);
 
 document.addEventListener('DOMContentLoaded', initThemeSwatches);
