@@ -85,9 +85,9 @@
 
               lastPost.insertAdjacentHTML(
                 "afterend",
-                `<h3 id="ivelt-new-response-notification" style="margin:4px auto;text-align:center;background:#cadceb;padding:7px 5px 5px 5px;border:none;border-radius:7px;user-select:none;">
+                `<h3 id="ivelt-new-response-notification">
                                 נייע תגובות זענען צוגעקומען
-                                <a class="button" style="width:150px;margin:5px auto;display:block;" href="/forum/viewtopic.php?t=${topicId}&view=unread#unread">רילאוד</a>
+                                <a class="button" href="/forum/viewtopic.php?t=${topicId}&view=unread#unread">רילאוד</a>
                             </h3>`
               );
               notificationElement = document.getElementById("ivelt-new-response-notification");
