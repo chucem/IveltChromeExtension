@@ -62,18 +62,10 @@ chrome.alarms.onAlarm.addListener(() => {
   checkNewNotification();
 });
 
-chrome.runtime.onInstalled.addListener((details) => {
+chrome.runtime.onInstalled.addListener(async (details) => {
 
-  // Migrate settings from sync storage to local storage
-  chrome.storage.sync.get(null, function (items) {
-    if (Object.keys(items).length > 0) {
-      Object.keys(items).forEach((key) => {
-        chrome.storage.local.set({ [key]: items[key] });
-        chrome.storage.sync.remove(key);
-        console.log(`Migrated ${key}`);
-      });
-    }
-  });
+  // before the defaults, so a new computer starts with the user's synced settings
+  await settingsSyncOnInstall(details.reason);
 
   if (details.reason === "update" || details.reason === "install") {
     // Get current settings in local storage
@@ -124,7 +116,7 @@ chrome.runtime.onMessage.addListener(function (request) {
 });
 
 chrome.storage.onChanged.addListener((changes, area) => {
-  if(area !== 'sync')
+  if(area !== 'local')
     return;
 
   // clean debug logs when turned off
@@ -184,4 +176,4 @@ function commitDebugLog(name, values){
   })
 }
 
-importScripts('./background.notifications.js', './background.drive.js', './background.dropbox.js')
+importScripts('./background.notifications.js', './background.drive.js', './background.dropbox.js', './background.settingsSync.js')

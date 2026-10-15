@@ -118,8 +118,38 @@ function initSettings() {
 
 		initThemePicker(items.theme, items.customTheme);
 		initThemesToggle(items.themesEnabled);
+		initSettingsSyncToggle(items.settingsSync);
 
 		startListeners();
+	});
+}
+
+// The syncing itself is done in the background. Turning it on may bring in the settings
+// from another computer, then the page is reloaded to show them
+function initSettingsSyncToggle(enabled){
+	const checkbox = document.getElementById('settingsSync');
+	checkbox.checked = !!enabled;
+
+	checkbox.addEventListener('change', () => {
+		if(!checkbox.checked){
+			commitNewSetting({ settingsSync: false });
+			return;
+		}
+
+		chrome.runtime.sendMessage({ type: 'settingsSyncStart' }, response => {
+			if(chrome.runtime.lastError || !response || response.error){
+				checkbox.checked = false;
+				notify('עס האט נישט געקלאפט, פרובירט נאכאמאל');
+				return;
+			}
+
+			if(response.pulled.length){
+				notify('די אנשטעלונגען פון אייערע אנדערע קאמפיוטערס זענען אריינגעברענגט געווארן');
+				setTimeout(() => location.reload(), 1500);
+			}
+			else
+				notify();
+		});
 	});
 }
 
