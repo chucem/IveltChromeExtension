@@ -1,0 +1,8 @@
+/* "ציטיר" button over words selected in a post (js/quoteSelection.js) */
+
+.ih-quote-selection {
+    position: absolute;
+    z-index: 10;
+    transform: translate(-50%, calc(-100% - 6px));
+    white-space: nowrap;
+}

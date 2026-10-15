@@ -25,6 +25,7 @@ Most features can be turned on or off on the extension's settings page (right-cl
 ### Post buttons
 Extra buttons next to the regular quote button on every post:
 * **Quote last only** – for posts with nested quotes, quote just the last reply.
+* **Quote a selection** – select some words in a post and a ציטיר button shows up above them; it adds just those words, as a quote, at the top of your reply (after the quotes already there).
 * **Mention** (דערמאן) – insert an empty quote so the poster gets a notification (optionally copies it to the clipboard instead).
 * **Quote in another topic** – copy the post as a quote (with a source link and, optionally, its images) to paste in a different topic.
 * **Quote in the comments topic** – for topics that have a linked קאמענטארן topic, open a reply there with the post already quoted.
