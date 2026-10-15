@@ -1,26 +1,28 @@
 /*
  * The settings page follows the color theme picked for the forum: js/theme.js sets the
- * --t-* variables from js/themes.data.js, without a theme the fallbacks give the normal look.
- * They're resolved here once, on :root, so the theme previews (which set their own --t-*
- * variables to draw themselves) don't change the colors of the page around them.
+ * --t-* variables from js/themes.data.js, without a theme the fallbacks give the forum's
+ * own blue phpBB look. They're resolved here once, on :root, so the theme previews (which
+ * set their own --t-* variables to draw themselves) don't change the colors of the page
+ * around them.
  */
 :root {
-    --ui-bg: var(--t-bg, #F5F7FA);
+    --ui-bg: var(--t-bg, #ECF1F2);
     --ui-surface: var(--t-surface, #fff);
-    --ui-text: var(--t-text, #444);
-    --ui-muted: var(--t-muted, #888);
-    --ui-link: var(--t-link, #3477db);
-    --ui-heading: var(--t-link, #0A8ED0);
-    --ui-accent: var(--t-accent, #0A8ED0);
-    --ui-accent-dark: var(--t-accent-dark, #0A8ED0);
+    --ui-text: var(--t-text, #333);
+    --ui-muted: var(--t-muted, #666);
+    --ui-link: var(--t-link, #105289);
+    --ui-heading: var(--t-link, #105289);
+    --ui-accent: var(--t-accent, #12A3EB);
+    --ui-accent-dark: var(--t-accent-dark, #1675B9);
     --ui-header: var(--t-accent, #12A3EB);
     --ui-on-header: var(--t-on-accent, #fff);
-    --ui-border: var(--t-border, #e7e7e7);
-    --ui-panel: var(--t-row2, #eff0f1);
-    --ui-panel-border: var(--t-border, #d5d6d7);
+    --ui-border: var(--t-border, #B9C2C9);
+    --ui-panel: var(--t-row2, #DCE8F0);
+    --ui-panel-border: var(--t-border, #B9C2C9);
+    --ui-row-alt: var(--t-row1, #F4F7F9);
     --ui-input-bg: var(--t-input-bg, #fff);
-    --ui-input-border: var(--t-input-border, #ccc);
-    --ui-input-text: var(--t-strong, #444);
+    --ui-input-border: var(--t-input-border, #B9C2C9);
+    --ui-input-text: var(--t-strong, #333);
     --ui-error: var(--t-error, #a50e0e);
     --ui-selection: var(--t-highlight, #fff567);
     color-scheme: var(--t-scheme, light);
@@ -34,7 +36,6 @@ html, body {
     font-size: 10px;
 }
 html {
-    height: 100vh;
     box-sizing: border-box;
 }
 *, *::before, *::after {
@@ -42,10 +43,10 @@ html {
 }
 body {
     color: var(--ui-text);
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     line-height: 1.5em;
     background: var(--ui-bg);
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji','Segoe UI Symbol';
+    font-family: Verdana, Arial, Helvetica, sans-serif;
     direction: rtl;
 }
 strong {
@@ -53,12 +54,6 @@ strong {
 }
 small {
     font-size: smaller;
-}
-h1 {
-    font-size: 26px;
-    font-weight: 700;
-    text-align: center;
-    margin-bottom: 20px;
 }
 p {
     margin: 0 0 15px;
@@ -76,115 +71,146 @@ a.active {
     cursor: default;
     pointer-events: none;
 }
-hr {
-    height: 1px;
-    margin: 23px 0;
-    border-width: 0;
-    border-top: 1px solid var(--ui-border);
-}
 .hidden {
     display: none;
 }
 .warning {
     color: var(--ui-error);
 }
+
+/* "saved" message at the bottom corner (js/settings.js) */
+#notify {
+    position: fixed;
+    bottom: 22px;
+    left: 22px;
+    padding: 8px 18px;
+    border-radius: 4px;
+    background: linear-gradient(180deg, var(--ui-accent) 0%, var(--ui-accent-dark) 100%);
+    color: var(--ui-on-header);
+    font-size: 12px;
+    font-weight: bold;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+    pointer-events: none;
+}
+#notify.fade {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.content {
+    padding: 18px 22px 28px;
+}
+.section-title {
+    margin: 0 0 12px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--ui-border);
+    color: var(--ui-heading);
+    font-size: 15px;
+    font-weight: bold;
+}
+
+/* each group of settings is a card, like a phpBB forum block */
+.settings-group {
+    margin-bottom: 14px;
+    border: 1px solid var(--ui-panel-border);
+    background: var(--ui-surface);
+}
+.settings-group h3 {
+    margin: 0;
+    padding: 7px 12px;
+    border-bottom: 1px solid var(--ui-panel-border);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--ui-panel) 50%, var(--ui-surface)) 0%, var(--ui-panel) 100%);
+    color: var(--ui-heading);
+    font-size: 13px;
+    font-weight: bold;
+}
 .row {
-    margin: 0 0 24px;
+    margin: 0 0 14px;
     text-align: right;
+}
+.settings-group .row {
+    margin: 0;
+    padding: 10px 12px;
+    border-bottom: 1px solid color-mix(in srgb, var(--ui-border) 45%, var(--ui-surface));
+}
+.settings-group .row:last-child {
+    border-bottom: none;
+}
+.settings-group .row:nth-child(even) {
+    background: var(--ui-row-alt);
 }
 .row.row-indented {
     padding-right: 30px;
 }
-#notify {
-    position: fixed;
-    top: 0;
-    left: 50%;
-    opacity: 0;
-    background: var(--ui-panel);
-    color: var(--ui-text);
-    font-weight: 500;
-    text-align: center;
-    padding: 5px 25px 7px 25px;
-    transform: translateX(-50%);
-    border-left: 2px solid var(--ui-input-border);
-    border-right: 2px solid var(--ui-input-border);
-    border-bottom: 2px solid var(--ui-input-border);
-    border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 4px;
-    transition: opacity 0.75s linear;
-}
-.mainContent {
-    width: 750px;
-    display: grid;
-    grid-template-columns: 500px auto;
-    grid-column-gap: 40px;
-    grid-template-areas:
-    'h h'
-    'n m';
-}
-.pageHeader {
-    grid-area: h;
-    margin: 0 0 50px;
-    font-size: 20px;
-}
-.credits {
-    grid-area: m;
-    border-right: 1px solid var(--ui-border);
-    padding-right: 15px;
-    align-self: start;
-}
-.credits ul {
-    padding: 0;
+.settings-group ul {
     margin: 0;
-    list-style-type: none;
-}
-.content {
-    grid-area: n;
-    font-size: 16px;
-}
-.content h2 {
-    font-size: 16px;
-    font-weight: bold;
-    margin: 0 0 30px;
-}
-.sub-section {
-    margin-bottom: 35px;
-    font-size: 18px;
-}
-.sub-section ul {
     padding-right: 20px;
 }
-.sub-section ul li {
-    margin: 10px 0;
+.settings-group li {
+    margin: 8px 0;
 }
+.credits ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 18px;
+    padding: 0;
+    list-style: none;
+}
+
+/* checkboxes are drawn as on/off switches at the end of the row */
 input[type='checkbox'] {
     position: absolute;
     opacity: 0;
 }
 input[type='checkbox'] + label {
     position: relative;
-    padding-right: 30px;
+    display: block;
+    min-height: 20px;
+    padding-left: 56px;
     cursor: pointer;
 }
 input[type='checkbox'] + label:before {
+    content: '';
     position: absolute;
-    right: 0;
-    top: 4px;
-    font-family: 'checkbox';
-    text-decoration: none;
-    content: '\f096';
-    color: var(--ui-muted);
-    font-size: 24px;
-    cursor: pointer;
+    left: 0;
+    top: 50%;
+    width: 40px;
+    height: 20px;
+    margin-top: -10px;
+    border: 1px solid var(--ui-input-border);
+    border-radius: 20px;
+    background: color-mix(in srgb, var(--ui-muted) 40%, var(--ui-surface));
+    transition: background 0.25s, border-color 0.25s;
+}
+input[type='checkbox'] + label:after {
+    content: '';
+    position: absolute;
+    left: 23px;
+    top: 50%;
+    width: 14px;
+    height: 14px;
+    margin-top: -7px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    transition: transform 0.25s;
 }
 input[type='checkbox']:checked + label:before {
-    content: '\f14a';
-    color: var(--ui-link);
+    border-color: var(--ui-accent-dark);
+    background: var(--ui-accent);
 }
-/* A labelled field lines up with the text of the checkbox above it */
-.row.row-field {
-    padding-right: 30px;
+input[type='checkbox']:checked + label:after {
+    transform: translateX(-20px);
 }
+input[type='checkbox']:focus-visible + label:before {
+    outline: 2px solid var(--ui-accent);
+    outline-offset: 2px;
+}
+
+/* A labelled field: the label on its own line, the field under it */
 .row.row-field .label {
     display: block;
     margin-bottom: 6px;
@@ -192,47 +218,57 @@ input[type='checkbox']:checked + label:before {
 .text-input {
     width: 100%;
     max-width: 280px;
-    height: 32px;
-    padding: 4px 10px;
+    height: 28px;
+    padding: 4px 8px;
     border: 1px solid var(--ui-input-border);
-    border-radius: 4px;
+    border-radius: 3px;
     background: var(--ui-input-bg);
     color: var(--ui-input-text);
     font: inherit;
-    font-size: 15px;
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 .text-input:focus {
     outline: none;
     border-color: var(--ui-link);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--ui-link) 15%, transparent);
+    box-shadow: 0 0 3px color-mix(in srgb, var(--ui-accent) 35%, transparent);
 }
 .text-input:disabled {
     background: var(--ui-panel);
     color: var(--ui-muted);
 }
 select {
-    min-height: 1em;
-    height: 1.3em;
-    padding-inline-start: 20px;
-}
-/* the browser's own look is kept unless a theme is picked */
-:root[data-ivh-theme] select {
+    padding: 2px 8px;
     border: 1px solid var(--ui-input-border);
     border-radius: 3px;
     background: var(--ui-input-bg);
     color: var(--ui-input-text);
+    font: inherit;
 }
-#notify.fade {
-    opacity: 1;
+
+/* buttons, like the forum's own */
+.button {
+    display: inline-block;
+    padding: 5px 12px;
+    border: 1px solid var(--ui-border);
+    border-radius: 3px;
+    background: linear-gradient(180deg, var(--ui-surface) 0%, color-mix(in srgb, var(--ui-accent) 10%, var(--ui-surface)) 100%);
+    color: var(--ui-link);
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
 }
+.button:hover {
+    border-color: var(--ui-link);
+    text-decoration: none;
+}
+
 .shortcut-key {
     display: inline-block;
     padding: 3px 5px;
     border-radius: 6px;
     border: 1px solid var(--ui-panel-border);
     background-color: var(--ui-panel);
-    font-size: 0.7em;
+    font-size: 0.85em;
     line-height: 1;
 }
 .shortcut-key .icon {
@@ -249,17 +285,3 @@ select {
 }
 
 .shortcut-key .icon:before { padding-right: 2px; }
-  .settings-group {
-    margin-bottom: 30px;
-  }
-  .settings-group h3 {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--ui-heading);
-    margin: 0 0 18px;
-    padding-bottom: 4px;
-    border-bottom: 1px solid var(--ui-border);
-  }
-  .aaa .row + h2 {
-    margin-top: 30px;
-  }
