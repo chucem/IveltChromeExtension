@@ -1,0 +1,54 @@
+/* Players for Google Drive and Dropbox video/audio links in posts (js/mediaPlayer.js).
+   A video starts small and grows to the full width of the post once it's clicked or played.
+   The colors follow the forum's color theme when one is picked */
+
+.ih-media {
+    width: fit-content;
+    max-width: 100%;
+    margin: 6px 0;
+    padding: 10px;
+    border-left: 3px solid var(--t-link, #60a5fa);
+    background: var(--t-row3, #dbeafe);
+    box-sizing: border-box;
+}
+.ih-media:has(.ih-media-expanded) {
+    width: 100%;
+}
+
+.ih-media-download {
+    margin-bottom: 8px;
+}
+
+.ih-media-video {
+    position: relative;
+    width: 320px;
+    max-width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #000;
+    cursor: pointer;
+    transition: width 0.25s ease;
+}
+.ih-media-video.ih-media-expanded {
+    width: 100%;
+    cursor: auto;
+}
+.ih-media-video iframe,
+.ih-media-video video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+/* while the video is small, Drive's iframe lets the click through to the box */
+.ih-media-video:not(.ih-media-expanded) iframe {
+    pointer-events: none;
+}
+
+.ih-media-audio {
+    display: block;
+    width: 320px;
+    max-width: 100%;
+}
