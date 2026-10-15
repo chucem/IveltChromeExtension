@@ -33,6 +33,14 @@
         $('.post').removeClass('online'); // remove online-status indicator
         $('.postbody').width('100%');
         if (showLikes) {
+            // the "sticky post buttons" setting pins one bar with position:fixed and keeps doing so on scroll;
+            // swap in plain copies, so the like box stays with its post (the scroll listener only knows the old nodes)
+            $('.post-buttons').each(function () {
+                let copy = this.cloneNode(true);
+                copy.classList.remove('sticky-post');
+                copy.style.left = '';
+                this.replaceWith(copy);
+            });
             // keep only the Like count from the post buttons
             $('.post-buttons > li:not(.postlove-li)').remove();
             $('.postlove-button, .postlove-button i').removeAttr('href data-ajax');
