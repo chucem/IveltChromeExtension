@@ -4,6 +4,7 @@ let scripts = [
   "js/newResponseNotification.js",
   "js/pageEnhancements.js",
   "js/splitNotifications.js",
+  "js/whoLiked.js",
   "js/addTopicButtons.js",
   "js/addGoogleSearch.js"
 ];

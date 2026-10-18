@@ -88,6 +88,7 @@
         "js/addGoogleSearch.js",
         "js/pageEnhancements.js",
         "js/splitNotifications.js",
+        "js/whoLiked.js",
 		"js/addTopicButtons.js",
         "js/settingsHandler.js",
         "js/print.js"
