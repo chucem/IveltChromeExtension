@@ -90,7 +90,8 @@
         "js/splitNotifications.js",
 		"js/addTopicButtons.js",
         "js/settingsHandler.js",
-        "js/print.js"
+        "js/print.js",
+        "js/pictureViewer.js"
       ],
       "matches": [
         "*://*.ivelt.com/*",

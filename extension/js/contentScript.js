@@ -5,7 +5,8 @@ let scripts = [
   "js/pageEnhancements.js",
   "js/splitNotifications.js",
   "js/addTopicButtons.js",
-  "js/addGoogleSearch.js"
+  "js/addGoogleSearch.js",
+  "js/pictureViewer.js"
 ];
 
 scripts.forEach((s) => {

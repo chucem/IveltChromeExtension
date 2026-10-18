@@ -30,6 +30,7 @@ Extra buttons next to the regular quote button on every post:
 * **Quote in the comments topic** – for topics that have a linked קאמענטארן topic, open a reply there with the post already quoted.
 * **Copy post link** – a plain click on the small post icon next to the author's name copies the post's link instead of opening it. Right-click and long-press work as before.
 * Option to keep the post buttons visible while scrolling through a long post.
+* **Picture viewer** – clicking a picture in a post opens it large over the page, with arrows (on the screen or the keyboard) to the other pictures on the page. Esc or a click next to the picture closes it.
 
 ### Notifications
 * Toolbar badge with your unread notification count, and optional browser notifications, even when אייוועלט isn't open.
