@@ -29,6 +29,7 @@ Extra buttons next to the regular quote button on every post:
 * **Quote in another topic** – copy the post as a quote (with a source link and, optionally, its images) to paste in a different topic.
 * **Quote in the comments topic** – for topics that have a linked קאמענטארן topic, open a reply there with the post already quoted.
 * **Copy post link** – a plain click on the small post icon next to the author's name copies the post's link instead of opening it. Right-click and long-press work as before.
+* **Profile card** – resting the mouse on a username (an author, a name in a quote, a mention) opens a card with everything their profile shows: avatar, online, rank, profile fields, contact links, statistics and signature. The mouse can move into the card to use its links.
 * Option to keep the post buttons visible while scrolling through a long post.
 
 ### Notifications

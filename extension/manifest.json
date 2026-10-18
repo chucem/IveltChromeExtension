@@ -35,6 +35,7 @@
       ],
 	  "css":["css/appcss.css"],
       "js": [
+        "js/profileCards.js",
         "js/settingsHandler.js",
         "js/contentScript.js",
         "js/refreshNotificationCount.js"

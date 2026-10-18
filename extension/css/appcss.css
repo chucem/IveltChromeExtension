@@ -11,6 +11,131 @@
     display: none;
 }
 
+/* the card shown when the mouse rests on a username (js/profileCards.js), with a small
+   pointer at the name; it follows the color theme when one is picked */
+.ih-profile-card {
+    position: absolute;
+    z-index: 1000;
+    width: 320px;
+    padding: 12px;
+    border: 1px solid var(--t-border, #B9C2C9);
+    border-radius: 10px;
+    background: var(--t-surface, #fff);
+    color: var(--t-text, #333);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+    direction: rtl;
+    text-align: right;
+    font-size: 12px;
+    line-height: 1.45;
+    animation: ih-profile-in 0.15s ease-out;
+}
+.ih-profile-card::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: var(--ih-pointer-x, 50%);
+    width: 10px;
+    height: 10px;
+    margin-left: -5px;
+    border-top: 1px solid var(--t-border, #B9C2C9);
+    border-left: 1px solid var(--t-border, #B9C2C9);
+    background: inherit;
+    transform: rotate(45deg);
+}
+/* over the name, the pointer is at the bottom */
+.ih-profile-card.ih-profile-above::before {
+    top: auto;
+    bottom: -6px;
+    border: 0;
+    border-right: 1px solid var(--t-border, #B9C2C9);
+    border-bottom: 1px solid var(--t-border, #B9C2C9);
+}
+@keyframes ih-profile-in {
+    from { opacity: 0; }
+}
+.ih-profile-card a {
+    color: var(--t-link, #105289);
+}
+.ih-profile-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.ih-profile-avatar {
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    border-radius: 8px;
+    object-fit: cover;
+}
+.ih-profile-title {
+    min-width: 0;
+}
+.ih-profile-name {
+    font-size: 15px;
+    font-weight: bold;
+    color: var(--t-link, #105289);
+}
+.ih-profile-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 4px;
+}
+.ih-profile-tag {
+    padding: 1px 8px;
+    border-radius: 10px;
+    background: var(--t-row2, #ECF3F7);
+    color: var(--t-muted, #666);
+    font-size: 11px;
+}
+.ih-profile-online {
+    background: var(--t-success, #2E7D32);
+    color: #fff;
+}
+.ih-profile-section {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: 1px solid var(--t-border, #DCE3E8);
+}
+.ih-profile-loading .ih-profile-section {
+    color: var(--t-muted, #666);
+}
+.ih-profile-heading {
+    margin-bottom: 4px;
+    color: var(--t-link, #105289);
+    font-size: 11px;
+    font-weight: bold;
+}
+.ih-profile-rows {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 4px 10px;
+    margin: 0;
+}
+.ih-profile-rows dt {
+    color: var(--t-muted, #666);
+    font-weight: normal;
+}
+.ih-profile-rows dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+/* a long signature shows its beginning, fading out */
+.ih-profile-signature {
+    max-height: 80px;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+}
+.ih-profile-signature-long {
+    -webkit-mask-image: linear-gradient(to bottom, #000 65%, transparent);
+    mask-image: linear-gradient(to bottom, #000 65%, transparent);
+}
+.ih-profile-signature img {
+    max-width: 100%;
+    max-height: 60px;
+}
+
 
 .sticky-post{
     position: fixed !important;
