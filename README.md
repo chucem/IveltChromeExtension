@@ -40,6 +40,7 @@ Extra buttons next to the regular quote button on every post:
 
 ### Writing posts
 * Warning before leaving a page with an unsent post.
+* **Drafts**: what you type in the reply box (quick reply or full editor) is kept as you type, so a crash or a closed tab doesn't lose it; the next time the same reply box opens, a bar shows when it was kept and its first lines, and offers to bring it back. Only sending the post drops the draft.
 * **Image Resizer** on the post editor: images that are too big for an attachment are shrunk automatically, whether they are picked, dropped or pasted.
 * **Paste images** straight into a post (like in Gmail): the image is attached and placed inline where you pasted it. This is a separate setting, so pasting can be on with the resizer off.
 * Pack a whole folder into a single ZIP attachment (drop it on the editor, or use the **Folder → ZIP** button).

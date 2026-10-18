@@ -7,6 +7,42 @@
     display: none;
 }
 
+/* the bar over the reply box that offers a kept draft back (js/drafts.js): an accent line,
+   when it was kept and its first words; it follows the color theme when one is picked */
+.ih-draft-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+    padding: 8px 10px;
+    border: 1px solid var(--t-border, #B9C2C9);
+    border-right: 3px solid var(--t-link, #105289);
+    background: var(--t-surface, #fff);
+    color: var(--t-text, #333);
+    animation: ih-draft-in 0.2s ease-out;
+}
+@keyframes ih-draft-in {
+    from { opacity: 0; transform: translateY(-4px); }
+}
+.ih-draft-icon {
+    color: var(--t-link, #105289);
+    font-size: 16px;
+}
+.ih-draft-text {
+    flex: 1;
+    min-width: 0;
+}
+/* the draft's first two lines */
+.ih-draft-words {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    color: var(--t-muted, #666);
+    font-size: 0.9em;
+    white-space: pre-line;
+}
+
 .post-buttons .app-hidden {
     display: none;
 }
