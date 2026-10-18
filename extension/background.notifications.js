@@ -63,39 +63,45 @@ function parseAndSendNotifications(data){
       }
     });
     
-    // filter sent items
-    if(items.notificationsSent){
-      unread = unread.filter(u => {
-        debugLog(u.id, 'Was already sent: ' + !!items.notificationsSent.includes(u.id));
-        return !items.notificationsSent.includes(u.id)
-      });
-    }
+    const sent = sentIds(items.notificationsSent);
+
+    // filter sent items, and ones already waiting in the queue
+    unread = unread.filter(u => {
+      debugLog(u.id, 'Was already sent: ' + sent.includes(u.id));
+      return !sent.includes(u.id) && !queue.some(q => q.id === u.id);
+    });
 
     if(!unread.length)
       return;
 
-    var saveNewIds = unread.map(u => {
-      debugLog(u.id, 'storeOnly: ' + storeOnly);
-      return u.id;
-    }).join(',');
+    // dont send the initial batch, only remember it
+    if(storeOnly){
+      debugLog(unread[0].id, 'storeOnly: saving ' + unread.length);
+      saveSentIds(sent.concat(unread.map(u => u.id)));
+      return;
+    }
 
-    var notificationsSent = (items.notificationsSent ? items.notificationsSent + ',' : '') + saveNewIds;
+    unread.forEach(u => queueNotification(u));
+  });
+}
 
-    debugLog(unread[0].id, 'savingBytes: ' + notificationsSent.length);
+// keep only the newest ids, a check never sees more than one page of notifications
+const maxSentIds = 250;
 
-    // save sent items in storage
-    // TODO: prune old ids to avoid storage quota errors
-    chrome.storage.local.set({
-      'notificationsSent': notificationsSent
-    }, () => {
-      // dont send the initial batch
-      if(storeOnly){
-        storeOnly = false;
-        return;
-      }
+function sentIds(stored){
+  return stored ? stored.split(',') : [];
+}
 
-      unread.forEach(u => queueNotification(u));
-    });
+function saveSentIds(ids){
+  chrome.storage.local.set({ 'notificationsSent': ids.slice(-maxSentIds).join(',') });
+}
+
+// remember an id only once its notification was shown, so a failed one is retried on the next check
+function markSent(id){
+  chrome.storage.local.get(['notificationsSent'], items => {
+    const sent = sentIds(items.notificationsSent);
+    if(!sent.includes(id))
+      saveSentIds(sent.concat(id));
   });
 }
 
@@ -122,11 +128,18 @@ function sendBrowserNotification(item){
   debugLog(item.id, 'Sending notification');
   chrome.notifications.create(item.id, {
     type: 'basic',
-    iconUrl: origin + 'fav/apple-icon-60x60.png',
+    // bundled icon: the site's own icon gets a Cloudflare challenge, which makes create() fail
+    iconUrl: chrome.runtime.getURL('img/icon128.png'),
     title: item.title,
     message: item.message,
     contextMessage: item.subMessage,
     priority: 2
+  }, () => {
+    if(chrome.runtime.lastError){
+      debugLog(item.id, 'Notification failed: ' + chrome.runtime.lastError.message);
+      return;
+    }
+    markSent(item.id);
   });
 }
 
