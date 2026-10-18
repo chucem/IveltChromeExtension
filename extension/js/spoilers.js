@@ -34,6 +34,8 @@
             spoiler.classList.add('ih-spoiler-inline');
             // an inline spoiler has a box for each of its lines
             if (content.getClientRects().length > MAX_LINES) spoiler.classList.add('ih-spoiler-long');
+        } else if (wordsPastLines(spoiler, MAX_LINES)) {
+            spoiler.classList.add('ih-spoiler-long');
         }
 
         spoiler.tabIndex = 0;
@@ -77,6 +79,16 @@
             text.replaceWith(words);
             words.appendChild(text);
         });
+    }
+
+    // A spoiler with a quote, a list... in it is long when its words go past its first lines
+    // (a spoiler of just a picture isn't, so the whole blurred picture shows)
+    function wordsPastLines(spoiler, lines) {
+        const style = getComputedStyle(spoiler);
+        const lineHeight = parseFloat(style.lineHeight) || parseFloat(style.fontSize) * 1.2;
+        const limit = spoiler.getBoundingClientRect().top + lines * lineHeight;
+        return [...spoiler.querySelectorAll('.ih-spoiler-words')]
+            .some((words) => words.getBoundingClientRect().bottom > limit + 1);
     }
 
     // The picture stays where it is, the dots go over it
