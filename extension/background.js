@@ -24,6 +24,7 @@ const defualtPreferences = {
   openAttachmentsTab: true,
   copyPostLink: true,
   printShowLikes: false,
+  printLikesStyle: 'names',
   themesEnabled: false,
   theme: 'default'
 };
