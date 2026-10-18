@@ -184,10 +184,12 @@
           </select>
         </div>
         <div class='row row-indented' >
-          <label for='backgroundSyncNotif' class='label'>טשעק פאר נייע נאטיפיקאציעס יעדע</label>
-          <select id='backgroundSyncNotif' class='option'>
+          <label for='backgroundSyncNotifMinutes' class='label'>טשעק פאר נייע נאטיפיקאציעס יעדע</label>
+          <select id='backgroundSyncNotifMinutes' class='option'>
             <option value="1">מינוט</option>
             <option value="5">5 מינוט</option>
+            <option value="10">10 מינוט</option>
+            <option value="15">15 מינוט</option>
             <option value="">טשעק נישט</option>
           </select>
         </div>
@@ -216,6 +218,9 @@
           <input type='checkbox' id='debugMode' class='option' />
           <label for='debugMode' class='label warning'>דיבאג מאוד <span style="font-size: 0.8em;">(נאר פאר טעכנישע פראבלעמען)</span></label>
           <a class="hidden js-copy-logs">קאפיר די לאגס</a>
+        </div>
+        <div class='row'>
+          <a style="font-size: 0.8em;" id='resetSettings' class='button'>שטעל צוריק אלע אנשטעלונגען ווי פון אנהייב</a>
         </div>
       </div>
 

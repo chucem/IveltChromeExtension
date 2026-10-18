@@ -1,4 +1,4 @@
-const notificationUrl = "http://www.ivelt.com/forum/ucp.php?i=ucp_notifications";
+const notificationUrl = "https://www.ivelt.com/forum/ucp.php?i=ucp_notifications";
 
 const defualtPreferences = {
   hideUserName: false,
@@ -9,7 +9,7 @@ const defualtPreferences = {
   debugMode: false,
   backgroundSync: true,
   backgroundSyncPosts: 20000,
-  backgroundSyncNotif: 1,
+  backgroundSyncNotifMinutes: 10, // minutes, checking less often goes easy on the server
   cachedTopicMappingExpire: 3600,
   forceUpdateTopicMapCache: false,
   stickyPostButtons: false,
@@ -33,8 +33,11 @@ let debugQueueTimeout;
 const debugLogPrefix = 'debug-';
 
 let checkNewNotification = function () {
-    fetch(notificationUrl)
-      .then((response) => response.text())
+    fetch(notificationUrl, { headers: { 'X-Requested-With': chrome.runtime.id } })
+      .then((response) => {
+        if (!response.ok) throw new Error(response.status);
+        return response.text();
+      })
       .then((data) => {
 
       let matches =
@@ -56,7 +59,8 @@ let checkNewNotification = function () {
 
       const debugDate = new Date();
       debugLog('backgroundSync', `checkNewNotification: newCount(${newCount}), ${debugDate.getUTCMinutes()}:${debugDate.getUTCSeconds()})`);
-    });
+    })
+    .catch((e) => debugLog('backgroundSync', `checkNewNotification failed: ${e.message}`));
 };
 
 chrome.alarms.onAlarm.addListener(() => {
@@ -96,16 +100,32 @@ chrome.runtime.onInstalled.addListener(async (details) => {
   // Set default settings to storage if not already present (fresh install or otherwise)
   chrome.storage.local.get({
     ...defualtPreferences,
-    isFreshInstall: true // needed for initial notifications
+    isFreshInstall: true, // needed for initial notifications
+    backgroundSyncNotif: null // the old name of backgroundSyncNotifMinutes
   }, function(items){
+    // move the old setting to the new name, and users off the old 1 minute default, to go easy on the server
+    if(items.backgroundSyncNotif !== null){
+      items.backgroundSyncNotifMinutes = parseInt(items.backgroundSyncNotif) === 1 ? defualtPreferences.backgroundSyncNotifMinutes : items.backgroundSyncNotif;
+      chrome.storage.local.remove('backgroundSyncNotif');
+    }
+    delete items.backgroundSyncNotif;
+
     if(items && Object.keys(items).length)
       chrome.storage.local.set(items);
 
-    alarmToFetch(items.backgroundSync, parseInt(items.backgroundSyncNotif));
+    alarmToFetch(items.backgroundSync, parseInt(items.backgroundSyncNotifMinutes));
   });
 });
 
-chrome.runtime.onMessage.addListener(function (request) {
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  if(request.type === 'resetSettings'){
+    chrome.storage.local.set(defualtPreferences, () => {
+      alarmToFetch(defualtPreferences.backgroundSync, defualtPreferences.backgroundSyncNotifMinutes);
+      sendResponse();
+    });
+    return true;
+  }
+
   if(request.type === 'badgeText'){
     chrome.action.setBadgeText({ text: request.text });
   }
@@ -117,6 +137,7 @@ chrome.runtime.onMessage.addListener(function (request) {
 });
 
 chrome.storage.onChanged.addListener((changes, area) => {
+  // settings live in local storage since the migration from sync
   if(area !== 'local')
     return;
 
@@ -130,16 +151,17 @@ chrome.storage.onChanged.addListener((changes, area) => {
     })
   }
 
-  if(changes.backgroundSync || changes.backgroundSyncNotif){
-    chrome.storage.local.get(['backgroundSync', 'backgroundSyncNotif'], items => {
-      alarmToFetch(items.backgroundSync, parseInt(items.backgroundSyncNotif));
+  if(changes.backgroundSync || changes.backgroundSyncNotifMinutes){
+    chrome.storage.local.get(['backgroundSync', 'backgroundSyncNotifMinutes'], items => {
+      alarmToFetch(items.backgroundSync, parseInt(items.backgroundSyncNotifMinutes));
     });
   }
 });
 
 function alarmToFetch(create, frequency){
   debugLog('backgroundSync', `alarmToFetch(${create}, ${frequency})`);
-  if(create){
+  // "dont check" saves an empty frequency
+  if(create && frequency > 0){
     chrome.alarms.create("alarm", { periodInMinutes: frequency });
   }
   else {

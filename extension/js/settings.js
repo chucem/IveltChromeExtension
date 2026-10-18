@@ -4,7 +4,7 @@ const preferencesOptions = [
 	'warnOnLosingPost',
 	'backgroundSync',
 	'backgroundSyncPosts',
-	'backgroundSyncNotif',
+	'backgroundSyncNotifMinutes',
 	'debugMode',
 	"alwaysCopyTopic",
 	'cachedTopicMappingExpire',
@@ -46,13 +46,22 @@ function startListeners(){
 		});
 	});
 	document.querySelector('.js-copy-logs').addEventListener('click', copyLogs);
+	document.getElementById('resetSettings').addEventListener('click', resetSettings);
+}
+
+// The defaults live in background.js, so it does the reset
+function resetSettings(){
+	if(!confirm('זענט איר זיכער אז איר ווילט צוריקשטעלן אלע אנשטעלונגען ווי זיי זענען געווען פון אנהייב?'))
+		return;
+
+	chrome.runtime.sendMessage({ type: 'resetSettings' }, () => location.reload());
 }
 
 // update fields after a related setting has been changed
 function postSettingChange(items){
 	if(items.hasOwnProperty('backgroundSync')){
 		document.getElementById('backgroundSyncPosts').disabled = !items.backgroundSync;
-		document.getElementById('backgroundSyncNotif').disabled = !items.backgroundSync;
+		document.getElementById('backgroundSyncNotifMinutes').disabled = !items.backgroundSync;
 	}
 
 	if(items.hasOwnProperty('driveUpload') || items.hasOwnProperty('dropboxUpload')){

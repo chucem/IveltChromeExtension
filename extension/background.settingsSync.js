@@ -22,7 +22,7 @@ const SYNCED_SETTINGS = [
   'warnOnLosingPost',
   'backgroundSync',
   'backgroundSyncPosts',
-  'backgroundSyncNotif',
+  'backgroundSyncNotifMinutes',
   'cachedTopicMappingExpire',
   'stickyPostButtons',
   'ShowMultiNotifs',
