@@ -10,6 +10,7 @@ const preferencesOptions = [
 	'cachedTopicMappingExpire',
 	'copyAttachments',
 	'stickyPostButtons',
+	'titleOpensUnread',
 	'ShowMultiNotifs',
 	'upDownArrowKeys',
 	'imageResizer',

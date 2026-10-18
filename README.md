@@ -48,6 +48,7 @@ Extra buttons next to the regular quote button on every post:
 
 ### Other
 * Google search within the current topic, or across the whole site.
+* **Titles open the first unread post**: in a list of topics, clicking the title of a topic with unread posts opens it at the first unread post instead of the first page (can be turned off).
 * Print several pages, or a whole topic, at once (forked from [bookmarkify.it/47839](https://bookmarkify.it/47839)).
 * Toolbar popup with quick links (home page, inbox, active topics), quick sign-in, and emergency sign-out.
 

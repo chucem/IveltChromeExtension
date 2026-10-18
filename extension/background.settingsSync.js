@@ -25,6 +25,7 @@ const SYNCED_SETTINGS = [
   'backgroundSyncNotifMinutes',
   'cachedTopicMappingExpire',
   'stickyPostButtons',
+  'titleOpensUnread',
   'ShowMultiNotifs',
   'upDownArrowKeys',
   'copyPostLink',
