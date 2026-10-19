@@ -26,6 +26,7 @@ const defualtPreferences = {
   copyPostLink: true,
   printShowLikes: false,
   printLikesStyle: 'names',
+  editorUndo: true,
   themesEnabled: false,
   theme: 'default'
 };

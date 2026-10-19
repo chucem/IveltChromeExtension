@@ -98,6 +98,7 @@
         "js/pageEnhancements.js",
         "js/splitNotifications.js",
 		"js/addTopicButtons.js",
+        "js/editorUndo.js",
         "js/settingsHandler.js",
         "js/print.js"
       ],

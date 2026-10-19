@@ -38,6 +38,7 @@ const SYNCED_SETTINGS = [
   'driveFolderName',
   'printShowLikes',
   'printLikesStyle',
+  'editorUndo',
   'themesEnabled',
   'theme',
   'customTheme'

@@ -22,7 +22,8 @@ const preferencesOptions = [
 	'openAttachmentsTab',
 	'copyPostLink',
 	'printShowLikes',
-	'printLikesStyle'
+	'printLikesStyle',
+	'editorUndo'
 ];
 
 // Listen to settings changes
