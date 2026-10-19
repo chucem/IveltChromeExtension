@@ -45,7 +45,8 @@
       "js": [
         "js/settingsHandler.js",
         "js/contentScript.js",
-        "js/refreshNotificationCount.js"
+        "js/refreshNotificationCount.js",
+        "js/mentionLinks.js"
       ]
     },
     {

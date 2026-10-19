@@ -37,6 +37,7 @@ Extra buttons next to the regular quote button on every post:
 * Separate notification bells for quotes, thanks and mentions (ציטירט / באדאנקט / דערמאנט).
 * Button to hide read notifications on the notifications page.
 * Confirmation before "mark all as read", so it isn't clicked by accident.
+* A mention (@name) in a post links to that user's profile.
 
 ### Writing posts
 * Warning before leaving a page with an unsent post.
