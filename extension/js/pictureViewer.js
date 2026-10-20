@@ -1,19 +1,7 @@
-// Picture viewer
-//
-// Clicking a picture in a post opens it large over the page, with arrows - on the screen
-// or the keyboard - to the other pictures on the page. Esc, the ✕ or a click next to the
-// picture closes it. Smilies and pictures in signatures are left alone, a picture that
-// links to another site still opens that site, and Ctrl+click still opens a new tab. The
-// forum's own click on an attachment (which only switched its size) is replaced by the
-// viewer.
-//
-// Runs in the page, loaded by js/contentScript.js like the other page scripts.
-
 (function () {
     'use strict';
 
     const PICTURES = '.postbody .content img:not(.smilies)';
-    // a link straight to a picture, or to an attachment
     const PICTURE_ADDRESS = /\.(jpe?g|png|gif|webp|bmp|avif)([?#]|$)|\/download\/file\.php\?/i;
 
     let viewer = null;
@@ -21,7 +9,6 @@
     let index = 0;
 
     function init() {
-        // capturing, so this runs before the forum's own click on the picture
         document.addEventListener('click', onClick, true);
         window.addEventListener('keydown', onKey, true);
     }
@@ -37,14 +24,12 @@
         show(pictures.indexOf(img));
     }
 
-    // Shown on the page and clickable (not in a closed or hidden spoiler), and not a link to another site
     function isViewable(img) {
         if (!img.matches(PICTURES) || !img.offsetParent || getComputedStyle(img).pointerEvents === 'none') return false;
         const link = img.closest('a');
         return !link || PICTURE_ADDRESS.test(link.href);
     }
 
-    // The full picture: the one its link goes to (an attachment's thumbnail links to the full one)
     function fullAddress(img) {
         const link = img.closest('a');
         return link && PICTURE_ADDRESS.test(link.href) ? link.href : img.currentSrc || img.src;
@@ -73,8 +58,6 @@
         return viewer && viewer.isConnected;
     }
 
-    // The arrows go the way the page reads (right to left), like the forum's own page arrows.
-    // While it's open the keys are the viewer's, not the page's (no page change, no scrolling)
     function onKey(event) {
         if (!isOpen()) return;
 
@@ -108,7 +91,6 @@
         newViewer.querySelector('.ih-viewer-close').addEventListener('click', close);
         newViewer.querySelector('.ih-viewer-previous').addEventListener('click', () => show(index - 1));
         newViewer.querySelector('.ih-viewer-next').addEventListener('click', () => show(index + 1));
-        // a click next to the picture closes it
         newViewer.addEventListener('click', (event) => {
             if (event.target === newViewer) close();
         });

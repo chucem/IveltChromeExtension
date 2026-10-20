@@ -23,7 +23,6 @@
     backdrop-filter: blur(2px);
 }
 
-/* the picture viewer over the page (js/pictureViewer.js) */
 .ih-viewer-open {
     overflow: hidden;
 }
@@ -90,7 +89,6 @@
 .ih-viewer-bar a {
     color: #fff;
 }
-/* with only one picture there's nothing to go to */
 .ih-viewer-single .ih-viewer-previous,
 .ih-viewer-single .ih-viewer-next,
 .ih-viewer-single .ih-viewer-count {
