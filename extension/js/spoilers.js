@@ -8,18 +8,27 @@
 // reveals it for good and opens it to its full height. While it's hidden the links and
 // pictures in it can't be clicked, so the first click only reveals.
 //
-// Runs as a content script (isolated world).
+// Runs as a content script (isolated world) and is controlled by the "telegramSpoilers"
+// setting (off by default, so the forum's spoilers look as they always did); turning it on
+// or off applies from the next page load.
 
 (function () {
     'use strict';
 
+    const SETTING_KEY = 'spoilerPolish';
     const MAX_LINES = 3;
     const EXPAND_MS = 400; // as long as the max-height transition in css/spoilers.css
     // anything that can't sit in the middle of a line of text
     const BLOCKS = 'div, p, blockquote, dl, ul, ol, table, pre, hr, iframe, video, audio';
 
     function init() {
-        document.querySelectorAll('.spoilwrapper').forEach(hideSpoiler);
+        if (!chrome.storage || !chrome.storage.local) return;
+
+        chrome.storage.local.get([SETTING_KEY], (items) => {
+            if (items[SETTING_KEY] !== true) return;
+
+            document.querySelectorAll('.spoilwrapper').forEach(hideSpoiler);
+        });
     }
 
     function hideSpoiler(spoiler) {

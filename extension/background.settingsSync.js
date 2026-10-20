@@ -27,6 +27,7 @@ const SYNCED_SETTINGS = [
   'stickyPostButtons',
   'ShowMultiNotifs',
   'upDownArrowKeys',
+  'spoilerPolish',
   'copyPostLink',
   'imageResizer',
   'pasteImages',

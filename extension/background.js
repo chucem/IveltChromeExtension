@@ -15,6 +15,7 @@ const defualtPreferences = {
   stickyPostButtons: false,
   ShowMultiNotifs: true,
   upDownArrowKeys: true,
+  spoilerPolish: false,
   imageResizer: true,
   pasteImages: true,
   driveUpload: true,

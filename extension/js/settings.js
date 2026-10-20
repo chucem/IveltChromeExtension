@@ -12,6 +12,7 @@ const preferencesOptions = [
 	'stickyPostButtons',
 	'ShowMultiNotifs',
 	'upDownArrowKeys',
+	'spoilerPolish',
 	'imageResizer',
 	'pasteImages',
 	'driveUpload',
