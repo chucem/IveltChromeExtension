@@ -1,10 +1,3 @@
-/* Spoilers like on Telegram (js/spoilers.js): the words are covered with moving dust right
-   where they are, the pictures are blurred with sparkling dots over them, until the spoiler
-   is clicked. !important because the forum writes the spoiler's styles inline. The dust
-   on words takes the text color, so it also shows in dark color themes */
-
-/* how much the spoiler is covered, 1 while hidden and 0 once revealed; registered so the
-   dust and the blur fade out together instead of jumping */
 @property --ih-dust {
     syntax: '<number>';
     inherits: true;
@@ -27,7 +20,6 @@
     outline: 2px solid currentColor;
     outline-offset: 2px;
 }
-/* the forum's "ווייז ספוילער" bar isn't needed, the content itself is the spoiler */
 .ih-spoiler .spoiltitle {
     display: none !important;
 }
@@ -41,13 +33,11 @@
     pointer-events: none;
 }
 
-/* a spoiler of a few words stays in the middle of its line */
 .ih-spoiler-inline,
 .ih-spoiler-inline .spoilcontent {
     display: inline !important;
     margin: 0 !important;
 }
-/* a long one shows only its first three lines until it's revealed */
 .ih-spoiler-long {
     display: block !important;
     margin: 0.5em 0 !important;
@@ -57,7 +47,6 @@
     overflow: hidden;
 }
 
-/* words: the text fades out and the dust in, line by line */
 .ih-spoiler-words {
     border-radius: 4px;
     -webkit-box-decoration-break: clone;
@@ -79,7 +68,6 @@
     text-decoration-color: transparent;
 }
 
-/* pictures: blurred, with white sparkling dots over them, like Telegram's hidden photos */
 .ih-spoiler-picture {
     position: relative;
     display: inline-block;
@@ -107,15 +95,12 @@
 .ih-spoiler-hidden .ih-spoiler-picture::after {
     animation-play-state: running;
 }
-/* an attached picture's caption (its name, size and views) shows only once it's revealed
-   (on screen; printed spoilers come out open) */
 @media screen {
     .ih-spoiler-hidden .spoilcontent dl:has(.ih-spoiler-picture) dd {
         display: none;
     }
 }
 
-/* videos and players in a spoiler are blurred too */
 .ih-spoiler .spoilcontent :is(iframe, video, audio) {
     filter: blur(calc(var(--ih-dust) * 16px));
 }
@@ -131,7 +116,6 @@
     }
 }
 
-/* printed open, like the print button already does with the forum's spoilers */
 @media print {
     .ih-spoiler-hidden {
         --ih-dust: 0;
