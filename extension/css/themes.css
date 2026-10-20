@@ -111,9 +111,14 @@
 :root[data-ivh-theme] .pinned div .postbody { color: var(--t-text); }
 
 /* Quotes, code and attachments */
+/* nested quotes alternate between two shades at every level, so each one stands out from the one around it */
 :root[data-ivh-theme] blockquote { background-color: var(--t-quote-bg); border-color: var(--t-quote-border); }
-:root[data-ivh-theme] blockquote blockquote { background-color: var(--t-row2); }
-:root[data-ivh-theme] blockquote blockquote blockquote { background-color: var(--t-quote-bg); }
+:root[data-ivh-theme] blockquote blockquote,
+:root[data-ivh-theme] blockquote blockquote blockquote blockquote,
+:root[data-ivh-theme] blockquote blockquote blockquote blockquote blockquote blockquote { background-color: var(--t-quote-bg2); }
+:root[data-ivh-theme] blockquote blockquote blockquote,
+:root[data-ivh-theme] blockquote blockquote blockquote blockquote blockquote,
+:root[data-ivh-theme] blockquote blockquote blockquote blockquote blockquote blockquote blockquote { background-color: var(--t-quote-bg); }
 :root[data-ivh-theme] .codebox { background-color: var(--t-code-bg); border-color: var(--t-border); }
 :root[data-ivh-theme] .codebox p { border-bottom-color: var(--t-border); }
 :root[data-ivh-theme] .codebox code { color: var(--t-code-text); }
