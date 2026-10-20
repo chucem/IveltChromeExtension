@@ -22,9 +22,10 @@ const SYNCED_SETTINGS = [
   'warnOnLosingPost',
   'backgroundSync',
   'backgroundSyncPosts',
-  'backgroundSyncNotif',
+  'backgroundSyncNotifMinutes',
   'cachedTopicMappingExpire',
   'stickyPostButtons',
+  'titleOpensUnread',
   'ShowMultiNotifs',
   'upDownArrowKeys',
   'copyPostLink',
@@ -36,6 +37,7 @@ const SYNCED_SETTINGS = [
   'driveButtonPlace',
   'driveFolderName',
   'printShowLikes',
+  'printLikesStyle',
   'theme',
   'customTheme'
 ];
