@@ -68,9 +68,6 @@ chrome.alarms.onAlarm.addListener(() => {
   checkNewNotification();
 });
 
-// Themes used to have an on/off switch of their own (themesEnabled). Now "אריגינעל" in the
-// colors tab is "off", so whoever had them turned off is moved to it, and the switch is removed.
-// It runs before the defaults are filled in, so nothing writes the old theme back
 async function moveThemesSwitch(){
   const { themesEnabled } = await chrome.storage.local.get('themesEnabled');
   if (themesEnabled === undefined)

@@ -22,7 +22,6 @@
 	}
 
 	function applyTheme(items){
-		// with "אריגינעל" (the default) picked the forum keeps its own look
 		const theme = resolveTheme(items.theme, items.customTheme);
 		const vars = theme ? themeVars(theme) : null;
 
