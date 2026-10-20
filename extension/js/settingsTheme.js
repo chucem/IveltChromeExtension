@@ -185,6 +185,6 @@ function initThemesToggle(enabled){
 }
 
 function showThemesTab(enabled){
-	document.querySelector('.page-tabs').classList.toggle('hidden', !enabled);
+	document.querySelector('.page-tabs a[data-tab="colors"]').classList.toggle('hidden', !enabled);
 	showTab();
 }

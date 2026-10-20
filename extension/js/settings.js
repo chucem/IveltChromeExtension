@@ -169,10 +169,10 @@ function initSettingsSyncToggle(enabled){
 	});
 }
 
-// The page has tabs, the hash picks one (settings.html#colors) so it can be linked to
 function showTab(){
-	const tabsShown = !document.querySelector('.page-tabs').classList.contains('hidden');
-	const tabName = tabsShown && document.getElementById('tab-' + location.hash.slice(1)) ? location.hash.slice(1) : 'settings';
+	const hashLink = [...document.querySelectorAll('.page-tabs a')]
+		.find(link => link.dataset.tab === location.hash.slice(1) && !link.classList.contains('hidden'));
+	const tabName = hashLink ? hashLink.dataset.tab : 'settings';
 
 	document.querySelectorAll('.tab-panel').forEach(panel => {
 		panel.classList.toggle('hidden', panel.id !== 'tab-' + tabName);
@@ -182,6 +182,11 @@ function showTab(){
 	});
 }
 
+function showVersion(){
+	document.getElementById('version').textContent = 'v' + chrome.runtime.getManifest().version;
+}
+
 window.addEventListener('hashchange', showTab);
 document.addEventListener('DOMContentLoaded', showTab);
+document.addEventListener('DOMContentLoaded', showVersion);
 document.addEventListener('DOMContentLoaded', initSettings);
