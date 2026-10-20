@@ -144,6 +144,10 @@
       <div class='settings-group'>
         <h3>ליינען אן אשכול</h3>
         <div class='row'>
+          <input type='checkbox' id='titleOpensUnread' class='option' />
+          <label for='titleOpensUnread' class='label'>א קליק אויפן לינק פון אן אשכול מיט נייע תגובות עפנט עס ביי דער ערשטער אומגעליינטער תגובה (אנשטאט דעם ערשטן בלאט)</label>
+        </div>
+        <div class='row'>
           <input type='checkbox' id='stickyPostButtons' class='option' />
           <label for='stickyPostButtons' class='label'>ווייז די תגובה קנעפלעך די גאנצע צייט (אויך ביים סקראלן)</label>
         </div>
@@ -157,7 +161,14 @@
         </div>
         <div class='row'>
           <input type='checkbox' id='printShowLikes' class='option' />
-          <label for='printShowLikes' class='label'>ביים <span class="shortcut-key"><i class="icon fa-print fa-fw" aria-hidden="true"></i></span> פרינטן עטליכע בלעטער / דעם גאנצן אשכול, לאז איבער דעם צאל לייקס ביי יעדע תגובה</label>
+          <label for='printShowLikes' class='label'>ביים <span class="shortcut-key"><i class="icon fa-print fa-fw" aria-hidden="true"></i></span> פרינטן עטליכע בלעטער / דעם גאנצן אשכול, ווייז אונטער יעדע תגובה די לייקס</label>
+        </div>
+        <div class='row row-indented'>
+          <label for='printLikesStyle' class='label'>וואס צו ווייזן</label>
+          <select id='printLikesStyle' class='option'>
+            <option value="names">ווער עס האט באדאנקט (מיט די נעמען)</option>
+            <option value="count">נאר וויפיל מאל באדאנקט</option>
+          </select>
         </div>
       </div>
 
@@ -184,10 +195,12 @@
           </select>
         </div>
         <div class='row row-indented' >
-          <label for='backgroundSyncNotif' class='label'>טשעק פאר נייע נאטיפיקאציעס יעדע</label>
-          <select id='backgroundSyncNotif' class='option'>
+          <label for='backgroundSyncNotifMinutes' class='label'>טשעק פאר נייע נאטיפיקאציעס יעדע</label>
+          <select id='backgroundSyncNotifMinutes' class='option'>
             <option value="1">מינוט</option>
             <option value="5">5 מינוט</option>
+            <option value="10">10 מינוט</option>
+            <option value="15">15 מינוט</option>
             <option value="">טשעק נישט</option>
           </select>
         </div>
@@ -216,6 +229,9 @@
           <input type='checkbox' id='debugMode' class='option' />
           <label for='debugMode' class='label warning'>דיבאג מאוד <span style="font-size: 0.8em;">(נאר פאר טעכנישע פראבלעמען)</span></label>
           <a class="hidden js-copy-logs">קאפיר די לאגס</a>
+        </div>
+        <div class='row'>
+          <a style="font-size: 0.8em;" id='resetSettings' class='button'>שטעל צוריק אלע אנשטעלונגען ווי פון אנהייב</a>
         </div>
       </div>
 

@@ -9,7 +9,7 @@
     const QUOTE_MAX_PX = 250; // long quotes are cut to this height (site uses 550 on screen)
     const REQUEST_DELAY_MS = 400; // small pause between pages, to be gentle on the server
 
-    let showLikes, printTag, totalPages, on_page, lastPage, baseUrl;
+    let showLikes, likeNames, printTag, totalPages, on_page, lastPage, baseUrl;
     let running = false;
 
     function ltr(t) { return '⁦' + t + '⁩'; } // keep number ranges like 4–6 in order in RTL text
@@ -33,19 +33,16 @@
         $('.post').removeClass('online'); // remove online-status indicator
         $('.postbody').width('100%');
         if (showLikes) {
-            // keep only the Like count from the post buttons
-            $('.post-buttons > li:not(.postlove-li)').remove();
-            $('.postlove-button, .postlove-button i').removeAttr('href data-ajax');
-            $('.postlove-button').css('pointer-events', 'none');
-        } else {
-            $('.post-buttons').remove();
+            addLikedBy();
         }
+        $('.post-buttons').remove();
         // expand all spoilers
         $('.spoilcontent').css('display', 'block');
         $('.spoilbtn').text('▼ ספוילער');
-        // like symbol for print + attachment/print layout fixes
+        // attachment/print layout fixes
         $('<style>').text(
-            '.postlove-button .like::before,.postlove-button .liked::before{font-family:FontAwesome;content:"\\f087";font-style:normal;font-size:1em;color:#555;padding-right:3px}' +
+            '.print-liked-by{clear:both;margin-top:6px;padding-top:4px;border-top:1px dotted #ccc;font-size:11px;color:#555}' +
+            '.print-liked-by .icon{padding-left:3px}' +
             '.postbody .content{overflow:visible!important;max-height:none!important}' +
             // long quotes: cut cleanly at QUOTE_MAX_PX, hide the "ווייז מער..." button/fade
             '.imcger-quote-text{height:auto!important}' +
@@ -82,6 +79,23 @@
             }
         });
         addPrintInfo();
+    }
+
+    // a "באדאנקט דורך: name, name" line under each liked post, from the like count's tooltip
+    // (postlove puts the names in its title, e.g. "תגובה באדאנקט דורך: name1, name2"), or just "באדאנקט: N"
+    function addLikedBy() {
+        $('.post').each(function () {
+            let likes = $(this).find('.postlove-count:first');
+            let count = Number(likes.text()) || 0;
+            if (!count) return;
+            let title = likes.attr('title') || '';
+            let names = title.indexOf(':') >= 0 ? title.slice(title.indexOf(':') + 1).trim() : '';
+            let text = likeNames ? 'באדאנקט דורך (' + count + '): ' + (names || '—') : 'באדאנקט: ' + count;
+            $('<div>').addClass('print-liked-by')
+                .append($('<i>').addClass('icon fa-thumbs-o-up fa-fw').attr('aria-hidden', 'true'))
+                .append(document.createTextNode(text))
+                .appendTo($(this).find('.postbody:first'));
+        });
     }
 
     function addPrintInfo() {
@@ -199,6 +213,7 @@
 
         let settings = document.getElementById('iveltHelperSettings');
         showLikes = !!settings && settings.getAttribute('data-print-show-likes') === 'true';
+        likeNames = !settings || settings.getAttribute('data-print-likes-style') !== 'count';
         printTag = 'פרינט אשכול ' + PRINT_VERSION + (showLikes ? '-L · מיט לייקס' : '');
 
         totalPages = Number($('.pagination li:not(.next):last').text()) || 1;

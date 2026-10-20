@@ -42,6 +42,16 @@
     opacity: 0;
 }
 
+/* mentions that link to the profile (js/mentionLinks.js): they keep the mention's own color,
+   and on hover the mention is underlined in that color */
+.ih-mention-link,
+.ih-mention-link:hover {
+    text-decoration: none;
+}
+.ih-mention-link:hover .mention {
+    text-decoration: underline;
+}
+
 /* "new replies" bar under the last post (js/newResponseNotification.js) */
 #ivelt-new-response-notification {
     margin: 4px auto;
