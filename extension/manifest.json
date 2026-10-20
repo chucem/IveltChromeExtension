@@ -33,11 +33,20 @@
         "*://*.yiddishworld.com/*",
         "*://*.198.153.76.147/*"
       ],
+      "js": ["js/titleOpensUnread.js"]
+    },
+    {
+      "matches": [
+        "*://*.ivelt.com/*",
+        "*://*.yiddishworld.com/*",
+        "*://*.198.153.76.147/*"
+      ],
 	  "css":["css/appcss.css"],
       "js": [
         "js/settingsHandler.js",
         "js/contentScript.js",
-        "js/refreshNotificationCount.js"
+        "js/refreshNotificationCount.js",
+        "js/mentionLinks.js"
       ]
     },
     {
