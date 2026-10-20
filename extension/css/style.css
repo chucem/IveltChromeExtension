@@ -78,7 +78,6 @@ a.active {
     color: var(--ui-error);
 }
 
-/* "saved" message at the bottom corner (js/settings.js) */
 #notify {
     position: fixed;
     bottom: 22px;
@@ -112,7 +111,6 @@ a.active {
     font-weight: bold;
 }
 
-/* each group of settings is a card, like a phpBB forum block */
 .settings-group {
     margin-bottom: 14px;
     border: 1px solid var(--ui-panel-border);
@@ -160,7 +158,6 @@ a.active {
     list-style: none;
 }
 
-/* checkboxes are drawn as on/off switches at the end of the row */
 input[type='checkbox'] {
     position: absolute;
     opacity: 0;
@@ -210,7 +207,6 @@ input[type='checkbox']:focus-visible + label:before {
     outline-offset: 2px;
 }
 
-/* A labelled field: the label on its own line, the field under it */
 .row.row-field .label {
     display: block;
     margin-bottom: 6px;
@@ -245,7 +241,6 @@ select {
     font: inherit;
 }
 
-/* buttons, like the forum's own */
 .button {
     display: inline-block;
     padding: 5px 12px;

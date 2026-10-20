@@ -75,8 +75,6 @@
     font-size: 1rem;
 }
 
-/* post buttons get a light glassy look. Only without a color theme, the themes color them
-   themselves; !important because js/addTopicButtons.js gives them an inline background */
 :root:not([data-ivh-theme]) .post-buttons .button {
     border: 1px solid rgba(160, 180, 210, 0.45) !important;
     border-radius: 6px !important;
@@ -89,8 +87,6 @@
     box-shadow: 0 1px 3px rgba(52, 119, 219, 0.25);
 }
 
-/* the ציטיר bubble over words selected in a post (js/quoteSelection.js), with a small
-   pointer towards the words. The colors follow the color theme when one is picked */
 .button.ih-quote-selection {
     padding: 5px 12px;
     border: 1px solid var(--t-border, #b6c8e4);

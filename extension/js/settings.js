@@ -154,8 +154,6 @@ function initSettingsSyncToggle(enabled){
 	});
 }
 
-// The page has tabs, the hash picks one (settings.html#colors) so it can be linked to.
-// A hidden tab (colors, while themes are turned off) can't be picked
 function showTab(){
 	const hashLink = [...document.querySelectorAll('.page-tabs a')]
 		.find(link => link.dataset.tab === location.hash.slice(1) && !link.classList.contains('hidden'));
