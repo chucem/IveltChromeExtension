@@ -4,8 +4,10 @@
 		chrome.storage.local.get(['alwaysCopyTopic', 'stickyPostButtons', 'copyAttachments', 'forceUpdateTopicMapCache', 'cachedTopicMappingExpire', 'hideUserName', 'warnOnLosingPost','backgroundSync', 'backgroundSyncPosts', 'ShowMultiNotifs', 'upDownArrowKeys', 'copyPostLink', 'printShowLikes', 'printLikesStyle'], function(items){
 			if(items.hideUserName){
 				let userName = document.querySelector('.header-avatar .username');
-				if (userName)
+				if (userName) {
+					userName.dataset.name = userName.innerText;
 					userName.innerText = 'הא?';
+				}
 				let avatar = document.querySelector('.header-avatar .avatar');
 				if (avatar)
 					avatar.style.display = "none";

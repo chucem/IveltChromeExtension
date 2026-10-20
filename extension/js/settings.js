@@ -21,6 +21,7 @@ const preferencesOptions = [
 	'driveFolderName',
 	'openAttachmentsTab',
 	'copyPostLink',
+	'whoLiked',
 	'printShowLikes',
 	'printLikesStyle'
 ];

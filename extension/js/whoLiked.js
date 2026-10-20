@@ -1,20 +1,27 @@
 (function () {
     'use strict';
 
+    const SETTING_KEY = 'whoLiked';
     const PROFILE_BY_NAME = '/forum/memberlist.php?mode=viewprofile&un=';
 
     let openList = null;
 
     function init() {
-        document.querySelectorAll('.post-buttons .postlove-li').forEach(addArrow);
+        if (!chrome.storage || !chrome.storage.local) return;
 
-        document.addEventListener('click', (event) => {
-            const arrow = event.target.closest('.ih-likes-arrow');
-            if (arrow) toggleList(arrow.closest('.postlove-li'));
-            else if (openList && !openList.contains(event.target)) closeList();
-        });
-        document.addEventListener('keydown', (event) => {
-            if (event.key === 'Escape') closeList();
+        chrome.storage.local.get([SETTING_KEY], (items) => {
+            if (items[SETTING_KEY] === false) return;
+
+            document.querySelectorAll('.post-buttons .postlove-li').forEach(addArrow);
+
+            document.addEventListener('click', (event) => {
+                const arrow = event.target.closest('.ih-likes-arrow');
+                if (arrow) toggleList(arrow.closest('.postlove-li'));
+                else if (openList && !openList.contains(event.target)) closeList();
+            });
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') closeList();
+            });
         });
     }
 
@@ -76,7 +83,7 @@
         const icon = likeItem.querySelector('.like, .liked');
         if (!me || !icon) return names;
 
-        const myName = me.textContent.trim();
+        const myName = (me.dataset.name || me.textContent).trim();
         const liked = icon.classList.contains('liked');
         if (liked && !names.includes(myName)) return [...names, myName];
         if (!liked) return names.filter((name) => name !== myName);
