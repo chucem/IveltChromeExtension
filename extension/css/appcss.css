@@ -58,9 +58,6 @@
     display: block;
 }
 
-/* who liked a post (js/whoLiked.js): a small arrow joined to the like button's side as one
-   button, and the list of names it opens under it; it follows the color theme when one is
-   picked. Printing keeps the like button, so there the arrow is left out */
 @media screen {
     .post-buttons .ih-likes-joined {
         position: relative;
@@ -107,7 +104,6 @@
     margin-bottom: 6px;
     font-weight: bold;
 }
-/* the names wrap like tags, and a long list scrolls */
 .ih-likes-names {
     display: flex;
     flex-wrap: wrap;

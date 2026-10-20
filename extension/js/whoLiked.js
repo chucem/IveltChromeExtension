@@ -1,13 +1,3 @@
-// Who liked a post
-//
-// The forum's like (דאנק) button shows only how many liked a post; the names are in its
-// tooltip, as one long line. A small arrow on the like button's side opens them as a list,
-// each name a link to that user's profile (the forum's profile page finds a user by name, so
-// the user's number isn't needed). Liking or unliking the post from this page shows in the
-// list too. Esc, the arrow again or a click anywhere else closes it.
-//
-// Runs in the page, loaded by js/contentScript.js like the other page scripts.
-
 (function () {
     'use strict';
 
@@ -18,8 +8,6 @@
     function init() {
         document.querySelectorAll('.post-buttons .postlove-li').forEach(addArrow);
 
-        // one listener for all the arrows, so they also work in the copies of the post buttons
-        // that the forum puts in its menu when the window is narrow
         document.addEventListener('click', (event) => {
             const arrow = event.target.closest('.ih-likes-arrow');
             if (arrow) toggleList(arrow.closest('.postlove-li'));
@@ -30,8 +18,6 @@
         });
     }
 
-    // The arrow is joined to the like button, in the same item; posts nobody liked yet don't
-    // get one
     function addArrow(likeItem) {
         const count = likeItem.querySelector('.postlove-count');
         const likeButton = likeItem.querySelector('.postlove-button');
@@ -47,7 +33,6 @@
         likeItem.classList.add('ih-likes-joined');
     }
 
-    // The count's tooltip: "תגובה באדאנקט דורך: name, name, name"
     function readLikes(count) {
         const title = count.getAttribute('title') || '';
         const colon = title.indexOf(':');
@@ -86,8 +71,6 @@
         openList = list;
     }
 
-    // The tooltip is from when the page loaded; the forum's like button changes only the
-    // count, so a like (or unlike) from this page is added to (or taken off) the names here
     function withMyLike(names, likeItem) {
         const me = document.querySelector('.header-avatar .username, .header-avatar .username-coloured');
         const icon = likeItem.querySelector('.like, .liked');
