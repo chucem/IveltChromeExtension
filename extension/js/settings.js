@@ -11,6 +11,7 @@ const preferencesOptions = [
 	'copyAttachments',
 	'stickyPostButtons',
 	'titleOpensUnread',
+	'pictureViewer',
 	'ShowMultiNotifs',
 	'upDownArrowKeys',
 	'imageResizer',

@@ -1,7 +1,8 @@
 (function () {
     'use strict';
 
-    const PICTURES = '.postbody .content img:not(.smilies)';
+    const SETTING_KEY = 'pictureViewer';
+    const PICTURES = '.postbody .content img:not(.smilies), .postbody .attachbox img';
     const PICTURE_ADDRESS = /\.(jpe?g|png|gif|webp|bmp|avif)([?#]|$)|\/download\/file\.php\?/i;
 
     let viewer = null;
@@ -9,8 +10,14 @@
     let index = 0;
 
     function init() {
-        document.addEventListener('click', onClick, true);
-        window.addEventListener('keydown', onKey, true);
+        if (!chrome.storage || !chrome.storage.local) return;
+
+        chrome.storage.local.get([SETTING_KEY], (items) => {
+            if (items[SETTING_KEY] !== true) return;
+
+            document.addEventListener('click', onClick, true);
+            window.addEventListener('keydown', onKey, true);
+        });
     }
 
     function onClick(event) {

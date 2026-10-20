@@ -51,6 +51,15 @@
     },
     {
       "matches": [
+        "*://*.ivelt.com/*",
+        "*://*.yiddishworld.com/*",
+        "*://*.198.153.76.147/*"
+      ],
+      "css": ["css/pictureViewer.css"],
+      "js": ["js/pictureViewer.js"]
+    },
+    {
+      "matches": [
         "*://*.ivelt.com/forum/posting.php*",
         "*://*.yiddishworld.com/forum/posting.php*",
         "*://*.198.153.76.147/forum/posting.php*"
@@ -99,8 +108,7 @@
         "js/splitNotifications.js",
 		"js/addTopicButtons.js",
         "js/settingsHandler.js",
-        "js/print.js",
-        "js/pictureViewer.js"
+        "js/print.js"
       ],
       "matches": [
         "*://*.ivelt.com/*",
