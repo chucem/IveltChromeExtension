@@ -1,5 +1,3 @@
-/* Follows the forum's color theme, like the settings page (see css/style.css).
-   The fallbacks are the forum's own blue look, used when no theme is picked */
 :root {
   --ui-surface: var(--t-surface, #fff);
   --ui-bg: var(--t-bg, #ECF1F2);
@@ -42,7 +40,6 @@ body {
   font-family: Verdana, Arial, Helvetica, sans-serif;
 }
 
-/* header bar, like the forum's own */
 .popup_header {
   padding: 10px 14px;
   background: linear-gradient(180deg, var(--ui-accent) 0%, var(--ui-accent-dark) 100%);
@@ -59,7 +56,6 @@ body {
   opacity: 0.85;
 }
 
-/* the big "active topics" button and the settings button at the bottom */
 .popup_main,
 .popup_button {
   margin: 8px;

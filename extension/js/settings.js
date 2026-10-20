@@ -126,7 +126,6 @@ function initSettings() {
 	});
 }
 
-// The user's own links for the toolbar popup (js/popup.js), each one a name and an address
 function initCustomLinks(savedLinks){
 	const links = Array.isArray(savedLinks) ? savedLinks : [];
 	const nameInput = document.getElementById('customLinkName');

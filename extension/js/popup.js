@@ -31,7 +31,6 @@ function checkLoginState() {
 
 getUserId('https://www.ivelt.com', 'phpbb3_sw7kk_u');
 
-// The forum's addresses; the extension can see the address of a tab on one of them
 const FORUM_HOSTS = /(^|\.)(ivelt\.com|yiddishworld\.com|198\.153\.76\.147)$/;
 
 function isForumUrl(url) {
@@ -42,8 +41,6 @@ function isForumUrl(url) {
     }
 }
 
-// A link to the forum opens in the current tab when that tab is already on the forum,
-// anything else in a new tab
 function openLink(url) {
     chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
         const tab = tabs[0];
@@ -84,7 +81,6 @@ function open_settings() {
     window.close();
 }
 
-// The user's own links, added on the settings page
 function initCustomLinks() {
     const section = document.getElementById('customLinksSection');
 

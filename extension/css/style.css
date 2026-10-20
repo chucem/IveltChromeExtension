@@ -211,7 +211,6 @@ input[type='checkbox']:checked + label:before {
     background: var(--ui-panel);
     color: var(--ui-muted);
 }
-/* the user's own links for the popup (js/settings.js) */
 #customLinkName,
 #customLinkUrl {
     display: block;
