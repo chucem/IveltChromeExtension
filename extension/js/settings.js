@@ -168,7 +168,6 @@ function initSettingsSyncToggle(enabled){
 	});
 }
 
-// The page has tabs, the hash picks one (settings.html#colors) so it can be linked to
 function showTab(){
 	const tabName = document.getElementById('tab-' + location.hash.slice(1)) ? location.hash.slice(1) : 'settings';
 

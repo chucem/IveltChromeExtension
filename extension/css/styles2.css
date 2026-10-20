@@ -1,4 +1,3 @@
-/* the page: a box with the forum's header bar on top, then phpBB-style tabs */
   .wrap {
     max-width: 920px;
     margin: 18px auto;
@@ -164,7 +163,6 @@
     color: var(--ui-input-text);
   }
 
-  /* tabs under the header, like phpBB's */
   .page-tabs {
     display: flex;
     flex-wrap: wrap;
