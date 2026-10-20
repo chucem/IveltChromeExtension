@@ -7,8 +7,6 @@
     display: none;
 }
 
-/* the bar over the reply box that offers a kept draft back (js/drafts.js): an accent line,
-   when it was kept and its first words; it follows the color theme when one is picked */
 .ih-draft-bar {
     display: flex;
     align-items: center;
@@ -32,7 +30,6 @@
     flex: 1;
     min-width: 0;
 }
-/* the draft's first two lines */
 .ih-draft-words {
     display: -webkit-box;
     -webkit-box-orient: vertical;

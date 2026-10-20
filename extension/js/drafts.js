@@ -1,23 +1,9 @@
-// Drafts
-//
-// What's typed in the reply box is kept as it's typed, so a crash, a closed tab or a lost
-// connection doesn't lose it. When the same reply box opens again - the same topic (in the
-// quick reply or the full editor), the same post being edited, the same private message... -
-// with a kept draft that differs from what's in the box, a bar over the box offers to bring it
-// back or to throw it away. Only sending the post drops the draft: the full editor and the
-// preview keep it (and the text they open with), since the post isn't sent yet. Drafts older
-// than two weeks are dropped too.
-//
-// Runs as a content script (isolated world). The drafts are kept in the extension's storage,
-// not the forum's, so they're there whether the forum is opened as www.ivelt.com or ivelt.com.
-
 (function () {
     'use strict';
 
     const PREFIX = 'draft:';
     const KEEP_MS = 14 * 24 * 60 * 60 * 1000;
     const SAVE_DELAY_MS = 800;
-    // the parts of the form's address that tell one reply box from another
     const KEY_PARAMS = ['i', 'mode', 'action', 'f', 't', 'p', 'u'];
 
     function init() {
@@ -31,7 +17,6 @@
     }
 
     function keepDraft(textarea, form, key, draft) {
-        // while the bar waits for an answer, leaving without typing keeps the old draft
         let offered = !!draft && draft.text.trim() !== textarea.value.trim();
         if (offered) offerDraft(textarea, key, draft, () => { offered = false; });
 
@@ -50,7 +35,6 @@
             saveTimeout = setTimeout(save, SAVE_DELAY_MS);
         });
         window.addEventListener('pagehide', save);
-        // the post button sends it; the full editor and preview buttons only carry the text along
         form.addEventListener('submit', (event) => {
             if (event.submitter && event.submitter.name !== 'post') {
                 save();
@@ -62,9 +46,6 @@
         });
     }
 
-    // The same reply box gets the same key: draft:posting.php?mode=reply&t=48 for both the
-    // quick reply under topic 48 and the full editor of a reply to it, whose address also has
-    // the topic's forum (f=6) in it
     function draftKey(form) {
         const address = new URL(form.getAttribute('action') || '', location.href);
         if (address.searchParams.has('t') || address.searchParams.has('p')) address.searchParams.delete('f');
@@ -74,8 +55,6 @@
         return PREFIX + address.pathname.split('/').pop() + '?' + parts.join('&');
     }
 
-    // A bar over the box: when the draft was kept and its first two lines, so it's clear what
-    // would come back
     function offerDraft(textarea, key, draft, answered) {
         const bar = document.createElement('div');
         bar.className = 'ih-draft-bar';
@@ -99,7 +78,6 @@
             bar.remove();
         });
 
-        // right over the box, inside its column, so it lines up with it in the full editor too
         textarea.before(bar);
     }
 
@@ -113,7 +91,6 @@
         return days === 1 ? 'פאר א טאג' : `פאר ${days} טעג`;
     }
 
-    // The draft's words without its BBCode tags and empty lines; the bar shows two lines of it
     function firstWords(text) {
         return text.replace(/\[[^\]]*\]/g, ' ').replace(/[ \t]+/g, ' ').replace(/\s*\n\s*/g, '\n').trim().slice(0, 300);
     }
@@ -126,8 +103,6 @@
         });
     }
 
-    // the extension can be reloaded or updated while the page is still open, and then this
-    // page's copy can't reach the storage anymore; a draft is never worth an error on the page
     function store(key, draft) {
         try {
             if (draft) chrome.storage.local.set({ [key]: draft });
