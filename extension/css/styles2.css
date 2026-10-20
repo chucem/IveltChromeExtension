@@ -1,43 +1,32 @@
-.header {
-    background-color: var(--ui-header);
-    background-image: linear-gradient(to bottom, #6ACEFF 0%, #0076B1 2px, #12A3EB 92px, #12A3EB 100%);
-    background-repeat: repeat-x;
-    color: var(--ui-on-header);
-    margin-bottom: 4px;
-    padding: 15px;
-    border-radius: 10px;
-  }
-
-  /* with a theme the header is drawn like the forum's (.headerbar in css/themes.css) */
-  :root[data-ivh-theme] .header {
-    background-image: linear-gradient(to bottom, var(--t-accent-dark) 0%, var(--t-accent) 92px);
-  }
-
-  #logo {
-    float: right;
-    padding: 7px 15px;
-  }
-
-
-  .aaa {
-    border-top: 15px solid var(--ui-accent-dark);
-    border-bottom: 3px solid var(--ui-accent-dark);
-    border-right: 1px solid var(--ui-accent-dark);
-    border-left: 1px solid var(--ui-accent-dark);
-    border-radius: 7px;
-    padding: 15px;
-    width: 750px;
-    margin: 50px auto;
-
-  }
-  .wrap{
+  .wrap {
+    max-width: 920px;
+    margin: 18px auto;
+    border: 1px solid var(--ui-panel-border);
     background-color: var(--ui-surface);
-
-    border-radius: 8px;
-    margin: 0 auto;
-    margin-top: 12px;
-    width: 780px;
-    padding: 15px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+  .header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 22px;
+    background-image: linear-gradient(180deg, var(--ui-header) 0%, var(--ui-accent-dark) 100%);
+    color: var(--ui-on-header);
+  }
+  .header h1 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: bold;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
+  }
+  .header .version {
+    margin-top: 2px;
+    font-size: 11px;
+    opacity: 0.85;
+  }
+  #logo {
+    width: 48px;
+    height: 48px;
   }
   /* theme picker, the previews get their colors from js/themes.data.js */
   .theme-grid {
@@ -174,31 +163,33 @@
     color: var(--ui-input-text);
   }
 
-  /* tabs at the top of the settings page */
   .page-tabs {
     display: flex;
-    gap: 4px;
-    margin-bottom: 25px;
-    border-bottom: 2px solid var(--ui-border);
-  }
-  /* hidden while themes are turned off, .hidden alone loses to display: flex above */
-  .page-tabs.hidden {
-    display: none;
+    flex-wrap: wrap;
+    padding: 0 12px;
+    border-bottom: 1px solid var(--ui-border);
+    background: var(--ui-panel);
   }
   .page-tabs a {
-    margin-bottom: -2px;
-    padding: 6px 16px;
-    border-bottom: 2px solid transparent;
-    color: var(--ui-text);
-    font-size: 16px;
-    font-weight: 600;
+    margin-top: 4px;
+    padding: 8px 16px;
+    border: 1px solid transparent;
+    border-bottom: none;
+    border-radius: 4px 4px 0 0;
+    color: var(--ui-link);
+    font-size: 12px;
   }
   .page-tabs a:hover {
-    color: var(--ui-heading);
+    border-color: var(--ui-border);
+    background: color-mix(in srgb, var(--ui-surface) 60%, var(--ui-panel));
     text-decoration: none;
   }
   .page-tabs a.active {
-    border-bottom-color: var(--ui-accent);
-    color: var(--ui-heading);
+    margin-bottom: -1px;
+    border-color: var(--ui-border);
+    border-bottom: 1px solid var(--ui-surface);
+    background: var(--ui-surface);
+    color: var(--ui-text);
+    font-weight: bold;
     pointer-events: auto;
   }

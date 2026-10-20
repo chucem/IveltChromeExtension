@@ -26,7 +26,6 @@ const defualtPreferences = {
   copyPostLink: true,
   printShowLikes: false,
   printLikesStyle: 'names',
-  themesEnabled: false,
   theme: 'default'
 };
 
@@ -69,10 +68,22 @@ chrome.alarms.onAlarm.addListener(() => {
   checkNewNotification();
 });
 
+async function moveThemesSwitch(){
+  const { themesEnabled } = await chrome.storage.local.get('themesEnabled');
+  if (themesEnabled === undefined)
+    return;
+
+  if (themesEnabled === false)
+    await chrome.storage.local.set({ theme: 'default' });
+  await chrome.storage.local.remove('themesEnabled');
+}
+
 chrome.runtime.onInstalled.addListener(async (details) => {
 
   // before the defaults, so a new computer starts with the user's synced settings
   await settingsSyncOnInstall(details.reason);
+
+  await moveThemesSwitch();
 
   if (details.reason === "update" || details.reason === "install") {
     // Get current settings in local storage

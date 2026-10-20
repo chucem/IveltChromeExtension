@@ -84,3 +84,15 @@
     transition: opacity 0.75s linear;
     font-size: 1rem;
 }
+
+:root:not([data-ivh-theme]) .post-buttons .button {
+    border: 1px solid rgba(160, 180, 210, 0.45) !important;
+    border-radius: 6px !important;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.18)) !important;
+    backdrop-filter: blur(4px);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+:root:not([data-ivh-theme]) .post-buttons .button:hover {
+    border-color: #3477db !important;
+    box-shadow: 0 1px 3px rgba(52, 119, 219, 0.25);
+}

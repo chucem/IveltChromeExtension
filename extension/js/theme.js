@@ -22,8 +22,7 @@
 	}
 
 	function applyTheme(items){
-		// when themes are turned off in the settings the forum keeps its own look
-		const theme = items.themesEnabled ? resolveTheme(items.theme, items.customTheme) : null;
+		const theme = resolveTheme(items.theme, items.customTheme);
 		const vars = theme ? themeVars(theme) : null;
 
 		setVars(items.theme, vars);
@@ -37,7 +36,7 @@
 	}
 
 	function loadAndApply(){
-		chrome.storage.local.get(['themesEnabled', 'theme', 'customTheme'], applyTheme);
+		chrome.storage.local.get(['theme', 'customTheme'], applyTheme);
 	}
 
 	try {
@@ -50,7 +49,7 @@
 
 	// switch live when the setting is changed (also while editing a custom theme)
 	chrome.storage.onChanged.addListener((changes, area) => {
-		if(area === 'local' && (changes.themesEnabled || changes.theme || changes.customTheme))
+		if(area === 'local' && (changes.theme || changes.customTheme))
 			loadAndApply();
 	});
 }());
