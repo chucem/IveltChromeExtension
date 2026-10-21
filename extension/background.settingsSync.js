@@ -38,6 +38,7 @@ const SYNCED_SETTINGS = [
   'openAttachmentsTab',
   'driveUpload',
   'dropboxUpload',
+  'cloudUploadInPms',
   'driveButtonPlace',
   'driveFolderName',
   'printShowLikes',

@@ -21,6 +21,7 @@ const preferencesOptions = [
 	'pasteImages',
 	'driveUpload',
 	'dropboxUpload',
+	'cloudUploadInPms',
 	'driveButtonPlace',
 	'driveFolderName',
 	'openAttachmentsTab',
@@ -118,6 +119,7 @@ function postSettingChange(items){
 		const dropbox = document.getElementById('dropboxUpload').checked;
 		document.getElementById('driveFolderName').disabled = !drive;
 		document.getElementById('driveButtonPlace').disabled = !drive && !dropbox;
+		document.getElementById('cloudUploadInPms').disabled = !drive && !dropbox;
 	}
 
 	if(items.hasOwnProperty('printShowLikes')){

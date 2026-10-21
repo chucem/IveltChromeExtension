@@ -113,6 +113,15 @@
     },
     {
       "matches": [
+        "*://*.ivelt.com/forum/ucp.php*",
+        "*://*.yiddishworld.com/forum/ucp.php*",
+        "*://*.198.153.76.147/forum/ucp.php*"
+      ],
+      "css": ["css/driveUpload.css"],
+      "js": ["js/driveUpload.js"]
+    },
+    {
+      "matches": [
         "*://*.ivelt.com/*",
         "*://*.yiddishworld.com/*",
         "*://*.198.153.76.147/*"
