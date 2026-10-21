@@ -28,6 +28,7 @@ Extra buttons next to the regular quote button on every post:
 * **Quote a selection** – select some words in a post and a ציטיר button shows up above them; it adds just those words, as a quote, at the top of your reply (after the quotes already there).
 * **Mention** (דערמאן) – insert an empty quote so the poster gets a notification (optionally copies it to the clipboard instead).
 * **Quote in another topic** – copy the post as a quote (with a source link and, optionally, its images) to paste in a different topic.
+* **Who liked** – a small arrow on the like button opens the list of who liked the post, each name a link to their profile.
 * **Quote in the comments topic** – for topics that have a linked קאמענטארן topic, open a reply there with the post already quoted.
 * **Copy post link** – a plain click on the small post icon next to the author's name copies the post's link instead of opening it. Right-click and long-press work as before.
 * Option to keep the post buttons visible while scrolling through a long post.

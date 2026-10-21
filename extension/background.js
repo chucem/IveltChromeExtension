@@ -26,6 +26,7 @@ const defualtPreferences = {
   driveFolderName: 'iVelt Helper',
   openAttachmentsTab: true,
   copyPostLink: true,
+  whoLiked: true,
   printShowLikes: false,
   printLikesStyle: 'names',
   themesEnabled: false,

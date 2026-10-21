@@ -59,6 +59,15 @@
         "*://*.yiddishworld.com/*",
         "*://*.198.153.76.147/*"
       ],
+      "css": ["css/whoLiked.css"],
+      "js": ["js/whoLiked.js"]
+    },
+    {
+      "matches": [
+        "*://*.ivelt.com/*",
+        "*://*.yiddishworld.com/*",
+        "*://*.198.153.76.147/*"
+      ],
 	  "css":["css/appcss.css"],
       "js": [
         "js/settingsHandler.js",
