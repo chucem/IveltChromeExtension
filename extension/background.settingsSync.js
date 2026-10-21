@@ -28,6 +28,7 @@ const SYNCED_SETTINGS = [
   'titleOpensUnread',
   'ShowMultiNotifs',
   'upDownArrowKeys',
+  'spoilerPolish',
   'copyPostLink',
   'imageResizer',
   'pasteImages',

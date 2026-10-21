@@ -13,6 +13,7 @@ const preferencesOptions = [
 	'titleOpensUnread',
 	'ShowMultiNotifs',
 	'upDownArrowKeys',
+	'spoilerPolish',
 	'imageResizer',
 	'pasteImages',
 	'driveUpload',

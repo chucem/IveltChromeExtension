@@ -16,6 +16,7 @@ const defualtPreferences = {
   titleOpensUnread: true,
   ShowMultiNotifs: true,
   upDownArrowKeys: true,
+  spoilerPolish: false,
   imageResizer: true,
   pasteImages: true,
   driveUpload: true,

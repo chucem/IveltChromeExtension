@@ -48,6 +48,9 @@ Extra buttons next to the regular quote button on every post:
 * **Google Drive upload**: shows which Google account it will use, then uploads files to a folder in your own Google Drive, makes them viewable by anyone with the link, and inserts the link into the post.
 * The editor opens on the **Attachments** tab instead of **Options**, so adding a file is one click (can be turned off).
 
+### Reading posts
+* **Spoiler polish**: the spoiled words are covered with moving dust right where they are (so a couple of spoiled words stay in the middle of their line), and pictures are blurred with sparkling dots over them. A long spoiler shows only its first three lines. One click reveals it and opens it to its full height. Printed spoilers come out open. Off by default; turn it on in the settings.
+
 ### Other
 * Google search within the current topic, or across the whole site.
 * **Titles open the first unread post**: in a list of topics, clicking the title of a topic with unread posts opens it at the first unread post instead of the first page (can be turned off).
