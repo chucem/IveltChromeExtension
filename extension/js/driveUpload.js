@@ -21,6 +21,7 @@
 
     const PLACE_KEY = 'driveButtonPlace'; // 'attachments' (default) or 'toolbar'
     const PROVIDER_KEY = 'cloudProvider';  // the service picked last time
+    const PMS_KEY = 'cloudUploadInPms';    // also when writing a private message
     const DRIVE_API = 'https://www.googleapis.com/drive/v3';
     const UPLOAD_API = 'https://www.googleapis.com/upload/drive/v3';
     const DROPBOX_API = 'https://api.dropboxapi.com/2';
@@ -55,9 +56,12 @@
     function init() {
         if (!chrome.storage || !chrome.storage.local) return;
 
-        const settingKeys = PROVIDER_ORDER.map(key => PROVIDERS[key].settingKey);
+        // On the private messages page (ucp.php) it also needs its own setting
+        const inPms = /\/ucp\.php$/.test(location.pathname);
+        const settingKeys = [...PROVIDER_ORDER.map(key => PROVIDERS[key].settingKey), PMS_KEY];
         const apply = (items) => {
-            enabledProviders = PROVIDER_ORDER.filter(key => items[PROVIDERS[key].settingKey] !== false);
+            enabledProviders = inPms && items[PMS_KEY] === false ? []
+                : PROVIDER_ORDER.filter(key => items[PROVIDERS[key].settingKey] !== false);
             place = items[PLACE_KEY] === 'toolbar' ? 'toolbar' : 'attachments';
             unmount();
             if (enabledProviders.length) mount();
