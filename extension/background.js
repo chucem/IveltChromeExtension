@@ -81,7 +81,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
   await settingsSyncOnInstall(details.reason);
 
   await moveToNewCheckTiming(details.reason);
-  markWhatsNew(details.reason);
+  markWhatsNew(details);
 
   if (details.reason === "update" || details.reason === "install") {
     // Get current settings in local storage
@@ -160,10 +160,12 @@ async function moveToNewCheckTiming(reason){
   await chrome.storage.local.set({ [CHECK_TIMING_MIGRATED]: true });
 }
 
-// After an update, the next forum page shows what's new in this version (js/whatsNew.js)
-function markWhatsNew(reason){
-  if(reason === 'update'){
-    chrome.storage.local.set({ whatsNewVersion: chrome.runtime.getManifest().version });
+// After an update, the next forum page shows what's new in this version (js/whatsNew.js).
+// Only when the version changed: reloading the same version (while developing) doesn't count
+function markWhatsNew(details){
+  const version = chrome.runtime.getManifest().version;
+  if(details.reason === 'update' && details.previousVersion !== version){
+    chrome.storage.local.set({ whatsNewVersion: version });
     // a "remind me later" from the last version's pop-up doesn't hold back this one
     chrome.storage.local.remove('whatsNewLaterUntil');
   }

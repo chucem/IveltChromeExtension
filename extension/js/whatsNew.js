@@ -50,7 +50,7 @@
 
         const title = element('h2', 'ih-whats-new-title', 'וואס איז ניי אינעם אייוועלט עקסטענשען');
         title.id = 'ih-whats-new-title';
-        dialog.append(title, element('div', 'ih-whats-new-version', 'ווערסיע ' + version));
+        dialog.append(title, element('div', 'ih-whats-new-version', 'דער עקסטענשען איז יעצט אפגעדעיטעט געווארן צו ווערסיע ' + version));
 
         if (checkTiming) {
             const notice = element('div', 'ih-whats-new-notice');
