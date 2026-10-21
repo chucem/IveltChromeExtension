@@ -106,7 +106,7 @@
         </div>
         <div class='row'>
           <input type='checkbox' id='keepDrafts' class='option' />
-          <label for='keepDrafts' class='label'>האלט אן וואס איך שרייב אין א תגובה ביז עס ווערט געשיקט, און ווען איך עפן עס ווידער פרעג מיך צי צוריקצושטעלן <span style="font-size: 0.8em;">(אויב דער טאב ווערט פארמאכט אדער דער בראוזער פאלט אראפ)</span></label>
+          <label for='keepDrafts' class='label'>האלט אן וואס איך שרייב אין א תגובה ביז עס ווערט געשיקט, כדי צו קענען צוריקצושטעלן <span style="font-size: 0.8em;">(אויב דער טעב ווערט פארמאכט אדער דער בראוזער פאלט אראפ)</span></label>
         </div>
         <div class='row'>
           <input type='checkbox' id='imageResizer' class='option' />
@@ -188,7 +188,7 @@
         </div>
       </div>
 
-      <div class='settings-group'>
+      <div class='settings-group' id='notifications'>
         <h3>נאטיפיקאציעס</h3>
         <div class='row'>
           <input type='checkbox' id='getBrowserNotifications' class='option' />
@@ -200,24 +200,22 @@
         </div>
         <div class='row'>
           <input type='checkbox' id='backgroundSync' class='option' />
-          <label for='backgroundSync' class='label'>טשעק אין הינטערגרונט פאר נייע תגובות און נאטיפיקאציעס</label>
-        </div>
-        <div class='row row-indented' >
-          <label for='backgroundSyncPosts' class='label'>טשעק פאר נייע תגובות אינעם אשכול יעדע</label>
-          <select id='backgroundSyncPosts' class='option'>
+          <label for='backgroundSync' class='label'>טשעק פאר נייע תגובות אינעם אשכול יעדע</label>
+          <select id='backgroundSyncPosts' class='option' aria-label='ווי אפט צו טשעקן פאר נייע תגובות אינעם אשכול'>
             <option value="20000">20 סעקונדעס</option>
-            <option value="60000">מינוט</option>
-            <option value="">טשעק נישט</option>
+            <option value="60000">1 מינוט</option>
+            <option value="120000">2 מינוט</option>
+            <option value="300000">5 מינוט</option>
           </select>
         </div>
-        <div class='row row-indented' >
-          <label for='backgroundSyncNotifMinutes' class='label'>טשעק פאר נייע נאטיפיקאציעס יעדע</label>
-          <select id='backgroundSyncNotifMinutes' class='option'>
-            <option value="1">מינוט</option>
+        <div class='row'>
+          <input type='checkbox' id='notificationCheck' />
+          <label for='notificationCheck' class='label'>טשעק פאר נייע נאטיפיקאציעס יעדע</label>
+          <select id='backgroundSyncNotifMinutes' class='option' aria-label='ווי אפט צו טשעקן פאר נייע נאטיפיקאציעס'>
+            <option value="2">2 מינוט</option>
             <option value="5">5 מינוט</option>
             <option value="10">10 מינוט</option>
-            <option value="15">15 מינוט</option>
-            <option value="">טשעק נישט</option>
+            <option value="20">20 מינוט</option>
           </select>
         </div>
       </div>

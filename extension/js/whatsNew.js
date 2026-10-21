@@ -1,0 +1,137 @@
+// What's new pop-up
+//
+// After the extension updates, the next forum page shows a pop-up with what's new in this
+// version (js/whatsNew.data.js). When the update turned off this user's checks for new replies
+// and notifications (see moveToNewCheckTiming in background.js), it says so first, with a button
+// to the settings. It stays until its close button is pressed; that closes it in the other tabs
+// too, and it doesn't come back. "Remind me later" hides it everywhere for a day.
+//
+// Runs as a content script (isolated world).
+
+(function () {
+    'use strict';
+
+    const KEYS = ['whatsNewVersion', 'whatsNewCheckTiming', 'whatsNewLaterUntil'];
+    const LATER_MS = 24 * 60 * 60 * 1000;
+
+    let overlay = null;
+
+    function init() {
+        if (window.top !== window || !chrome.storage || !chrome.storage.local) return;
+
+        chrome.storage.local.get(KEYS, (items) => {
+            const version = items.whatsNewVersion;
+            if (!version || Date.now() < (items.whatsNewLaterUntil || 0)) return;
+
+            const release = whatsNewReleases[version];
+            if (!release && !items.whatsNewCheckTiming) {
+                chrome.storage.local.remove(KEYS);
+                return;
+            }
+            show(version, release, items.whatsNewCheckTiming);
+        });
+
+        // closed, or put off for later, in another tab
+        chrome.storage.onChanged.addListener((changes, area) => {
+            if (area !== 'local' || !overlay) return;
+            const closed = changes.whatsNewVersion && !changes.whatsNewVersion.newValue;
+            const later = changes.whatsNewLaterUntil && changes.whatsNewLaterUntil.newValue > Date.now();
+            if (closed || later) hide();
+        });
+    }
+
+    function show(version, release, checkTiming) {
+        overlay = element('div', 'ih-whats-new');
+        const dialog = element('div', 'ih-whats-new-dialog');
+        dialog.setAttribute('role', 'dialog');
+        dialog.setAttribute('aria-modal', 'true');
+        dialog.setAttribute('aria-labelledby', 'ih-whats-new-title');
+        dialog.dir = 'rtl';
+
+        const title = element('h2', 'ih-whats-new-title', 'וואס איז ניי אינעם אייוועלט עקסטענשען');
+        title.id = 'ih-whats-new-title';
+        dialog.append(title, element('div', 'ih-whats-new-version', 'ווערסיע ' + version));
+
+        if (checkTiming) {
+            const notice = element('div', 'ih-whats-new-notice');
+            notice.append(
+                element('strong', null, 'די נאטיפיקאציע אנשטעלונגען האבן זיך געטוישט'),
+                element('p', null, 'מיר האבן מסדר געווען די אנשטעלונגען פון טשעקן פאר נייע תגובות אינעם אשכול און פאר נייע נאטיפיקאציעס, יעדע האט יעצט זיין אייגענע קעסטל און ווי אפט. דערפאר האבן מיר ביידע אויסגעלאשן ביי יעדעם, און מען דארף זיי צוריק אנשטעלן. ווילט איר זיי ווייטער? שטעלט זיי אן אין די אנשטעלונגען און קלויבט אויס ווי אפט.'),
+                button('עפן די נאטיפיקאציע אנשטעלונגען', 'ih-btn-main', () => openSettings('notifications'))
+            );
+            dialog.appendChild(notice);
+        }
+
+        if (release && release.features && release.features.length) {
+            dialog.appendChild(element('h3', null, 'נייע זאכן'));
+            const list = element('ul', 'ih-whats-new-list');
+            release.features.forEach((text) => list.appendChild(element('li', null, text)));
+            dialog.appendChild(list);
+        }
+
+        if (release && release.fixes && release.fixes.length) {
+            dialog.appendChild(element('h3', null, 'פאראכטען'));
+            const list = element('ul', 'ih-whats-new-list');
+            release.fixes.forEach((text) => list.appendChild(element('li', null, text)));
+            dialog.appendChild(list);
+        }
+
+        // one main button: the notice's, when there is one, otherwise closing
+        const buttons = element('div', 'ih-whats-new-buttons');
+        buttons.append(
+            button('פארמאכן', checkTiming ? 'ih-btn-second' : 'ih-btn-main', close),
+            button('דערמאן מיך שפעטער', 'ih-btn-second', later),
+            button('אלע אנשטעלונגען', 'ih-btn-link', () => openSettings(''))
+        );
+        dialog.appendChild(buttons);
+
+        overlay.appendChild(dialog);
+        document.body.appendChild(overlay);
+        // without scrolling to the buttons, the top (the notice) is what matters most
+        buttons.querySelector('button').focus({ preventScroll: true });
+    }
+
+    function hide() {
+        if (overlay) overlay.remove();
+        overlay = null;
+    }
+
+    // Only the close button closes it for good, here and in other tabs;
+    // until then it shows on every forum page
+    function close() {
+        hide();
+        try {
+            chrome.storage.local.remove(KEYS);
+        } catch (e) {}
+    }
+
+    // Hidden everywhere for a day, then it shows again
+    function later() {
+        hide();
+        try {
+            chrome.storage.local.set({ whatsNewLaterUntil: Date.now() + LATER_MS });
+        } catch (e) {}
+    }
+
+    function openSettings(hash) {
+        try {
+            chrome.runtime.sendMessage({ type: 'openSettings', hash });
+        } catch (e) {}
+    }
+
+    function button(text, className, onClick) {
+        const node = element('button', 'ih-btn ' + className, text);
+        node.type = 'button';
+        node.addEventListener('click', onClick);
+        return node;
+    }
+
+    function element(tag, className, text) {
+        const node = document.createElement(tag);
+        if (className) node.className = className;
+        if (text) node.textContent = text;
+        return node;
+    }
+
+    init();
+})();

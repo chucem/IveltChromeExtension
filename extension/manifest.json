@@ -50,6 +50,15 @@
         "*://*.yiddishworld.com/*",
         "*://*.198.153.76.147/*"
       ],
+      "css": ["css/whatsNew.css"],
+      "js": ["js/whatsNew.data.js", "js/whatsNew.js"]
+    },
+    {
+      "matches": [
+        "*://*.ivelt.com/*",
+        "*://*.yiddishworld.com/*",
+        "*://*.198.153.76.147/*"
+      ],
       "css": ["css/drafts.css"],
       "js": ["js/drafts.js"]
     },

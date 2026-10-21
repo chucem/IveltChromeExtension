@@ -9,9 +9,10 @@ const defualtPreferences = {
   warnOnLosingPost: true,
   keepDrafts: true,
   debugMode: false,
-  backgroundSync: true,
-  backgroundSyncPosts: 20000,
-  backgroundSyncNotifMinutes: 10, // minutes, checking less often goes easy on the server
+  // both checks are off until the user turns them on, which goes easy on the server
+  backgroundSync: false, // checking an open topic for new replies
+  backgroundSyncPosts: 60000, // every minute, once it's turned on
+  backgroundSyncNotifMinutes: '', // the notification check, '' is off
   cachedTopicMappingExpire: 3600,
   forceUpdateTopicMapCache: false,
   stickyPostButtons: false,
@@ -79,6 +80,9 @@ chrome.runtime.onInstalled.addListener(async (details) => {
   // before the defaults, so a new computer starts with the user's synced settings
   await settingsSyncOnInstall(details.reason);
 
+  await moveToNewCheckTiming(details.reason);
+  markWhatsNew(details.reason);
+
   if (details.reason === "update" || details.reason === "install") {
     // Get current settings in local storage
     chrome.storage.local.get(null, (currentSettings) => {
@@ -120,17 +124,62 @@ chrome.runtime.onInstalled.addListener(async (details) => {
     if(items && Object.keys(items).length)
       chrome.storage.local.set(items);
 
-    alarmToFetch(items.backgroundSync, parseInt(items.backgroundSyncNotifMinutes));
+    alarmToFetch(parseInt(items.backgroundSyncNotifMinutes));
   });
 });
+
+// The settings for the checks were reorganized: each check (an open topic's new replies, and
+// the notifications) now has its own on/off and its own choices of how often. Many users had
+// the old checks running without meaning to, which loaded the site for nothing, so once, on the
+// update, both are turned off. Whoever had one of them on is told so in the "what's new" pop-up
+// (js/whatsNew.js), with a button to the settings to turn them back on
+const CHECK_TIMING_MIGRATED = 'checkTimingMigrated';
+
+async function moveToNewCheckTiming(reason){
+  if(reason !== 'install' && reason !== 'update')
+    return;
+
+  const items = await chrome.storage.local.get([CHECK_TIMING_MIGRATED, 'backgroundSync', 'backgroundSyncPosts', 'backgroundSyncNotifMinutes', 'backgroundSyncNotif']);
+  if(items[CHECK_TIMING_MIGRATED])
+    return;
+
+  if(reason === 'update'){
+    const minutes = items.backgroundSyncNotifMinutes !== undefined ? items.backgroundSyncNotifMinutes : items.backgroundSyncNotif;
+    const wasChecking = items.backgroundSync !== false && (parseInt(minutes) > 0 || items.backgroundSyncPosts !== '');
+
+    await chrome.storage.local.set({
+      backgroundSync: false,
+      backgroundSyncPosts: defualtPreferences.backgroundSyncPosts,
+      backgroundSyncNotifMinutes: '',
+      whatsNewCheckTiming: wasChecking
+    });
+    // the old name would be moved over the new setting further down
+    await chrome.storage.local.remove('backgroundSyncNotif');
+  }
+
+  await chrome.storage.local.set({ [CHECK_TIMING_MIGRATED]: true });
+}
+
+// After an update, the next forum page shows what's new in this version (js/whatsNew.js)
+function markWhatsNew(reason){
+  if(reason === 'update'){
+    chrome.storage.local.set({ whatsNewVersion: chrome.runtime.getManifest().version });
+    // a "remind me later" from the last version's pop-up doesn't hold back this one
+    chrome.storage.local.remove('whatsNewLaterUntil');
+  }
+}
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if(request.type === 'resetSettings'){
     chrome.storage.local.set(defualtPreferences, () => {
-      alarmToFetch(defualtPreferences.backgroundSync, defualtPreferences.backgroundSyncNotifMinutes);
+      alarmToFetch(parseInt(defualtPreferences.backgroundSyncNotifMinutes));
       sendResponse();
     });
     return true;
+  }
+
+  if(request.type === 'openSettings'){
+    chrome.tabs.create({ url: chrome.runtime.getURL('settings.html' + (request.hash ? '#' + request.hash : '')) });
   }
 
   if(request.type === 'badgeText'){
@@ -158,17 +207,16 @@ chrome.storage.onChanged.addListener((changes, area) => {
     })
   }
 
-  if(changes.backgroundSync || changes.backgroundSyncNotifMinutes){
-    chrome.storage.local.get(['backgroundSync', 'backgroundSyncNotifMinutes'], items => {
-      alarmToFetch(items.backgroundSync, parseInt(items.backgroundSyncNotifMinutes));
-    });
+  if(changes.backgroundSyncNotifMinutes){
+    alarmToFetch(parseInt(changes.backgroundSyncNotifMinutes.newValue));
   }
 });
 
-function alarmToFetch(create, frequency){
-  debugLog('backgroundSync', `alarmToFetch(${create}, ${frequency})`);
-  // "dont check" saves an empty frequency
-  if(create && frequency > 0){
+// The notification check has its own on/off (an empty frequency is off); backgroundSync is
+// only for checking an open topic for new replies (js/newResponseNotification.js)
+function alarmToFetch(frequency){
+  debugLog('backgroundSync', `alarmToFetch(${frequency})`);
+  if(frequency > 0){
     chrome.alarms.create("alarm", { periodInMinutes: frequency });
   }
   else {
