@@ -1,6 +1,7 @@
 (function () {
     'use strict';
 
+    const SETTING_KEY = 'keepDrafts';
     const PREFIX = 'draft:';
     const KEEP_MS = 14 * 24 * 60 * 60 * 1000;
     const SAVE_DELAY_MS = 800;
@@ -9,11 +10,15 @@
     function init() {
         const textarea = document.querySelector('#message-box textarea');
         const form = textarea && textarea.closest('form');
-        if (!form) return;
+        if (!form || !chrome.storage || !chrome.storage.local) return;
 
-        dropOldDrafts();
         const key = draftKey(form);
-        chrome.storage.local.get(key, (items) => keepDraft(textarea, form, key, items[key]));
+        chrome.storage.local.get([SETTING_KEY, key], (items) => {
+            if (items[SETTING_KEY] === false) return;
+
+            dropOldDrafts();
+            keepDraft(textarea, form, key, items[key]);
+        });
     }
 
     function keepDraft(textarea, form, key, draft) {

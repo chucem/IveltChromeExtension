@@ -6,6 +6,7 @@ const defualtPreferences = {
   copyAttachments: true,
   getBrowserNotifications: false,
   warnOnLosingPost: true,
+  keepDrafts: true,
   debugMode: false,
   backgroundSync: true,
   backgroundSyncPosts: 20000,

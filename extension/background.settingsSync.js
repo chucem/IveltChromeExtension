@@ -20,6 +20,7 @@ const SYNCED_SETTINGS = [
   'copyAttachments',
   'getBrowserNotifications',
   'warnOnLosingPost',
+  'keepDrafts',
   'backgroundSync',
   'backgroundSyncPosts',
   'backgroundSyncNotifMinutes',
