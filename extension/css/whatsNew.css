@@ -100,11 +100,23 @@
     outline-offset: 2px;
 }
 .ih-whats-new .ih-btn-main {
+    padding: 9px 22px;
     background: var(--t-link, #105289);
     color: var(--t-on-accent, #fff);
+    font-size: 15px;
+    font-weight: 800;
+    box-shadow: 0 2px 6px color-mix(in srgb, var(--t-link, #105289) 35%, transparent);
 }
 .ih-whats-new .ih-btn-main:hover {
     background: color-mix(in srgb, var(--t-link, #105289) 82%, #000);
+}
+.ih-whats-new .ih-btn-outline {
+    border-color: var(--t-link, #105289);
+    background: var(--t-surface, #fff);
+    color: var(--t-link, #105289);
+}
+.ih-whats-new .ih-btn-outline:hover {
+    background: color-mix(in srgb, var(--t-link, #105289) 10%, var(--t-surface, #fff));
 }
 .ih-whats-new .ih-btn-second {
     border-color: var(--t-button-border, #B9C2C9);

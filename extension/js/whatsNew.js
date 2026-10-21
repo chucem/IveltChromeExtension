@@ -57,7 +57,7 @@
             notice.append(
                 element('strong', null, 'די נאטיפיקאציע אנשטעלונגען האבן זיך געטוישט'),
                 element('p', null, 'מיר האבן מסדר געווען די אנשטעלונגען פון טשעקן פאר נייע תגובות אינעם אשכול און פאר נייע נאטיפיקאציעס, יעדע האט יעצט זיין אייגענע קעסטל און ווי אפט. דערפאר האבן מיר ביידע אויסגעלאשן ביי יעדעם, און מען דארף זיי צוריק אנשטעלן. ווילט איר זיי ווייטער? שטעלט זיי אן אין די אנשטעלונגען און קלויבט אויס ווי אפט.'),
-                button('עפן די נאטיפיקאציע אנשטעלונגען', 'ih-btn-main', () => openSettings('notifications'))
+                button('עפן די נאטיפיקאציע אנשטעלונגען', 'ih-btn-outline', () => openSettings('notifications'))
             );
             dialog.appendChild(notice);
         }
@@ -76,10 +76,10 @@
             dialog.appendChild(list);
         }
 
-        // one main button: the notice's, when there is one, otherwise closing
+        // closing is the main button, the way out of the pop-up
         const buttons = element('div', 'ih-whats-new-buttons');
         buttons.append(
-            button('פארמאכן', checkTiming ? 'ih-btn-second' : 'ih-btn-main', close),
+            button('פארשטאנען און פארמאך', 'ih-btn-main', close),
             button('דערמאן מיך שפעטער', 'ih-btn-second', later),
             button('אלע אנשטעלונגען', 'ih-btn-link', () => openSettings(''))
         );
