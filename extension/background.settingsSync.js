@@ -19,6 +19,7 @@ const SYNCED_SETTINGS = [
   'alwaysCopyTopic',
   'copyAttachments',
   'getBrowserNotifications',
+  'popupSameTab',
   'warnOnLosingPost',
   'keepDrafts',
   'backgroundSync',

@@ -5,6 +5,7 @@ const defualtPreferences = {
   alwaysCopyTopic: false,
   copyAttachments: true,
   getBrowserNotifications: false,
+  popupSameTab: false,
   warnOnLosingPost: true,
   keepDrafts: true,
   debugMode: false,
