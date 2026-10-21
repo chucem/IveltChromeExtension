@@ -7,6 +7,23 @@
     animation: ih-double-click-like 0.8s ease-out forwards;
 }
 
+/* taking a like back: the thumb shows grey and shrinks away */
+.ih-double-click-unlike {
+    filter: grayscale(1);
+    animation-name: ih-double-click-unlike;
+}
+
+@keyframes ih-double-click-unlike {
+    0% {
+        opacity: 0.9;
+        transform: translate(-50%, -50%) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.4);
+    }
+}
+
 @keyframes ih-double-click-like {
     0% {
         opacity: 0;

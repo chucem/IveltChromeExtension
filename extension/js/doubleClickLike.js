@@ -21,13 +21,15 @@
         const likeButton = post.querySelector('.postlove-button');
         if (!likeButton) return;
 
-        if (!likeButton.querySelector('.liked')) likeButton.click();
-        showThumb(event.clientX, event.clientY);
+        // the forum's like button toggles, so a double-click on a liked post takes the like back
+        const unliking = !!likeButton.querySelector('.liked');
+        likeButton.click();
+        showThumb(event.clientX, event.clientY, unliking);
     }
 
-    function showThumb(x, y) {
+    function showThumb(x, y, unliking) {
         const thumb = document.createElement('span');
-        thumb.className = 'ih-double-click-like';
+        thumb.className = 'ih-double-click-like' + (unliking ? ' ih-double-click-unlike' : '');
         thumb.textContent = '👍';
         thumb.style.left = x + 'px';
         thumb.style.top = y + 'px';
