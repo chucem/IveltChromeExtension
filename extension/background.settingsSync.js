@@ -43,6 +43,7 @@ const SYNCED_SETTINGS = [
   'printShowLikes',
   'whoLiked',
   'printLikesStyle',
+  'editorUndo',
   'themesEnabled',
   'theme',
   'customTheme'

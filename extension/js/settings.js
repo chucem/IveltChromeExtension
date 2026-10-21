@@ -27,7 +27,8 @@ const preferencesOptions = [
 	'copyPostLink',
 	'whoLiked',
 	'printShowLikes',
-	'printLikesStyle'
+	'printLikesStyle',
+	'editorUndo'
 ];
 
 // Listen to settings changes

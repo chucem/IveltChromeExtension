@@ -5,6 +5,7 @@ let scripts = [
   "js/pageEnhancements.js",
   "js/splitNotifications.js",
   "js/addTopicButtons.js",
+  "js/editorUndo.js",
   "js/addGoogleSearch.js"
 ];
 
