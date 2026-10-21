@@ -16,6 +16,7 @@ const defualtPreferences = {
   forceUpdateTopicMapCache: false,
   stickyPostButtons: false,
   titleOpensUnread: true,
+  doubleClickLike: false,
   ShowMultiNotifs: true,
   upDownArrowKeys: true,
   spoilerPolish: false,

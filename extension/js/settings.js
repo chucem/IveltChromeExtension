@@ -13,6 +13,7 @@ const preferencesOptions = [
 	'copyAttachments',
 	'stickyPostButtons',
 	'titleOpensUnread',
+	'doubleClickLike',
 	'ShowMultiNotifs',
 	'upDownArrowKeys',
 	'spoilerPolish',

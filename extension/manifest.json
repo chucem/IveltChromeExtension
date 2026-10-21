@@ -78,6 +78,15 @@
     },
     {
       "matches": [
+        "*://*.ivelt.com/*",
+        "*://*.yiddishworld.com/*",
+        "*://*.198.153.76.147/*"
+      ],
+      "css": ["css/doubleClickLike.css"],
+      "js": ["js/doubleClickLike.js"]
+    },
+    {
+      "matches": [
         "*://*.ivelt.com/forum/posting.php*",
         "*://*.yiddishworld.com/forum/posting.php*",
         "*://*.198.153.76.147/forum/posting.php*"

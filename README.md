@@ -31,6 +31,7 @@ Extra buttons next to the regular quote button on every post:
 * **Who liked** – a small arrow on the like button opens the list of who liked the post, each name a link to their profile.
 * **Quote in the comments topic** – for topics that have a linked קאמענטארן topic, open a reply there with the post already quoted.
 * **Copy post link** – a plain click on the small post icon next to the author's name copies the post's link instead of opening it. Right-click and long-press work as before.
+* **Double-click to like** – double-clicking a post (not on its words) likes it, with a small 👍 where you clicked. It never takes a like away. Off by default; turn it on in the settings.
 * Option to keep the post buttons visible while scrolling through a long post.
 
 ### Notifications
