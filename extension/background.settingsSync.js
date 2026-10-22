@@ -43,6 +43,7 @@ const SYNCED_SETTINGS = [
   'driveFolderName',
   'printShowLikes',
   'whoLiked',
+  'profileCards',
   'printLikesStyle',
   'editorUndo',
   'themesEnabled',

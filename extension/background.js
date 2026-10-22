@@ -31,6 +31,7 @@ const defualtPreferences = {
   openAttachmentsTab: true,
   copyPostLink: true,
   whoLiked: true,
+  profileCards: true,
   printShowLikes: false,
   printLikesStyle: 'names',
   editorUndo: true,
