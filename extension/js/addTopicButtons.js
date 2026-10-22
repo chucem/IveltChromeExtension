@@ -411,6 +411,18 @@ function iveltNotify(message){
 //https://docs.google.com/spreadsheets/d/1bziJ_h6bIRBXFSBJHT3aBsb13-QrEnrSjjy_-IS3FFw/edit?gid=1771705226#gid=1771705226
 
 
+// the forum's CSP blocks this page from reaching Google Sheets, so the extension fetches the sheet (see js/contentScript.js)
+function requestTopicMappingCsv() {
+    return new Promise((resolve, reject) => {
+        window.addEventListener('message', function onResult(e) {
+            if (e.source !== window || !e.data || e.data.type !== 'ivelt-helper-topic-mapping-result') return;
+            window.removeEventListener('message', onResult);
+            e.data.error ? reject(new Error(e.data.error)) : resolve(e.data.text);
+        });
+        window.postMessage({ type: 'ivelt-helper-topic-mapping' }, location.origin);
+    });
+}
+
 async function fetchTopicMapping() {
     const now = Date.now();
 
@@ -429,13 +441,7 @@ if (!forceRefresh && cachedData && lastFetchTime && now - lastFetchTime < CACHE_
 // Otherwise, fetch new data from Google Sheets
     try {
         console.log('fetching topic mappings form google sheet');
-        const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS8-2oWC0g995y_fNyR4scrXBEimeYpI5Hm0TPqt1IyvVqEdVUDKYw2n7Z6A2d1DDj3Ef6ofpwe2s3T/pub?gid=986512672&single=true&output=csv";
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch CSV data: ${response.statusText}`);
-        }
-
-        const csvText = await response.text();
+        const csvText = await requestTopicMappingCsv();
         const mappings = {};
 
         const rows = csvText.split("\n");
