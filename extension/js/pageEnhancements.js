@@ -69,11 +69,14 @@ function enchancePage() {
   if (url.pathname === "/forum/viewtopic.php"){
     // Duplicate link for "Unread Post" to bottom of page.
     const paginations = document.getElementsByClassName("pagination");
-    paginations[1].outerHTML = paginations[0].outerHTML;
+    if (paginations.length > 1) {
+      paginations[1].outerHTML = paginations[0].outerHTML;
+    }
   }
 
-  if (url.pathname === "/forum/ucp.php" && params.get('i') === 'ucp_notifications'){
-    const pagination = document.querySelector(".action-bar.bar-top .pagination");
+  const pagination = url.pathname === "/forum/ucp.php" && params.get('i') === 'ucp_notifications'
+    && document.querySelector(".action-bar.bar-top .pagination");
+  if (pagination){
 
     const link = document.createElement("a");
     // add listened

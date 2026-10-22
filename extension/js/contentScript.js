@@ -9,7 +9,8 @@ let scripts = [
   "js/addGoogleSearch.js"
 ];
 
-scripts.forEach((s) => {
+// skip pages that aren't the forum, like Cloudflare's challenge page, the scripts expect the forum's elements
+if (document.getElementById("page-body")) scripts.forEach((s) => {
   let e = document.createElement("script");
   e.src = chrome.runtime.getURL(s);
   (document.head || document.documentElement).appendChild(e);
