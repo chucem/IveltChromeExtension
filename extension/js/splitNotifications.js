@@ -60,8 +60,9 @@ function splitNotifications() {
       const dropdown = li.querySelector('.dropdown-extended');
       if (dropdown) {
         dropdown.id = `${type}_notification_list`;
-        // phpBB's own toggle lifts the dropdown it opens; ours only flip display,
-        // so without this the pinned first post is drawn over them
+        // Not whatever position phpBB had set on the original when it was copied
+        dropdown.removeAttribute('style');
+        // so the pinned first post isn't drawn over them
         dropdown.style.zIndex = '1000';
 
         // Update header
@@ -75,6 +76,13 @@ function splitNotifications() {
         if (ul) {
           ul.innerHTML = '';
           items.forEach(item => ul.appendChild(item));
+          // phpBB sizes the dropdown to what's in it, so an empty one was just a sliver
+          if (!items.length) {
+            const empty = document.createElement('li');
+            empty.className = 'no_notifications';
+            empty.textContent = 'נישטא קיין נאטיפיקאציעס';
+            ul.appendChild(empty);
+          }
         }
 
         // Update footer link
@@ -84,27 +92,23 @@ function splitNotifications() {
           footerLink.textContent = "ווייז אלע";
         }
 
-        // Add click handlers
-        if (link) {
-          link.addEventListener('click', e => {
-            e.preventDefault();
-            e.stopPropagation();
-            document.querySelectorAll('.dropdown-extended').forEach(el => {
-              if (el !== dropdown) el.style.display = 'none';
-            });
-            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
-          });
-        }
+        // Opened and closed by phpBB's own dropdown code, like the original bell: it keeps the
+        // dropdown on screen (on a phone the bells are near the left edge) and closes it on a
+        // click elsewhere
+        if (link) registerDropdown(link, dropdown);
       }
 
-      // Close dropdown when clicking outside
-      document.addEventListener('click', e => {
-        if (!li.contains(e.target)) {
-          dropdown.style.display = 'none';
-        }
-      });
-
       return li;
+    }
+
+    function registerDropdown(link, dropdown) {
+      if (!window.jQuery || !window.phpbb || !phpbb.registerDropdown) return;
+      // After phpBB's own ready handlers, which register every dropdown already on the page (maybe
+      // these too, when this ran first), so each is registered once
+      jQuery(() => setTimeout(() => {
+        if (!jQuery(link).data('dropdown-options'))
+          phpbb.registerDropdown(jQuery(link), jQuery(dropdown), { direction: 'auto', verticalDirection: 'auto' });
+      }));
     }
 
     // Create notification bells by cloning the original
