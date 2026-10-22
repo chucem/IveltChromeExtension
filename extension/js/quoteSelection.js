@@ -86,7 +86,10 @@
         const timeElm = post.querySelector('time');
         const time = timeElm ? Date.parse(timeElm.dateTime) / 1000 : '';
 
-        const quote = `[quote="${username}" user_id=${userId} time=${time} post_id=${postId}]\n${text}\n[/quote]`;
+        // The topic review under the reply box shows the date as plain text, without a <time>:
+        // what isn't known is left out rather than written empty
+        const attributes = [`user_id=${userId}`, `time=${time}`, `post_id=${postId}`].filter((a) => !a.endsWith('='));
+        const quote = `[quote="${username}" ${attributes.join(' ')}]\n${text}\n[/quote]`;
 
         const textarea = getTextarea();
         let at, insert;
