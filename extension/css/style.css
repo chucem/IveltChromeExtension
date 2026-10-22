@@ -127,6 +127,12 @@ hr {
     margin: 0 0 50px;
     font-size: 20px;
 }
+.version {
+    margin-top: -12px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--ui-muted);
+}
 .credits {
     grid-area: m;
     border-right: 1px solid var(--ui-border);

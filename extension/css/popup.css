@@ -58,6 +58,13 @@ body {
   padding-bottom: 3px;
   border-top: 1px solid var(--ui-border);
 }
+.popup_version {
+  margin: 2px 8px 4px;
+  font-size: 10px;
+  color: var(--ui-muted);
+  text-align: left;
+  direction: ltr;
+}
 .popup_themes_title {
   margin: 8px 12px 6px;
   font-size: 13px;
