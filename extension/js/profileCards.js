@@ -2,7 +2,7 @@
     'use strict';
 
     const SETTING_KEY = 'profileCards';
-    const SHOW_DELAY_MS = 400;
+    const SHOW_DELAY_MS = 800;
     const HIDE_DELAY_MS = 300;
     const PROFILE_LINK = '#page-body a[href*="mode=viewprofile"]';
     const KEEP_TAGS = new Set(['a', 'b', 'br', 'div', 'em', 'i', 'img', 'p', 'span', 'strong', 'u']);
