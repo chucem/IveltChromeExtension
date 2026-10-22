@@ -45,6 +45,7 @@
             selection.removeAllRanges();
             button.querySelector('span').textContent = 'צוגעלייגט ✓';
             doneTimeout = setTimeout(() => button.remove(), DONE_MS);
+            goToReply();
         };
 
         const rect = selection.getRangeAt(0).getBoundingClientRect();
@@ -106,6 +107,15 @@
         textarea.setRangeText(insert, at, at, 'end');
         if (caret !== null) caret = at + insert.length;
         textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    function goToReply() {
+        const textarea = getTextarea();
+        const end = endOfQuotesOnTop(textarea.value);
+        const caret = textarea.value[end] === '\n' ? end + 1 : end;
+        textarea.focus({ preventScroll: true });
+        textarea.setSelectionRange(caret, caret);
+        textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
     function endOfQuotesOnTop(text) {
