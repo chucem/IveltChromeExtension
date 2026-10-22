@@ -1,34 +1,17 @@
-// Profile card on hover
-//
-// Resting the mouse on a username (a post's author, a name in a quote, a mention...)
-// opens a card with what the user's profile page shows: the avatar, the name (in their
-// group's color), whether they're online, the rank, the profile fields (like the
-// location), the contact links, the statistics (joined, last active, posts, thanks...)
-// and the signature - in the forum's own words, with the links working; the mouse can move
-// into the card to use them. Dates are written so they read right from right to left.
-//
-// A profile is loaded once per page, and only after the mouse has rested on the name for a
-// moment; until it's there, the card shows "…".
-//
-// Runs as a content script (isolated world).
-
 (function () {
     'use strict';
 
     const SHOW_DELAY_MS = 400;
     const HIDE_DELAY_MS = 300;
-    // links to a profile in the page itself (not the header), but not the avatars
     const PROFILE_LINK = '#page-body a[href*="mode=viewprofile"]';
-    // only plain formatting, links and pictures are copied from the profile page
     const KEEP_TAGS = new Set(['a', 'b', 'br', 'div', 'em', 'i', 'img', 'p', 'span', 'strong', 'u']);
     const DROP_TAGS = new Set(['button', 'embed', 'form', 'iframe', 'input', 'noscript', 'object', 'script', 'select', 'style', 'textarea']);
     const MONTHS = 'יאנואר|פעברואר|מארטש|אפריל|מאי|יוני|יולי|אויגוסט|אוגוסט|סעפטעמבער|אקטאבער|נאוועמבער|דעצעמבער';
-    // "מיטוואך מארטש 12, 2025 2:46 pm" - the weekday and the time may be missing
     const DATE = new RegExp(`^(?:\\S+ )?(${MONTHS}) (\\d{1,2}), (\\d{4})(?: (\\d{1,2}):(\\d{2}) ?(am|pm))?$`, 'i');
     const TIME = /(\d{1,2}):(\d{2}) ?(am|pm)/gi;
 
-    const profiles = new Map(); // profile address -> promise of what the card shows (or null)
-    const loaded = new Map();   // the same, once it's there
+    const profiles = new Map();
+    const loaded = new Map();
     let card = null;
     let hoveredLink = null;
     let showTimeout;
@@ -50,7 +33,6 @@
             showTimeout = setTimeout(() => showCard(link), SHOW_DELAY_MS);
         });
 
-        // closes a moment after the mouse leaves both the name and the card
         document.addEventListener('mouseout', (event) => {
             const link = event.target.closest(PROFILE_LINK);
             const leavingLink = link && link === hoveredLink && !link.contains(event.relatedTarget)
@@ -80,7 +62,6 @@
         }
 
         const profile = loaded.get(address);
-        // the mouse may have moved on while it was loading, or there's nothing to show
         if (link !== hoveredLink) return;
         if (!profile) {
             hideCard();
@@ -103,8 +84,6 @@
         return profiles.get(address);
     }
 
-    // The forum's profile page: a first box with the avatar, rank, name, groups and profile
-    // fields; then the contact and statistics columns, each with its heading; then the signature
     function readProfile(html, address) {
         const page = new DOMParser().parseFromString(html, 'text/html');
         const profile = page.getElementById('viewprofile');
@@ -124,7 +103,6 @@
             nameColor: username ? username.style.color : '',
             online: !!profile.querySelector('.panel.online'),
             rank: rank ? cleanText(rank.textContent) : '',
-            // the first pair is the username itself, and the groups (in a dropdown) are left out
             fields: pairs(profile.querySelector('.profile-details')).slice(1).filter((row) => !row.value.querySelector('select')),
             sections: [...profile.querySelectorAll('.column1, .column2')]
                 .map((column) => ({ title: textOf(column.querySelector('h3')), rows: pairs(column.querySelector('dl.details')) }))
@@ -133,7 +111,6 @@
         };
     }
 
-    // The label / value pairs of a details list, each label without its colon
     function pairs(list) {
         if (!list) return [];
         return [...list.querySelectorAll('dt')]
@@ -150,8 +127,6 @@
         return text.replace(/\s+/g, ' ').trim();
     }
 
-    // A date in an order that reads right in a right-to-left line, with a 24-hour time:
-    // "מיטוואך מארטש 12, 2025 2:46 pm" -> "12 מארטש 2025 אום 14:46"
     function readableDate(text) {
         const date = text.match(DATE);
         if (!date) return text.replace(TIME, (all, hour, minute, half) => clock(hour, minute, half));
@@ -165,8 +140,6 @@
         return `${hours}:${minute}`;
     }
 
-    // Copies the profile page's HTML with only plain formatting, links and pictures, so nothing
-    // in it can run or restyle the page; everything else is kept as its text
     function safeCopy(source, base) {
         const copy = document.createDocumentFragment();
         source.childNodes.forEach((node) => {
@@ -207,8 +180,6 @@
         }
     }
 
-    // Under the name (or over it, when there's no room below), never off the side of the
-    // window, with the pointer at the name
     function placeCard(link, profile) {
         if (!card) {
             card = document.createElement('div');
@@ -280,7 +251,6 @@
         }
     }
 
-    // A heading (if there is one) and label / value rows; a value with links keeps them
     function section(title, rows, base) {
         const box = element('div', 'ih-profile-section');
         if (title) box.appendChild(element('div', 'ih-profile-heading', title));

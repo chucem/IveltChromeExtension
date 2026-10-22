@@ -11,8 +11,6 @@
     display: none;
 }
 
-/* the card shown when the mouse rests on a username (js/profileCards.js), with a small
-   pointer at the name; it follows the color theme when one is picked */
 .ih-profile-card {
     position: absolute;
     z-index: 1000;
@@ -42,7 +40,6 @@
     background: inherit;
     transform: rotate(45deg);
 }
-/* over the name, the pointer is at the bottom */
 .ih-profile-card.ih-profile-above::before {
     top: auto;
     bottom: -6px;
@@ -121,7 +118,6 @@
     margin: 0;
     overflow-wrap: anywhere;
 }
-/* a long signature shows its beginning, fading out */
 .ih-profile-signature {
     max-height: 80px;
     overflow: hidden;
