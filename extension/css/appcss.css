@@ -1,4 +1,23 @@
+/* Google search above the forum's search box (js/addGoogleSearch.js): the input stretches
+   so the row is as wide as the forum's box, which has two buttons to our one. With the id,
+   as the forum's own styles load after this file */
+#search-box .ih-google-search {
+    margin-bottom: 5px;
+}
+#search-box .ih-google-search fieldset {
+    display: flex;
+}
+#search-box .ih-google-search .inputbox {
+    flex: 1;
+}
 
+/* "private message with a quote" post button (js/addTopicButtons.js): only where the forum's phone
+   layout hides the profile's contact menu, which has the same link */
+@media (min-width: 701px) {
+    .post-buttons li.ih-pm-quote {
+        display: none;
+    }
+}
 
 .clone-first .app-hidden {
     display: none;

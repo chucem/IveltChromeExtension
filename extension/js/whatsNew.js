@@ -56,7 +56,7 @@
             const notice = element('div', 'ih-whats-new-notice');
             notice.append(
                 element('strong', null, 'די נאטיפיקאציע אנשטעלונגען האבן זיך געטוישט'),
-                element('p', null, 'מיר האבן מסדר געווען די אנשטעלונגען פון טשעקן פאר נייע תגובות אינעם אשכול און פאר נייע נאטיפיקאציעס, יעדע האט יעצט זיין אייגענע קעסטל און ווי אפט. דערפאר האבן מיר ביידע אויסגעלאשן ביי יעדעם, און מען דארף זיי צוריק אנשטעלן. ווילט איר זיי ווייטער? שטעלט זיי אן אין די אנשטעלונגען און קלויבט אויס ווי אפט.'),
+                element('p', null, 'מיר האבן מסדר געווען די אנשטעלונגען פון טשעקן פאר נייע תגובות אינעם אשכול און פאר נייע נאטיפיקאציעס, יעדער האט יעצט זיין אייגענע קעסטל און ווי אפט. דערפאר האבן מיר ביידע אויסגעלאשן ביי יעדעם, און מען דארף זיי צוריק אנשטעלן. ווילט איר זיי ווייטער? שטעלט זיי אן אין די אנשטעלונגען און קלייבט אויס ווי אפט.'),
                 button('עפן די נאטיפיקאציע אנשטעלונגען', 'ih-btn-outline', () => openSettings('notifications'))
             );
             dialog.appendChild(notice);
@@ -70,7 +70,7 @@
         }
 
         if (release && release.fixes && release.fixes.length) {
-            dialog.appendChild(element('h3', null, 'פאראכטען'));
+            dialog.appendChild(element('h3', null, 'תיקונים'));
             const list = element('ul', 'ih-whats-new-list');
             release.fixes.forEach((text) => list.appendChild(element('li', null, text)));
             dialog.appendChild(list);

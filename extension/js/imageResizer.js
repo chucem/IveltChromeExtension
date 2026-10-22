@@ -199,7 +199,7 @@
             cleanups.push(() => target.removeEventListener(type, handler, capture));
         }
 
-        const fullMessage = `עס מעג זיין מאקסימום ${MAX_ATTACHMENTS} עטעטשמענטס. מעקט אויס איינס איידער איר לייגט צו נאך.`;
+        const fullMessage = `עס מעג זיין מאקסימום ${MAX_ATTACHMENTS} אטעטשמענטס. מעקט אויס איינס איידער איר לייגט צו נאך.`;
 
         // Opens the attachments tab when the uploader isn't there yet, and waits for it
         async function ensureAttachmentInput() {
@@ -211,7 +211,7 @@
 
             const until = Date.now() + INPUT_WAIT_MS;
             while (!(input = findAttachmentInput()) && Date.now() < until) await delay(100);
-            if (!input) throw new Error('קען נישט געפינען וואו מען לייגט צו עטעטשמענטס.');
+            if (!input) throw new Error('קען נישט געפינען וואו מען לייגט צו אטעטשמענטס.');
             return input;
         }
 
@@ -253,7 +253,7 @@
             // has to start with Yiddish - a line starting with "OK" comes out scrambled.
             if (resize && files.length > slots) {
                 const zip = confirm(
-                    `איר האט אויסגעקליבן ${files.length} פיילס, אבער עס איז נאר דא פלאץ פאר ${plural(slots, 'עטעטשמענט', 'עטעטשמענטס')}.\n\n` +
+                    `איר האט אויסגעקליבן ${files.length} פיילס, אבער עס איז נאר דא פלאץ פאר ${plural(slots, 'אטעטשמענט', 'אטעטשמענטס')}.\n\n` +
                     `• דרוקט OK צו לייגן זיי אלע אריין אין איין ZIP פייל (די בילדער ווערן פארקלענערט אז עס זאל אריינפאסן)\n` +
                     `• דרוקט Cancel צו צולייגן נאר די ערשטע ${slots}`
                 );
@@ -578,14 +578,14 @@
             const collected = [];
 
             busy = true;
-            showStatus('⏳ לייענט דעם פאלדער…');
+            showStatus('⏳ ליינט דעם פאלדער…');
             try {
                 for (const entry of fsEntries) {
                     await readEntryRecursive(entry, '', collected);
                 }
             } catch (err) {
                 console.error(err);
-                showStatus('❌ קען נישט לייענען דעם פאלדער: ' + err.message, 'error', HOLD_STATUS_MS * 2);
+                showStatus('❌ קען נישט ליינען דעם פאלדער: ' + err.message, 'error', HOLD_STATUS_MS * 2);
                 return;
             } finally {
                 busy = false;
@@ -611,7 +611,7 @@
 
             const sourceBytes = entries.reduce((sum, e) => sum + e.file.size, 0);
             if (sourceBytes > ZIP_SOURCE_LIMIT) {
-                showStatus(`דער פאלדער איז ${formatSize(sourceBytes)} - פיל צו גרויס פאר איין עטעטשמענט.`, 'error', HOLD_STATUS_MS * 2);
+                showStatus(`דער פאלדער איז ${formatSize(sourceBytes)} - פיל צו גרויס פאר איין אטעטשמענט.`, 'error', HOLD_STATUS_MS * 2);
                 return;
             }
 
@@ -635,7 +635,7 @@
                     showStatus('');
                     const ok = confirm(
                         `דער ZIP איז ${formatSize(zipFile.size)} (${plural(list.length, 'פייל', 'פיילס')}).\n\n` +
-                        `אייוועלט נעמט געווענליך נישט אן ZIP פיילס גרעסער פון ${formatSize(256 * 1024)}, איז עס קען נישט ארויפגיין.\n\n` +
+                        `אייוועלט נעמט געווענליך נישט אן ZIP פיילס גרעסער פון ${formatSize(256 * 1024)}, און עס קען זיין אז עס וועט נישט ארויפגיין.\n\n` +
                         `צולייגן סיי ווי?`
                     );
                     if (!ok) return;

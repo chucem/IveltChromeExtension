@@ -58,11 +58,51 @@ body {
   padding-bottom: 3px;
   border-top: 1px solid var(--ui-border);
 }
+.popup_version {
+  margin: 2px 8px 4px;
+  font-size: 10px;
+  color: var(--ui-muted);
+  text-align: left;
+  direction: ltr;
+}
+/* a small line icon in front of each link, in the text's color */
+.popup_icon {
+  width: 16px;
+  height: 16px;
+  margin-left: 8px;
+  vertical-align: -3px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.8;
+}
+.popup_options {
+  direction: rtl;
+}
+/* the color themes are a card of their own, so they don't look like more links */
+.popup_themes {
+  margin: 6px 8px 4px;
+  padding: 2px 0 2px;
+  border: 1px solid var(--ui-border);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--ui-text) 5%, var(--ui-surface));
+}
+.popup_themes .theme-swatches {
+  padding: 0 8px;
+}
+.popup_themes .popup_options {
+  margin: 8px 10px 4px;
+  font-size: 14px;
+}
 .popup_themes_title {
-  margin: 8px 12px 6px;
+  margin: 8px 10px 6px;
   font-size: 13px;
+  font-weight: 600;
   color: var(--ui-muted);
   text-align: right;
+  direction: rtl;
 }
 /* theme swatches, colors come from js/themes.data.js */
 .theme-swatches {

@@ -232,6 +232,13 @@ function showTab(){
 	});
 }
 
+// The version under the title, from the manifest (version_name has the beta number)
+function showVersion(){
+	const manifest = chrome.runtime.getManifest();
+	document.getElementById('version').textContent = manifest.version_name || manifest.version;
+}
+
 window.addEventListener('hashchange', showTab);
+document.addEventListener('DOMContentLoaded', showVersion);
 document.addEventListener('DOMContentLoaded', showTab);
 document.addEventListener('DOMContentLoaded', initSettings);

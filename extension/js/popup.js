@@ -153,3 +153,8 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 document.addEventListener('DOMContentLoaded', initThemeSwatches);
+
+document.addEventListener('DOMContentLoaded', function () {
+    const manifest = chrome.runtime.getManifest();
+    document.getElementById('popup_version').textContent = 'v' + (manifest.version_name || manifest.version);
+});
