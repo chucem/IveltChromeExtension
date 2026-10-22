@@ -27,6 +27,7 @@ const preferencesOptions = [
 	'openAttachmentsTab',
 	'copyPostLink',
 	'whoLiked',
+	'profileCards',
 	'printShowLikes',
 	'printLikesStyle',
 	'editorUndo'

@@ -1,6 +1,7 @@
 (function () {
     'use strict';
 
+    const SETTING_KEY = 'profileCards';
     const SHOW_DELAY_MS = 400;
     const HIDE_DELAY_MS = 300;
     const PROFILE_LINK = '#page-body a[href*="mode=viewprofile"]';
@@ -18,6 +19,14 @@
     let hideTimeout;
 
     function init() {
+        if (!chrome.storage || !chrome.storage.local) return;
+
+        chrome.storage.local.get([SETTING_KEY], (items) => {
+            if (items[SETTING_KEY] !== false) listen();
+        });
+    }
+
+    function listen() {
         document.addEventListener('mouseover', (event) => {
             if (card && card.contains(event.target)) {
                 clearTimeout(hideTimeout);

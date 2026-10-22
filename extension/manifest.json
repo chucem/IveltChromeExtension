@@ -77,6 +77,15 @@
         "*://*.yiddishworld.com/*",
         "*://*.198.153.76.147/*"
       ],
+      "css": ["css/profileCards.css"],
+      "js": ["js/profileCards.js"]
+    },
+    {
+      "matches": [
+        "*://*.ivelt.com/*",
+        "*://*.yiddishworld.com/*",
+        "*://*.198.153.76.147/*"
+      ],
       "css": ["css/editorUndo.css"]
     },
     {
@@ -87,7 +96,6 @@
       ],
 	  "css":["css/appcss.css"],
       "js": [
-        "js/profileCards.js",
         "js/settingsHandler.js",
         "js/contentScript.js",
         "js/refreshNotificationCount.js",
