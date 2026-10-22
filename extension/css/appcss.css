@@ -1,4 +1,15 @@
-
+/* Google search above the forum's search box (js/addGoogleSearch.js): the input stretches
+   so the row is as wide as the forum's box, which has two buttons to our one. With the id,
+   as the forum's own styles load after this file */
+#search-box .ih-google-search {
+    margin-bottom: 5px;
+}
+#search-box .ih-google-search fieldset {
+    display: flex;
+}
+#search-box .ih-google-search .inputbox {
+    flex: 1;
+}
 
 .clone-first .app-hidden {
     display: none;

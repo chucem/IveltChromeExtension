@@ -29,16 +29,21 @@ function addGoogleSiteSearch(){
     if (!siteSearch) return;
 
     let searchUrl = `https://www.google.com/search?q=site%3Awww.ivelt.com+`
-        siteSearch.insertAdjacentHTML('beforebegin', 
-            '<input id="g_site_search_keywords" type="search" class="inputbox search" style="border-radius:4px;margin-bottom: 5px;" placeholder="גוגל זוך אין אייוועלט">'
-        ) 
+    // Built like the forum's own search box under it (same classes), with a Google button in place of its two
+    siteSearch.insertAdjacentHTML('beforebegin',
+        '<form class="ih-google-search"><fieldset>' +
+            '<input id="g_site_search_keywords" type="search" class="inputbox search tiny" size="20" placeholder="גוגל זוך אין אייוועלט…">' +
+            '<button class="button button-search-end" type="submit" title="זוך אין גוגל">' +
+                '<i class="icon fa-google fa-fw" aria-hidden="true"></i><span class="sr-only">זוך אין גוגל</span>' +
+            '</button>' +
+        '</fieldset></form>'
+    )
 
-        document.getElementById('g_site_search_keywords').addEventListener('keydown' ,function (e) {
-            if (e.key === 'Enter') {
-                window.open(searchUrl + document.getElementById('g_site_search_keywords').value, '_blank').focus();
-                e.preventDefault();
-            }
-        });
+    // Enter in the box submits the form too
+    siteSearch.previousElementSibling.addEventListener('submit', function (e) {
+        e.preventDefault();
+        window.open(searchUrl + document.getElementById('g_site_search_keywords').value, '_blank').focus();
+    });
 }
 
 addGoogleSiteSearch();
