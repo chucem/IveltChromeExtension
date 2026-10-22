@@ -198,7 +198,7 @@
         if (!card.isConnected) document.body.appendChild(card);
 
         const signature = card.querySelector('.ih-profile-signature');
-        if (signature) signature.classList.toggle('ih-profile-signature-long', signature.scrollHeight > signature.clientHeight);
+        if (signature) markSignature(signature);
 
         const rect = link.getBoundingClientRect();
         const width = card.offsetWidth;
@@ -211,6 +211,12 @@
         card.style.top = `${window.scrollY + (below ? rect.bottom + 8 : rect.top - 8 - height)}px`;
         card.style.left = `${window.scrollX + left}px`;
         card.style.setProperty('--ih-pointer-x', `${clamp(middle - left, 14, width - 14)}px`);
+    }
+
+    // fades the bottom of a signature while there's more to scroll to
+    function markSignature(signature) {
+        signature.classList.toggle('ih-profile-signature-more',
+            signature.scrollTop + signature.clientHeight < signature.scrollHeight - 2);
     }
 
     function clamp(value, min, max) {
@@ -227,6 +233,8 @@
             avatar.src = profile.avatar;
             avatar.alt = '';
             header.appendChild(avatar);
+        } else if (profile.loading) {
+            header.appendChild(element('div', 'ih-profile-skeleton ih-profile-avatar'));
         }
 
         const title = element('div', 'ih-profile-title');
@@ -237,13 +245,14 @@
         const tags = element('div', 'ih-profile-tags');
         if (profile.online) tags.appendChild(element('span', 'ih-profile-tag ih-profile-online', 'אנליין'));
         if (profile.rank) tags.appendChild(element('span', 'ih-profile-tag', profile.rank));
+        if (profile.loading) tags.appendChild(element('span', 'ih-profile-skeleton ih-profile-skeleton-tag'));
         if (tags.childNodes.length) title.appendChild(tags);
 
         header.appendChild(title);
         card.appendChild(header);
 
         if (profile.loading) {
-            card.appendChild(element('div', 'ih-profile-section', '…'));
+            card.append(skeletonSection(false), skeletonSection(true));
             return;
         }
 
@@ -257,6 +266,10 @@
             signature.appendChild(safeCopy(profile.signature.content, profile.address));
             box.appendChild(signature);
             card.appendChild(box);
+
+            const markMore = () => markSignature(signature);
+            signature.addEventListener('scroll', markMore);
+            signature.querySelectorAll('img').forEach((img) => img.addEventListener('load', markMore));
         }
     }
 
@@ -271,6 +284,17 @@
             else value.textContent = readableDate(textOf(row.value));
             list.append(element('dt', '', row.label), value);
         });
+        box.appendChild(list);
+        return box;
+    }
+
+    // the shape of a section while the profile loads, so the card doesn't jump much when it's filled
+    function skeletonSection(withHeading) {
+        const box = element('div', 'ih-profile-section');
+        if (withHeading) box.appendChild(element('div', 'ih-profile-skeleton ih-profile-skeleton-heading'));
+
+        const list = element('dl', 'ih-profile-rows');
+        for (let i = 0; i < 3; i++) list.append(element('dt', 'ih-profile-skeleton'), element('dd', 'ih-profile-skeleton'));
         box.appendChild(list);
         return box;
     }

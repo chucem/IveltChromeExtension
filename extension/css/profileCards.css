@@ -82,9 +82,47 @@
     padding-top: 8px;
     border-top: 1px solid var(--t-border, #DCE3E8);
 }
-.ih-profile-loading .ih-profile-section {
-    color: var(--t-muted, #666);
+/* placeholders in the card's shape while the profile loads, with a light passing shine */
+.ih-profile-skeleton {
+    --ih-skeleton: color-mix(in srgb, var(--t-text, #333) 14%, var(--t-surface, #fff));
+    --ih-skeleton-shine: color-mix(in srgb, var(--t-text, #333) 6%, var(--t-surface, #fff));
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--ih-skeleton) 30%, var(--ih-skeleton-shine) 50%, var(--ih-skeleton) 70%) 0 0 / 300% 100%;
+    animation: ih-profile-shine 1.4s ease-in-out infinite;
 }
+@keyframes ih-profile-shine {
+    from { background-position: 100% 0; }
+    to { background-position: 0 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .ih-profile-skeleton {
+        animation: none;
+    }
+}
+.ih-profile-skeleton.ih-profile-avatar {
+    border-radius: 8px;
+}
+.ih-profile-skeleton-tag {
+    display: inline-block;
+    width: 56px;
+    height: 17px;
+    border-radius: 10px;
+}
+.ih-profile-skeleton-heading {
+    width: 70px;
+    height: 9px;
+    margin: 2px 0 8px;
+}
+.ih-profile-rows dt.ih-profile-skeleton {
+    width: 64px;
+}
+.ih-profile-rows .ih-profile-skeleton {
+    height: 10px;
+    margin: 3px 0 4px;
+}
+.ih-profile-rows dd.ih-profile-skeleton:nth-of-type(1) { width: 55%; }
+.ih-profile-rows dd.ih-profile-skeleton:nth-of-type(2) { width: 80%; }
+.ih-profile-rows dd.ih-profile-skeleton:nth-of-type(3) { width: 40%; }
 .ih-profile-heading {
     margin-bottom: 4px;
     color: var(--t-link, #105289);
@@ -105,14 +143,18 @@
     margin: 0;
     overflow-wrap: anywhere;
 }
+/* a long signature scrolls inside the card: the scrollbar shows, and the bottom fades while there's more below */
 .ih-profile-signature {
     max-height: 80px;
-    overflow: hidden;
+    overflow-y: auto;
     overflow-wrap: anywhere;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--t-text, #333) 35%, transparent) transparent;
 }
-.ih-profile-signature-long {
-    -webkit-mask-image: linear-gradient(to bottom, #000 65%, transparent);
-    mask-image: linear-gradient(to bottom, #000 65%, transparent);
+.ih-profile-signature-more {
+    -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent);
+    mask-image: linear-gradient(to bottom, #000 55%, transparent);
 }
 .ih-profile-signature img {
     max-width: 100%;
