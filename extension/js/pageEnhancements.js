@@ -112,6 +112,13 @@ function showCopiedTip(anchor) {
   tip.style.left = `${rect.left + window.scrollX + rect.width / 2}px`;
   document.body.appendChild(tip);
 
+  // Keep it on screen: centered over a link at the screen's edge (on a phone the link is at the right edge) it sticks out
+  const margin = 6;
+  const tipRect = tip.getBoundingClientRect();
+  const viewWidth = document.documentElement.clientWidth;
+  const shift = Math.min(0, viewWidth - margin - tipRect.right) || Math.max(0, margin - tipRect.left);
+  tip.style.left = `${parseFloat(tip.style.left) + shift}px`;
+
   setTimeout(() => tip.classList.add('ext-copied-tip-hide'), 1200);
   setTimeout(() => tip.remove(), 1600);
 }
