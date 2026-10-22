@@ -1,26 +1,35 @@
 const preferencesOptions = [
 	'hideUserName',
 	'getBrowserNotifications',
+	'popupSameTab',
 	'warnOnLosingPost',
+	'keepDrafts',
 	'backgroundSync',
 	'backgroundSyncPosts',
-	'backgroundSyncNotif',
+	'backgroundSyncNotifMinutes',
 	'debugMode',
 	"alwaysCopyTopic",
 	'cachedTopicMappingExpire',
 	'copyAttachments',
 	'stickyPostButtons',
+	'titleOpensUnread',
+	'doubleClickLike',
 	'ShowMultiNotifs',
 	'upDownArrowKeys',
+	'spoilerPolish',
 	'imageResizer',
 	'pasteImages',
 	'driveUpload',
 	'dropboxUpload',
+	'cloudUploadInPms',
 	'driveButtonPlace',
 	'driveFolderName',
 	'openAttachmentsTab',
 	'copyPostLink',
-	'printShowLikes'
+	'whoLiked',
+	'printShowLikes',
+	'printLikesStyle',
+	'editorUndo'
 ];
 
 // Listen to settings changes
@@ -37,6 +46,9 @@ function startListeners(){
 
 			commitNewSetting(newSetting);
 			postSettingChange(newSetting);
+
+			if(prefName === 'getBrowserNotifications' && newSetting.getBrowserNotifications)
+				startNotificationCheck();
 		});
 	});
 
@@ -46,13 +58,60 @@ function startListeners(){
 		});
 	});
 	document.querySelector('.js-copy-logs').addEventListener('click', copyLogs);
+	document.getElementById('resetSettings').addEventListener('click', resetSettings);
+}
+
+// The notification check is off by default (an empty backgroundSyncNotifMinutes). Its checkbox
+// turns it on and off, and turning it on starts it at every 5 minutes
+const NOTIFICATION_CHECK_START = '5';
+
+function initNotificationCheck(savedMinutes){
+	const checkbox = document.getElementById('notificationCheck');
+	const minutes = document.getElementById('backgroundSyncNotifMinutes');
+
+	checkbox.checked = !!savedMinutes;
+	// while it's off the list shows what turning it on would start with
+	if(!savedMinutes)
+		minutes.value = NOTIFICATION_CHECK_START;
+
+	checkbox.addEventListener('change', () => {
+		if(checkbox.checked)
+			minutes.value = NOTIFICATION_CHECK_START;
+		const newSetting = { backgroundSyncNotifMinutes: checkbox.checked ? minutes.value : '' };
+		commitNewSetting(newSetting);
+		postSettingChange(newSetting);
+	});
+}
+
+// Browser notifications need the notification check, so turning them on turns it on too
+function startNotificationCheck(){
+	const checkbox = document.getElementById('notificationCheck');
+	if(checkbox.checked)
+		return;
+
+	checkbox.checked = true;
+	const newSetting = { backgroundSyncNotifMinutes: NOTIFICATION_CHECK_START };
+	document.getElementById('backgroundSyncNotifMinutes').value = NOTIFICATION_CHECK_START;
+	commitNewSetting(newSetting);
+	postSettingChange(newSetting);
+}
+
+// The defaults live in background.js, so it does the reset
+function resetSettings(){
+	if(!confirm('זענט איר זיכער אז איר ווילט צוריקשטעלן אלע אנשטעלונגען ווי זיי זענען געווען פון אנהייב?'))
+		return;
+
+	chrome.runtime.sendMessage({ type: 'resetSettings' }, () => location.reload());
 }
 
 // update fields after a related setting has been changed
 function postSettingChange(items){
 	if(items.hasOwnProperty('backgroundSync')){
 		document.getElementById('backgroundSyncPosts').disabled = !items.backgroundSync;
-		document.getElementById('backgroundSyncNotif').disabled = !items.backgroundSync;
+	}
+
+	if(items.hasOwnProperty('backgroundSyncNotifMinutes')){
+		document.getElementById('backgroundSyncNotifMinutes').disabled = !items.backgroundSyncNotifMinutes;
 	}
 
 	if(items.hasOwnProperty('driveUpload') || items.hasOwnProperty('dropboxUpload')){
@@ -60,6 +119,11 @@ function postSettingChange(items){
 		const dropbox = document.getElementById('dropboxUpload').checked;
 		document.getElementById('driveFolderName').disabled = !drive;
 		document.getElementById('driveButtonPlace').disabled = !drive && !dropbox;
+		document.getElementById('cloudUploadInPms').disabled = !drive && !dropbox;
+	}
+
+	if(items.hasOwnProperty('printShowLikes')){
+		document.getElementById('printLikesStyle').disabled = !items.printShowLikes;
 	}
 
 	if(items.hasOwnProperty('debugMode')){
@@ -115,6 +179,7 @@ function initSettings() {
 				element.value = items[prefName];
 		});
 
+		initNotificationCheck(items.backgroundSyncNotifMinutes);
 		postSettingChange(items);
 
 		initThemePicker(items.theme, items.customTheme);

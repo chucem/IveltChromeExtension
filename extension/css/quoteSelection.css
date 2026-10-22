@@ -1,0 +1,31 @@
+.ih-quote-selection {
+    position: absolute;
+    z-index: 10;
+    transform: translate(-50%, calc(-100% - 6px));
+    white-space: nowrap;
+}
+
+.button.ih-quote-selection {
+    padding: 5px 12px;
+    border: 1px solid var(--t-border, #b6c8e4);
+    border-radius: 8px;
+    background: linear-gradient(180deg, var(--t-surface, #ffffff), var(--t-row2, #eaf1fb));
+    color: var(--t-link, #1f2d4a);
+    font: 600 13px/1.3 system-ui, -apple-system, sans-serif;
+    box-shadow: 0 6px 18px rgba(40, 60, 100, 0.18);
+}
+.button.ih-quote-selection:hover {
+    border-color: var(--t-link, #3477db);
+}
+.button.ih-quote-selection::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    width: 10px;
+    height: 10px;
+    border-right: inherit;
+    border-bottom: inherit;
+    background: var(--t-row2, #eaf1fb);
+    transform: translateX(-50%) rotate(45deg);
+}

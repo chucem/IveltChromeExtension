@@ -41,6 +41,7 @@
       <li><div><a target="_blank" href="https://www.ivelt.com/forum/memberlist.php?mode=viewprofile&u=5451">מאטל שניידער</a></div></li>
       <li><div><a target="_blank" href="https://www.ivelt.com/forum/memberlist.php?mode=viewprofile&u=279">פאטאקי08</a></div></li>
       <li><div><a target="_blank" href="https://www.ivelt.com/forum/memberlist.php?mode=viewprofile&u=26914">שדכן גדול</a></div></li>
+      <li><div><a target="_blank" href="https://www.ivelt.com/forum/memberlist.php?mode=viewprofile&u=24528">כ'זאג נישט אויס</a></div></li>
       <li><div>יקירי קרתא דק"ק אייוועלט</div></li>
       <li><div style="user-select:none;">&thinsp;</div></li>
     </ul>
@@ -105,6 +106,14 @@
           <label for='warnOnLosingPost' class='label'>ווארן מיך איידער איך פארליר א נישט-געשיקטע תגובה/אשכול, און איידער איך פארצייכן אלע נאטיפיקאציעס ווי געליינט</label>
         </div>
         <div class='row'>
+          <input type='checkbox' id='keepDrafts' class='option' />
+          <label for='keepDrafts' class='label'>האלט אן וואס איך שרייב אין א תגובה ביז עס ווערט געשיקט, כדי צו קענען צוריקצושטעלן <span style="font-size: 0.8em;">(אויב דער טעב ווערט פארמאכט אדער דער בראוזער פאלט אראפ)</span></label>
+        </div>
+        <div class='row'>
+          <input type='checkbox' id='editorUndo' class='option' />
+          <label for='editorUndo' class='label'>לאז צוריקדרייען (undo) און ווידער טון ביים שרייבן <span class="shortcut-key">Ctrl+Z</span> <span class="shortcut-key">Ctrl+Y</span>, אויך נאך די BBCode קנעפלעך, מיט צוויי קנעפלעך אויבן אין שרייב קעסטל</label>
+        </div>
+        <div class='row'>
           <input type='checkbox' id='imageResizer' class='option' />
           <label for='imageResizer' class='label'>פארקלענער אויטאמאטיש בילדער וואס זענען צו גרויס פאר אן עטעטשמענט, און מאך א פאלדער (אדער מער פיילס ווי עס איז דא פלאץ) אין א ZIP</label>
         </div>
@@ -132,6 +141,10 @@
           <input type='checkbox' id='dropboxUpload' class='option' />
           <label for='dropboxUpload' class='label'>ווייז אויך Dropbox <span style="font-size: 0.8em;">(די פיילס גייען אין <bdi dir='ltr'>Apps/iVelt Helper</bdi> אויף אייער Dropbox)</span></label>
         </div>
+        <div class='row'>
+          <input type='checkbox' id='cloudUploadInPms' class='option' />
+          <label for='cloudUploadInPms' class='label'>ווייז דאס אויך ביים שרייבן א פריוואטע מעסעדזש</label>
+        </div>
         <div class='row row-field'>
           <label for='driveButtonPlace' class='label'>וואו צו ווייזן דעם קנעפל</label>
           <select id='driveButtonPlace' class='option'>
@@ -144,12 +157,28 @@
       <div class='settings-group'>
         <h3>ליינען אן אשכול</h3>
         <div class='row'>
+          <input type='checkbox' id='titleOpensUnread' class='option' />
+          <label for='titleOpensUnread' class='label'>א קליק אויפן לינק פון אן אשכול מיט נייע תגובות עפנט עס ביי דער ערשטער אומגעליינטער תגובה (אנשטאט דעם ערשטן בלאט)</label>
+        </div>
+        <div class='row'>
+          <input type='checkbox' id='doubleClickLike' class='option' />
+          <label for='doubleClickLike' class='label'>א דאבל-קליק אויף א תגובה (נישט אויף די ווערטער) באדאנקט זי</label>
+        </div>
+        <div class='row'>
           <input type='checkbox' id='stickyPostButtons' class='option' />
           <label for='stickyPostButtons' class='label'>ווייז די תגובה קנעפלעך די גאנצע צייט (אויך ביים סקראלן)</label>
         </div>
         <div class='row'>
+          <input type='checkbox' id='whoLiked' class='option' />
+          <label for='whoLiked' class='label'>א קליינע פייל אויפן דאנק קנעפל ווייזט ווער עס האט באדאנקט די תגובה</label>
+        </div>
+        <div class='row'>
           <input type='checkbox' id='copyPostLink' class='option' />
           <label for='copyPostLink' class='label'>א קליק אויפן <span class="shortcut-key"><i class="icon fa-file fa-fw" aria-hidden="true"></i></span> אייקאן נעבן א תגובה קאפירט דעם לינק צו דער תגובה, אנשטאט אריינצוגיין אין לינק</label>
+        </div>
+        <div class='row'>
+          <input type='checkbox' id='spoilerPolish' class='option' />
+          <label for='spoilerPolish' class='label'>ווייז שענערע ספוילערס: די ווערטער און בילדער בלייבן אויף זייער פלאץ צוגעדעקט, און א קליק ווייזט זיי</label>
         </div>
         <div class='row'>
           <input type='checkbox' id='upDownArrowKeys' class='option' />
@@ -157,11 +186,18 @@
         </div>
         <div class='row'>
           <input type='checkbox' id='printShowLikes' class='option' />
-          <label for='printShowLikes' class='label'>ביים <span class="shortcut-key"><i class="icon fa-print fa-fw" aria-hidden="true"></i></span> פרינטן עטליכע בלעטער / דעם גאנצן אשכול, לאז איבער דעם צאל לייקס ביי יעדע תגובה</label>
+          <label for='printShowLikes' class='label'>ביים <span class="shortcut-key"><i class="icon fa-print fa-fw" aria-hidden="true"></i></span> פרינטן עטליכע בלעטער / דעם גאנצן אשכול, ווייז אונטער יעדע תגובה די לייקס</label>
+        </div>
+        <div class='row row-indented'>
+          <label for='printLikesStyle' class='label'>וואס צו ווייזן</label>
+          <select id='printLikesStyle' class='option'>
+            <option value="names">ווער עס האט באדאנקט (מיט די נעמען)</option>
+            <option value="count">נאר וויפיל מאל באדאנקט</option>
+          </select>
         </div>
       </div>
 
-      <div class='settings-group'>
+      <div class='settings-group' id='notifications'>
         <h3>נאטיפיקאציעס</h3>
         <div class='row'>
           <input type='checkbox' id='getBrowserNotifications' class='option' />
@@ -173,22 +209,22 @@
         </div>
         <div class='row'>
           <input type='checkbox' id='backgroundSync' class='option' />
-          <label for='backgroundSync' class='label'>טשעק אין הינטערגרונט פאר נייע תגובות און נאטיפיקאציעס</label>
-        </div>
-        <div class='row row-indented' >
-          <label for='backgroundSyncPosts' class='label'>טשעק פאר נייע תגובות אינעם אשכול יעדע</label>
-          <select id='backgroundSyncPosts' class='option'>
+          <label for='backgroundSync' class='label'>טשעק פאר נייע תגובות אינעם אשכול יעדע</label>
+          <select id='backgroundSyncPosts' class='option' aria-label='ווי אפט צו טשעקן פאר נייע תגובות אינעם אשכול'>
             <option value="20000">20 סעקונדעס</option>
-            <option value="60000">מינוט</option>
-            <option value="">טשעק נישט</option>
+            <option value="60000">1 מינוט</option>
+            <option value="120000">2 מינוט</option>
+            <option value="300000">5 מינוט</option>
           </select>
         </div>
-        <div class='row row-indented' >
-          <label for='backgroundSyncNotif' class='label'>טשעק פאר נייע נאטיפיקאציעס יעדע</label>
-          <select id='backgroundSyncNotif' class='option'>
-            <option value="1">מינוט</option>
+        <div class='row'>
+          <input type='checkbox' id='notificationCheck' />
+          <label for='notificationCheck' class='label'>טשעק פאר נייע נאטיפיקאציעס יעדע</label>
+          <select id='backgroundSyncNotifMinutes' class='option' aria-label='ווי אפט צו טשעקן פאר נייע נאטיפיקאציעס'>
+            <option value="2">2 מינוט</option>
             <option value="5">5 מינוט</option>
-            <option value="">טשעק נישט</option>
+            <option value="10">10 מינוט</option>
+            <option value="20">20 מינוט</option>
           </select>
         </div>
       </div>
@@ -199,6 +235,10 @@
           <input type='checkbox' id='hideUserName' class='option' />
           <del> <label for='hideUserName' class='label' >ווייז נישט מיין ניק ווען איך בין אריינגעסיינט</label></del>
           <div style="font-size: 0.8em;">ביטע שטעלט די <a href="https://www.ivelt.com/forum/ucp.php?i=165">"באהאלט מיין ניק"</a> אפציע אויף "יא". <a href="https://www.ivelt.com/forum/viewtopic.php?p=5080519#p5080519">ליינט מער</a></div>
+        </div>
+        <div class='row'>
+          <input type='checkbox' id='popupSameTab' class='option' />
+          <label for='popupSameTab' class='label'>די לינקס אינעם פאפ-אפ עפענען זיך אינעם זעלבן טאב, ווען ער איז שוין אויף אייוועלט</label>
         </div>
         <div class='row' >
           <label for='cachedTopicMappingExpire' class='label'>אפדעיט די ליסטע פון קאמענטארן אשכולות יעדע</label>
@@ -216,6 +256,9 @@
           <input type='checkbox' id='debugMode' class='option' />
           <label for='debugMode' class='label warning'>דיבאג מאוד <span style="font-size: 0.8em;">(נאר פאר טעכנישע פראבלעמען)</span></label>
           <a class="hidden js-copy-logs">קאפיר די לאגס</a>
+        </div>
+        <div class='row'>
+          <a style="font-size: 0.8em;" id='resetSettings' class='button'>שטעל צוריק אלע אנשטעלונגען ווי פון אנהייב</a>
         </div>
       </div>
 

@@ -1,11 +1,13 @@
 (function(){
 
 	if(chrome.storage){
-		chrome.storage.local.get(['alwaysCopyTopic', 'stickyPostButtons', 'copyAttachments', 'forceUpdateTopicMapCache', 'cachedTopicMappingExpire', 'hideUserName', 'warnOnLosingPost','backgroundSync', 'backgroundSyncPosts', 'ShowMultiNotifs', 'upDownArrowKeys', 'copyPostLink', 'printShowLikes'], function(items){
+		chrome.storage.local.get(['alwaysCopyTopic', 'stickyPostButtons', 'copyAttachments', 'forceUpdateTopicMapCache', 'cachedTopicMappingExpire', 'hideUserName', 'warnOnLosingPost','backgroundSync', 'backgroundSyncPosts', 'ShowMultiNotifs', 'upDownArrowKeys', 'copyPostLink', 'printShowLikes', 'printLikesStyle', 'editorUndo'], function(items){
 			if(items.hideUserName){
 				let userName = document.querySelector('.header-avatar .username');
-				if (userName)
+				if (userName) {
+					userName.dataset.name = userName.innerText;
 					userName.innerText = 'הא?';
+				}
 				let avatar = document.querySelector('.header-avatar .avatar');
 				if (avatar)
 					avatar.style.display = "none";
@@ -54,6 +56,8 @@
 			e.setAttribute('data-up-down-arrow-keys',items.upDownArrowKeys);
 			e.setAttribute('data-copy-post-link',items.copyPostLink);
 			e.setAttribute('data-print-show-likes',items.printShowLikes);
+			e.setAttribute('data-print-likes-style',items.printLikesStyle);
+			e.setAttribute('data-editor-undo',items.editorUndo);
 			document.body.appendChild(e);
 
 			if(items.forceUpdateTopicMapCache === true){
