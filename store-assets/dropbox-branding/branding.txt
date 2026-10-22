@@ -15,6 +15,7 @@ Settings tab:
   App folder name:     iVelt Helper
   Redirect URIs:       https://ahidenbhdkloaingggdcijofobjboopi.chromiumapp.org/   (Chrome)
                        https://hnklcnfpeamfiflmpnmjphigmbjoeknc.chromiumapp.org/   (Edge)
+                       https://mkhocmhicodbokdhfjgamkhebdelcdaa.chromiumapp.org/   (test builds and running the code unpacked)
   Development users:   enable additional users (not "Only you")
 
 Permissions tab (then click Submit):
