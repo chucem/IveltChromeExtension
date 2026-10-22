@@ -3,6 +3,7 @@
 
     const SETTING_KEY = 'whoLiked';
     const PROFILE_BY_NAME = '/forum/memberlist.php?mode=viewprofile&un=';
+    const SCREEN_MARGIN = 6;
 
     let openList = null;
 
@@ -14,11 +15,13 @@
 
             document.querySelectorAll('.post-buttons .postlove-li').forEach(addArrow);
 
+            // Capturing, since phpBB's dropdown buttons (like the ⋯ menu on a phone) stop their
+            // clicks from reaching the page, and the list would stay open over the dropdown
             document.addEventListener('click', (event) => {
                 const arrow = event.target.closest('.ih-likes-arrow');
                 if (arrow) toggleList(arrow.closest('.postlove-li'));
                 else if (openList && !openList.contains(event.target)) closeList();
-            });
+            }, true);
             document.addEventListener('keydown', (event) => {
                 if (event.key === 'Escape') closeList();
             });
@@ -74,8 +77,19 @@
         list.append(heading, links);
 
         likeItem.appendChild(list);
+        keepOnScreen(list);
         likeItem.querySelector('.ih-likes-arrow').setAttribute('aria-expanded', 'true');
         openList = list;
+    }
+
+    // On a phone the list, which starts at the like button, can stick out of the screen: it's moved
+    // back in, and is never wider than the screen
+    function keepOnScreen(list) {
+        const viewWidth = document.documentElement.clientWidth;
+        list.style.maxWidth = `${viewWidth - 2 * SCREEN_MARGIN}px`;
+        const rect = list.getBoundingClientRect();
+        const shift = Math.min(0, viewWidth - SCREEN_MARGIN - rect.right) || Math.max(0, SCREEN_MARGIN - rect.left);
+        if (shift) list.style.left = `${shift}px`;
     }
 
     function withMyLike(names, likeItem) {
