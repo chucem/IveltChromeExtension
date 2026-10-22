@@ -5,9 +5,19 @@
 
     let button = null;
     let doneTimeout;
+    // Where the user left the cursor in the reply box, once they clicked or typed in it: a quote goes
+    // there. Kept as they go, since selecting text in the page can reset the box's own cursor
+    let caret = null;
 
     function init() {
-        if (!getTextarea()) return;
+        const textarea = getTextarea();
+        if (!textarea) return;
+
+        ['mouseup', 'keyup', 'input'].forEach((type) => {
+            textarea.addEventListener(type, (event) => {
+                if (event.isTrusted) caret = textarea.selectionEnd;
+            });
+        });
 
         document.addEventListener('mouseup', (event) => {
             if (!button || !button.contains(event.target)) setTimeout(showButton);
@@ -79,9 +89,19 @@
         const quote = `[quote="${username}" user_id=${userId} time=${time} post_id=${postId}]\n${text}\n[/quote]`;
 
         const textarea = getTextarea();
-        const at = endOfQuotesOnTop(textarea.value);
-        const insert = at > 0 ? '\n' + quote : quote + '\n';
+        let at, insert;
+        if (caret !== null) {
+            // On a line of its own, where the cursor was in the text
+            at = Math.min(caret, textarea.value.length);
+            const before = textarea.value.slice(0, at);
+            const after = textarea.value.slice(at);
+            insert = (before && !before.endsWith('\n') ? '\n' : '') + quote + (after && !after.startsWith('\n') ? '\n' : '');
+        } else {
+            at = endOfQuotesOnTop(textarea.value);
+            insert = at > 0 ? '\n' + quote : quote + '\n';
+        }
         textarea.setRangeText(insert, at, at, 'end');
+        if (caret !== null) caret = at + insert.length;
         textarea.dispatchEvent(new Event('input', { bubbles: true }));
     }
 
