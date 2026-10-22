@@ -125,6 +125,7 @@ async function addBtn() {
         }
         let pingOnClick = `ping_user(${strippedId})`
         addSimpleButton(btn, null, 'fa-at', 'דערמאן תגובה', 'דערמאן תגובה', pingOnClick)
+        addPMQuoteButton(btn, id)
         if (contentElement.innerHTML.includes("blockquote")) {
             addQuoteLastButton(btn, isPosting);
         }
@@ -191,6 +192,23 @@ function addCopyQuoteButton(btn, postID, imageData){
             '${JSON.stringify(imageData)}')`:
             `copyQuoteParse("${postID}")`
     )
+}
+
+// A private message to the writer with the post quoted: the link from the profile's contact menu
+// (פארבינד זיך), which a phone doesn't show. Only on a phone, see css/appcss.css
+function addPMQuoteButton(btn, postID) {
+    let pmLink = getPMHref(postID);
+    if (!pmLink) {
+        return;
+    }
+
+    let button = createButton(pmLink.getAttribute('href'), 'fa-envelope', 'שיק א פריוואטע מעסעדזש מיט א ציטאט פון דער תגובה', 'פריוואטע מעסעדזש מיט א ציטאט');
+    button.li.classList.add('ih-pm-quote');
+
+    let quoteLi = getQuoteElm(btn)?.parentElement;
+    if (quoteLi) {
+        quoteLi.parentNode.insertBefore(button.li, quoteLi.nextSibling)
+    }
 }
 
 function addQuoteLastButton(btn, isPosting) {

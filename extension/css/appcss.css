@@ -11,6 +11,14 @@
     flex: 1;
 }
 
+/* "private message with a quote" post button (js/addTopicButtons.js): only where the forum's phone
+   layout hides the profile's contact menu, which has the same link */
+@media (min-width: 701px) {
+    .post-buttons li.ih-pm-quote {
+        display: none;
+    }
+}
+
 .clone-first .app-hidden {
     display: none;
 }
