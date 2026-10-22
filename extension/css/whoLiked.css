@@ -1,5 +1,6 @@
 @media screen {
-    .post-buttons .ih-likes-joined {
+    /* one class more than the forum's own .post-buttons rules, which load after this file */
+    .post-buttons .postlove-li.ih-likes-joined {
         position: relative;
         display: flex;
     }
@@ -7,7 +8,7 @@
         border-top-left-radius: 0;
         border-bottom-left-radius: 0;
     }
-    .post-buttons .ih-likes-arrow {
+    .post-buttons .button.ih-likes-arrow {
         margin-right: -1px;
         padding-left: 4px;
         padding-right: 4px;
