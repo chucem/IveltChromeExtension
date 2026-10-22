@@ -181,6 +181,38 @@ input[type='checkbox']:checked + label:before {
     content: '\f14a';
     color: var(--ui-link);
 }
+/* one choice out of a few (new notifications: off / number / number and browser notifications) */
+.notification-mode .label {
+    display: block;
+    margin-bottom: 6px;
+}
+.notification-mode .radio-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 3px 30px 3px 0;
+    cursor: pointer;
+}
+.notification-mode input[type='radio'] {
+    margin: 0;
+    width: 16px;
+    height: 16px;
+    accent-color: var(--ui-link);
+    cursor: pointer;
+}
+.notification-mode .radio-field {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+    padding-right: 54px;
+}
+/* a setting that depends on another one, while that one is off */
+input[type='checkbox']:disabled + label,
+input[type='checkbox']:disabled + label:before {
+    opacity: 0.45;
+    cursor: default;
+}
 /* A labelled field lines up with the text of the checkbox above it */
 .row.row-field {
     padding-right: 30px;

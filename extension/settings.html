@@ -200,16 +200,8 @@
       <div class='settings-group' id='notifications'>
         <h3>נאטיפיקאציעס</h3>
         <div class='row'>
-          <input type='checkbox' id='getBrowserNotifications' class='option' />
-          <label for='getBrowserNotifications' class='label'>שיק בראוזער נאטיפיקאציעס פון מיין אייוועלט אינבאקס</label>
-        </div>
-        <div class='row'>
-          <input type='checkbox' id='ShowMultiNotifs' class='option' />
-          <label for='ShowMultiNotifs' class='label'>ווייז די נאטיפיקאציעס באזונדער לויט סארט <span style="font-size: 0.8em;">(ציטירט, באדאנקט, דערמאנט)</span></label>
-        </div>
-        <div class='row'>
           <input type='checkbox' id='backgroundSync' class='option' />
-          <label for='backgroundSync' class='label'>טשעק פאר נייע תגובות אינעם אשכול יעדע</label>
+          <label for='backgroundSync' class='label'>ווייז ווען עס קומען צו נייע תגובות אינעם אשכול וואס איז אפן, טשעק יעדע</label>
           <select id='backgroundSyncPosts' class='option' aria-label='ווי אפט צו טשעקן פאר נייע תגובות אינעם אשכול'>
             <option value="20000">20 סעקונדעס</option>
             <option value="60000">1 מינוט</option>
@@ -217,15 +209,24 @@
             <option value="300000">5 מינוט</option>
           </select>
         </div>
+        <div class='row notification-mode' role='radiogroup' aria-labelledby='notificationModeTitle'>
+          <div class='label' id='notificationModeTitle'>נייע נאטיפיקאציעס <span style="font-size: 0.8em;">(אויך ווען אייוועלט איז נישט אפן)</span></div>
+          <label class='radio-row'><input type='radio' name='notificationMode' id='notificationModeOff' value='off' /> נישט טשעקן</label>
+          <label class='radio-row'><input type='radio' name='notificationMode' id='notificationModeCount' value='count' /> ווייז נאר די צאל אויפן עקסטענשען אייקאן</label>
+          <label class='radio-row'><input type='radio' name='notificationMode' id='notificationModePopup' value='popup' /> ווייז די צאל, און שיק א בראוזער נאטיפיקאציע פאר יעדע נייע</label>
+          <div class='radio-field'>
+            <label for='backgroundSyncNotifMinutes'>טשעק יעדע</label>
+            <select id='backgroundSyncNotifMinutes' class='option'>
+              <option value="2">2 מינוט</option>
+              <option value="5">5 מינוט</option>
+              <option value="10">10 מינוט</option>
+              <option value="20">20 מינוט</option>
+            </select>
+          </div>
+        </div>
         <div class='row'>
-          <input type='checkbox' id='notificationCheck' />
-          <label for='notificationCheck' class='label'>טשעק פאר נייע נאטיפיקאציעס יעדע</label>
-          <select id='backgroundSyncNotifMinutes' class='option' aria-label='ווי אפט צו טשעקן פאר נייע נאטיפיקאציעס'>
-            <option value="2">2 מינוט</option>
-            <option value="5">5 מינוט</option>
-            <option value="10">10 מינוט</option>
-            <option value="20">20 מינוט</option>
-          </select>
+          <input type='checkbox' id='ShowMultiNotifs' class='option' />
+          <label for='ShowMultiNotifs' class='label'>ווייז די נאטיפיקאציעס באזונדער לויט סארט <span style="font-size: 0.8em;">(ציטירט, באדאנקט, דערמאנט)</span></label>
         </div>
       </div>
 
