@@ -78,7 +78,24 @@ chrome.alarms.onAlarm.addListener(() => {
   checkNewNotification();
 });
 
+// The Yiddish-letters domain goes to the forum. A dynamic rule and not a static ruleset in the
+// manifest: Chrome writes a static ruleset's index into the extension's folder (_metadata), and
+// mobile browsers loading it unpacked then refuse to load the folder again
+async function addDomainRedirect() {
+  await chrome.declarativeNetRequest.updateDynamicRules({
+    removeRuleIds: [1],
+    addRules: [{
+      id: 1,
+      priority: 1,
+      action: { type: 'redirect', redirect: { url: 'https://www.ivelt.com/forum/' } },
+      condition: { urlFilter: '*://www.xn--4dbhss5b.com/*', resourceTypes: ['main_frame'] }
+    }]
+  }).catch((e) => console.error('Domain redirect rule failed:', e));
+}
+
 chrome.runtime.onInstalled.addListener(async (details) => {
+
+  await addDomainRedirect();
 
   // before the defaults, so a new computer starts with the user's synced settings
   await settingsSyncOnInstall(details.reason);
