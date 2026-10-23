@@ -133,6 +133,12 @@ hr {
     font-size: 13px;
     color: var(--ui-muted);
 }
+.version + .version {
+    margin-top: 2px;
+}
+.version:empty {
+    display: none;
+}
 .credits {
     grid-area: m;
     border-right: 1px solid var(--ui-border);
