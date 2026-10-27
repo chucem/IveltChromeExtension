@@ -18,7 +18,9 @@
         const post = event.target.closest('.post');
         if (!post || event.target.closest(IGNORED) || window.getSelection().toString().trim()) return;
 
-        const likeButton = post.querySelector('.postlove-button');
+        // a post that can't be liked (your own, or when logged out) has a plain <span> with no
+        // data-ajax, so there's nothing to click and no thumb to show
+        const likeButton = post.querySelector('.postlove-button[data-ajax]');
         if (!likeButton) return;
 
         // the forum's like button toggles, so a double-click on a liked post takes the like back
