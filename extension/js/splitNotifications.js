@@ -106,6 +106,7 @@ function splitNotifications() {
       // Update dropdown
       const dropdown = createDropdown(type, label, items, './ucp.php?i=ucp_notifications', 'ווייז אלע');
       li.querySelector('.dropdown-extended').replaceWith(dropdown);
+      handleMarkRead(dropdown, link);
 
       // Opened and closed by phpBB's own dropdown code, like the original bell: it keeps the
       // dropdown on screen (on a phone the bells are near the left edge) and closes it on a
@@ -113,6 +114,42 @@ function splitNotifications() {
       if (link) registerDropdown(link, dropdown);
 
       return li;
+    }
+
+    // The check mark next to an unread notification. phpBB's own handler always takes one off the
+    // original bell's count, so here it's done for the bell the notification is in: the row turns
+    // read, this bell's count goes down, and so does the count in the page title. Without a
+    // bellLink (the PM icon, whose count is of unread messages) only the row and the title change
+    function handleMarkRead(dropdown, bellLink) {
+      // in the capture phase, so it runs before phpBB's handler on the link itself, and stops it
+      dropdown.addEventListener('click', async (event) => {
+        const markRead = event.target.closest('a.mark_read');
+        if (!markRead) return;
+        event.preventDefault();
+        event.stopPropagation();
+
+        const row = markRead.closest('li');
+        try {
+          const response = await fetch(markRead.href, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+          if (!(await response.json()).success) return;
+        } catch (e) {
+          return;
+        }
+
+        row.classList.remove('bg1', 'bg2');
+        markRead.remove();
+        // the notification's link went through a "mark read" URL until now, as phpBB does it
+        const notificationLink = row.querySelector('a[data-real-url]');
+        if (notificationLink) notificationLink.href = notificationLink.getAttribute('data-real-url');
+
+        const badge = bellLink?.querySelector('strong.badge');
+        if (badge) {
+          const count = parseInt(badge.textContent, 10) - 1;
+          if (count > 0) badge.textContent = count;
+          else badge.remove();
+        }
+        document.title = document.title.replace(/^\((\d+)\)\s*/, (match, count) => count > 1 ? `(${count - 1}) ` : '');
+      }, true);
     }
 
     function registerDropdown(link, dropdown) {
@@ -149,6 +186,7 @@ function splitNotifications() {
       pmLink.id = 'pm_notification_list_button';
       pmLI.appendChild(dropdown);
       registerDropdown(pmLink, dropdown);
+      handleMarkRead(dropdown, null);
     }
 
     // Update original badge count
