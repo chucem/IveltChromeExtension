@@ -1,5 +1,6 @@
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/ahidenbhdkloaingggdcijofobjboopi?label=Chrome%20Web%20Store%20Version&style=flat-square&color=66bb6a)](https://chromewebstore.google.com/detail/ivelt-helper-v2/ahidenbhdkloaingggdcijofobjboopi)
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/chucem/IveltChromeExtension?label=GitHub%20Release%20Version&style=flat-square&color=42a5f5)](https://github.com/chucem/IveltChromeExtension/releases/latest/)
+[![Edge Add-ons](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fmicrosoftedge.microsoft.com%2Faddons%2Fgetproductdetailsbycrxid%2Fhnklcnfpeamfiflmpnmjphigmbjoeknc&query=%24.version&label=Edge%20Add-ons%20Version&style=flat-square&color=0078d4)](https://microsoftedge.microsoft.com/addons/detail/ivelt-helper-v2/hnklcnfpeamfiflmpnmjphigmbjoeknc)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/chucem/ivelt-helper?label=GitHub%20Release%20Version&style=flat-square&color=42a5f5)](https://github.com/chucem/ivelt-helper/releases/latest/)
 ![Chrome Web Store](https://img.shields.io/chrome-web-store/users/ahidenbhdkloaingggdcijofobjboopi?label=Users&style=flat-square&color=9575cd)
 
 [English](README.md) | **אידיש**
@@ -70,7 +71,7 @@
 3. פינט **iVelt Helper** אויפן טולבאר, כדי צו זען דעם נאטיפיקאציע נומער.
 
 ## אינסטאלירן פון GitHub (מיט די האנט)
-1. דאונלאודט **ivelt-helper-x.x.x.zip** פון _Assets_ ביי די לעצטע ווערסיע אויפן **[Releases בלאט](https://github.com/chucem/IveltChromeExtension/releases/latest/)**.
+1. דאונלאודט **ivelt-helper-x.x.x.zip** פון _Assets_ ביי די לעצטע ווערסיע אויפן **[Releases בלאט](https://github.com/chucem/ivelt-helper/releases/latest/)**.
 2. עקסטראקט עס אין א **ivelt-helper-x.x.x** פאלדער און לייגט אים אוועק אויף א פערמאנענטן פלאץ. קראום לויפט די עקסטענשען פון דעם פאלדער, דערפאר מוז ער בלייבן אויפן זעלבן פלאץ.
 3. עפנט `chrome://extensions/`.
 4. צינדט אן **Developer mode** (אויבן רעכטס).

@@ -1,5 +1,6 @@
 [![Chrome Web Store](https://img.shields.io/chrome-web-store/v/ahidenbhdkloaingggdcijofobjboopi?label=Chrome%20Web%20Store%20Version&style=flat-square&color=66bb6a)](https://chromewebstore.google.com/detail/ivelt-helper-v2/ahidenbhdkloaingggdcijofobjboopi)
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/chucem/IveltChromeExtension?label=GitHub%20Release%20Version&style=flat-square&color=42a5f5)](https://github.com/chucem/IveltChromeExtension/releases/latest/)
+[![Edge Add-ons](https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fmicrosoftedge.microsoft.com%2Faddons%2Fgetproductdetailsbycrxid%2Fhnklcnfpeamfiflmpnmjphigmbjoeknc&query=%24.version&label=Edge%20Add-ons%20Version&style=flat-square&color=0078d4)](https://microsoftedge.microsoft.com/addons/detail/ivelt-helper-v2/hnklcnfpeamfiflmpnmjphigmbjoeknc)
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/chucem/ivelt-helper?label=GitHub%20Release%20Version&style=flat-square&color=42a5f5)](https://github.com/chucem/ivelt-helper/releases/latest/)
 ![Chrome Web Store](https://img.shields.io/chrome-web-store/users/ahidenbhdkloaingggdcijofobjboopi?label=Users&style=flat-square&color=9575cd)
 
 **English** | [אידיש](README.yi.md)
@@ -68,7 +69,7 @@ Extra buttons next to the regular quote button on every post:
 3. Pin **iVelt Helper** to the toolbar so you can see the notification badge.
 
 ## Install from GitHub (manual install)
-1. Download **ivelt-helper-x.x.x.zip** from the _Assets_ of the latest release on the **[Releases page](https://github.com/chucem/IveltChromeExtension/releases/latest/)**.
+1. Download **ivelt-helper-x.x.x.zip** from the _Assets_ of the latest release on the **[Releases page](https://github.com/chucem/ivelt-helper/releases/latest/)**.
 2. Extract it to an **ivelt-helper-x.x.x** folder and move it somewhere permanent. Chrome runs the extension from this folder, so it has to stay in the same place.
 3. Open `chrome://extensions/`.
 4. Turn on **Developer mode** (top right).
@@ -84,7 +85,7 @@ Extra buttons next to the regular quote button on every post:
 The store upload needs these repository secrets: `CWS_SERVICE_ACCOUNT_KEY` (a Google Cloud service account JSON key) and `CWS_PUBLISHER_ID` for the Chrome Web Store, and `EDGE_PRODUCT_ID`, `EDGE_CLIENT_ID`, `EDGE_API_KEY` for Edge Add-ons.
 
 ## Website and privacy policy
-The extension's [website](https://chucem.github.io/) and [privacy policy](https://chucem.github.io/privacy.html) live in the [chucem.github.io](https://github.com/chucem/chucem.github.io) repo.
+The extension's [website](https://ivelthelper.com/) and [privacy policy](https://ivelthelper.com/privacy.html) live in the [chucem.github.io](https://github.com/chucem/chucem.github.io) repo.
 
 ## Credits
 Made by members of אייוועלט; the full list is on the extension's settings page.

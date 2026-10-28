@@ -251,7 +251,7 @@ function showVersion(){
 const installSources = {
 	chrome: { name: 'Chrome Web Store', link: 'https://chromewebstore.google.com/detail/ivelt-helper-v2/ahidenbhdkloaingggdcijofobjboopi' },
 	edge: { name: 'Edge Add-ons', link: 'https://microsoftedge.microsoft.com/addons/detail/ivelt-helper-v2/hnklcnfpeamfiflmpnmjphigmbjoeknc' },
-	github: { name: 'GitHub', link: 'https://github.com/chucem/IveltChromeExtension/releases' },
+	github: { name: 'GitHub', link: 'https://github.com/chucem/ivelt-helper/releases' },
 };
 
 async function getInstallSource(){
@@ -283,7 +283,7 @@ function compareVersions(a, b){
 // GitHub: the newest release, test builds (prereleases) only for someone already on one
 async function checkForUpdate(source, installed){
 	if(source === 'github'){
-		const response = await fetch('https://api.github.com/repos/chucem/IveltChromeExtension/releases?per_page=20');
+		const response = await fetch('https://api.github.com/repos/chucem/ivelt-helper/releases?per_page=20');
 		if(!response.ok)
 			throw new Error(response.status);
 		const onPrerelease = installed.includes('-');
