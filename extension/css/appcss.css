@@ -19,6 +19,14 @@
     }
 }
 
+/* The extra post buttons (and the marked quote button) have an inline beige background in
+   js/addTopicButtons.js, which marks them on the bar. In the ⋯ menu (on a phone, or zoomed in)
+   they're plain rows like the forum's own, on the menu's color (phpBB's copies there have no
+   .button class, so the theme's rule for them in css/themes.css doesn't reach them either) */
+.post-buttons .dropdown-contents a[style*="background"] {
+    background: transparent !important;
+}
+
 .clone-first .app-hidden {
     display: none;
 }
