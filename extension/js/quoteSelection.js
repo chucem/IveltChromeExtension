@@ -12,6 +12,7 @@
     'use strict';
 
     const SETTING_KEY = 'quoteSelection';
+    const JUMP_KEY = 'quoteJumpToReply'; // after quoting, go down to the reply box (off by default)
     const DONE_MS = 1200;
     const MARKED_ICON = 'fa-i-cursor';
     const MARKED_TEXT = 'ציטיר אנגעצייכנט';
@@ -24,11 +25,13 @@
     // Where the user left the cursor in the reply box, once they clicked or typed in it: a quote goes
     // there. Kept as they go, since selecting text in the page can reset the box's own cursor
     let caret = null;
+    let jumpToReply = false;
 
     function init() {
         if (!getTextarea() || !chrome.storage || !chrome.storage.local) return;
 
-        chrome.storage.local.get([SETTING_KEY], (items) => {
+        chrome.storage.local.get([SETTING_KEY, JUMP_KEY], (items) => {
+            jumpToReply = items[JUMP_KEY] === true;
             if (items[SETTING_KEY] !== false) start();
         });
     }
@@ -57,9 +60,10 @@
             if (!marked || !pending || !marked.link.contains(event.target)) return;
             event.preventDefault();
             event.stopImmediatePropagation();
-            addQuote(pending.content, pending.text);
+            const end = addQuote(pending.content, pending.text);
             showDone();
             window.getSelection().removeAllRanges();
+            if (jumpToReply) goToReply(end);
         }, true);
     }
 
@@ -178,6 +182,18 @@
         textarea.setRangeText(insert, at, at, 'end');
         if (caret !== null) caret = at + insert.length;
         textarea.dispatchEvent(new Event('input', { bubbles: true }));
+        return at + insert.length;
+    }
+
+    // Down to the reply box, ready to type right after the quote that was just added
+    // (the "quoteJumpToReply" setting)
+    function goToReply(end) {
+        const textarea = getTextarea();
+        const at = textarea.value[end] === '\n' ? end + 1 : end;
+        textarea.focus({ preventScroll: true });
+        textarea.setSelectionRange(at, at);
+        caret = at;
+        textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
     function endOfQuotesOnTop(text) {

@@ -23,6 +23,7 @@ const SYNCED_SETTINGS = [
   'warnOnLosingPost',
   'keepDrafts',
   'quoteSelection',
+  'quoteJumpToReply',
   'backgroundSync',
   'backgroundSyncPosts',
   'backgroundSyncNotifMinutes',

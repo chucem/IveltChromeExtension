@@ -5,6 +5,7 @@ const preferencesOptions = [
 	'warnOnLosingPost',
 	'keepDrafts',
 	'quoteSelection',
+	'quoteJumpToReply',
 	'backgroundSync',
 	'backgroundSyncPosts',
 	'backgroundSyncNotifMinutes',
@@ -126,6 +127,11 @@ function postSettingChange(items){
 
 	if(items.hasOwnProperty('printShowLikes')){
 		document.getElementById('printLikesStyle').disabled = !items.printShowLikes;
+	}
+
+	// on unless turned off
+	if(items.hasOwnProperty('quoteSelection')){
+		document.getElementById('quoteJumpToReply').disabled = items.quoteSelection === false;
 	}
 
 	if(items.hasOwnProperty('debugMode')){
