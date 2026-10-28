@@ -3,8 +3,8 @@ Dropbox App Console - Branding tab for "iVelt Helper"
 App name:      iVelt Helper
 Publisher:     chucem
 Description:   Upload files from the iVelt forum post editor to your own Dropbox and insert a share link into the post.
-App website:   https://chucem.github.io/
-Privacy policy: https://chucem.github.io/privacy.html
+App website:   https://ivelthelper.com/
+Privacy policy: https://ivelthelper.com/privacy.html
 
 Icons (white background, from extension/img/icon128.png):
   icon-64.png    64 x 64
