@@ -133,11 +133,12 @@ hr {
     font-size: 13px;
     color: var(--ui-muted);
 }
-.version + .version {
-    margin-top: 2px;
-}
-.version:empty {
+/* version, where it's installed from, and whether there's a newer one, on one line */
+.version-part:empty {
     display: none;
+}
+.version-part::before {
+    content: ' · ';
 }
 .credits {
     grid-area: m;
