@@ -22,6 +22,7 @@ const SYNCED_SETTINGS = [
   'popupSameTab',
   'warnOnLosingPost',
   'keepDrafts',
+  'quoteSelection',
   'backgroundSync',
   'backgroundSyncPosts',
   'backgroundSyncNotifMinutes',

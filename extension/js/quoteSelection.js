@@ -1,17 +1,40 @@
+// Quote a selection, with the post's own ציטיר button
+//
+// While words in a post are selected, that post's ציטיר button changes (its icon, its text and
+// its color) to "ציטיר אנגעצייכנט", and a click on it quotes just those words where the cursor
+// is in the reply box, instead of the whole post. With nothing selected it's the forum's own
+// button again. Nothing pops up over the text, so it doesn't get in the way of double-clicking
+// or copying. Only where there's a reply box on the page, and not for words inside a quote.
+//
+// Runs as a content script (isolated world), controlled by the "quoteSelection" setting.
+
 (function () {
     'use strict';
 
+    const SETTING_KEY = 'quoteSelection';
     const DONE_MS = 1200;
+    const MARKED_ICON = 'fa-i-cursor';
+    const MARKED_TEXT = 'ציטיר אנגעצייכנט';
 
-    let button = null;
-    let doneTimeout;
+    // The post's quote button while it's marked: { link, icon, label, iconClass, labelText, title }
+    let marked = null;
+    // What the marked button would quote: { content, text }
+    let pending = null;
+    let doneUntil = 0;
     // Where the user left the cursor in the reply box, once they clicked or typed in it: a quote goes
     // there. Kept as they go, since selecting text in the page can reset the box's own cursor
     let caret = null;
 
     function init() {
+        if (!getTextarea() || !chrome.storage || !chrome.storage.local) return;
+
+        chrome.storage.local.get([SETTING_KEY], (items) => {
+            if (items[SETTING_KEY] !== false) start();
+        });
+    }
+
+    function start() {
         const textarea = getTextarea();
-        if (!textarea) return;
 
         ['mouseup', 'keyup', 'input'].forEach((type) => {
             textarea.addEventListener(type, (event) => {
@@ -19,47 +42,96 @@
             });
         });
 
-        document.addEventListener('mouseup', (event) => {
-            if (!button || !button.contains(event.target)) setTimeout(showButton);
+        let updateTimeout;
+        document.addEventListener('selectionchange', () => {
+            clearTimeout(updateTimeout);
+            updateTimeout = setTimeout(update, 60);
         });
+
+        // in the capture phase, before the forum's own handlers on the button
         document.addEventListener('mousedown', (event) => {
-            if (button && !button.contains(event.target)) button.remove();
-        });
+            // pressing the marked button mustn't clear the selection it's about to quote
+            if (marked && marked.link.contains(event.target)) event.preventDefault();
+        }, true);
+        document.addEventListener('click', (event) => {
+            if (!marked || !pending || !marked.link.contains(event.target)) return;
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            addQuote(pending.content, pending.text);
+            showDone();
+            window.getSelection().removeAllRanges();
+        }, true);
     }
 
     function getTextarea() {
         return document.querySelector('#message-box textarea');
     }
 
-    function showButton() {
+    // Marks the quote button of the post the selection is in, or puts it back when there's none
+    function update() {
+        if (Date.now() < doneUntil) return;
+
         const selection = window.getSelection();
         const text = selection.toString().trim();
-        const content = text && getQuotableContent(selection);
-        if (!content) return;
+        const content = text && selection.rangeCount && getQuotableContent(selection);
+        const link = content && findQuoteLink(content);
+        if (!link) {
+            unmark();
+            return;
+        }
 
-        if (!button) button = createButton();
-        clearTimeout(doneTimeout);
-        button.querySelector('span').textContent = 'ציטיר';
-        button.onclick = () => {
-            addQuote(content, text);
-            selection.removeAllRanges();
-            button.querySelector('span').textContent = 'צוגעלייגט ✓';
-            doneTimeout = setTimeout(() => button.remove(), DONE_MS);
-        };
-
-        const rect = selection.getRangeAt(0).getBoundingClientRect();
-        button.style.top = `${window.scrollY + rect.top}px`;
-        button.style.left = `${window.scrollX + rect.left + rect.width / 2}px`;
-        document.body.appendChild(button);
+        if (marked && marked.link !== link) unmark();
+        if (!marked) mark(link);
+        pending = { content, text };
     }
 
-    function createButton() {
-        const newButton = document.createElement('button');
-        newButton.type = 'button';
-        newButton.className = 'button ih-quote-selection';
-        newButton.innerHTML = '<i class="icon fa-quote-left fa-fw" aria-hidden="true"></i><span></span>';
-        newButton.addEventListener('mousedown', (event) => event.preventDefault());
-        return newButton;
+    // The forum's own ציטיר button of the post (not the extension's "ציטיר לעצטע", which has "last")
+    function findQuoteLink(content) {
+        const post = content.closest('.post');
+        if (!post) return null;
+        return [...post.querySelectorAll('.post-buttons a[href*="mode=quote"]')]
+            .find((link) => !link.querySelector('.last')) || null;
+    }
+
+    function mark(link) {
+        const icon = link.querySelector('i.icon');
+        const label = link.querySelector('span');
+        marked = {
+            link, icon, label,
+            iconClass: icon ? icon.className : '',
+            labelText: label ? label.textContent : '',
+            title: link.getAttribute('title')
+        };
+        if (icon) icon.className = `icon ${MARKED_ICON} fa-fw`;
+        if (label) label.textContent = MARKED_TEXT;
+        link.setAttribute('title', MARKED_TEXT);
+        link.classList.add('ih-quote-marked');
+    }
+
+    function unmark() {
+        pending = null;
+        if (!marked) return;
+        const { link, icon, label, iconClass, labelText, title } = marked;
+        if (icon) icon.className = iconClass;
+        if (label) label.textContent = labelText;
+        if (title === null) link.removeAttribute('title');
+        else link.setAttribute('title', title);
+        link.classList.remove('ih-quote-marked');
+        marked = null;
+    }
+
+    // "צוגעלייגט ✓" on the button for a moment, then it's the forum's own button again
+    function showDone() {
+        if (!marked) return;
+        doneUntil = Date.now() + DONE_MS;
+        if (marked.icon) marked.icon.className = 'icon fa-check fa-fw';
+        if (marked.label) marked.label.textContent = 'צוגעלייגט';
+        marked.link.setAttribute('title', 'צוגעלייגט');
+        setTimeout(() => {
+            doneUntil = 0;
+            unmark();
+            update();
+        }, DONE_MS);
     }
 
     function getQuotableContent(selection) {
