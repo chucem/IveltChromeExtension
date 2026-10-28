@@ -4,6 +4,7 @@ const preferencesOptions = [
 	'popupSameTab',
 	'warnOnLosingPost',
 	'keepDrafts',
+	'quoteSelection',
 	'backgroundSync',
 	'backgroundSyncPosts',
 	'backgroundSyncNotifMinutes',
