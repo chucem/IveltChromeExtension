@@ -9,7 +9,7 @@ const defualtPreferences = {
   warnOnLosingPost: true,
   keepDrafts: true,
   quoteSelection: true,
-  quoteJumpToReply: false,
+  quoteJumpToReply: true,
   debugMode: false,
   // both checks are off until the user turns them on, which goes easy on the server
   backgroundSync: false, // checking an open topic for new replies

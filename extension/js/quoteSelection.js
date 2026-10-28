@@ -12,7 +12,7 @@
     'use strict';
 
     const SETTING_KEY = 'quoteSelection';
-    const JUMP_KEY = 'quoteJumpToReply'; // after quoting, go down to the reply box (off by default)
+    const JUMP_KEY = 'quoteJumpToReply'; // after quoting, go down to the reply box (on by default)
     const DONE_MS = 1200;
     const MARKED_ICON = 'fa-i-cursor';
     const MARKED_TEXT = 'ציטיר אנגעצייכנט';
@@ -31,7 +31,7 @@
         if (!getTextarea() || !chrome.storage || !chrome.storage.local) return;
 
         chrome.storage.local.get([SETTING_KEY, JUMP_KEY], (items) => {
-            jumpToReply = items[JUMP_KEY] === true;
+            jumpToReply = items[JUMP_KEY] !== false;
             if (items[SETTING_KEY] !== false) start();
         });
     }
