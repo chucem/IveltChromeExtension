@@ -1,6 +1,7 @@
 const TOPIC_MAPPING_EXPIRE = document.getElementById("iveltHelperSettings").getAttribute("data-cached-topic-mapping-expire");
 const COPY_ATTACHMENTS = document.getElementById("iveltHelperSettings").getAttribute("data-copy-attachments");
-const CACHE_EXPIRY_MS = (TOPIC_MAPPING_EXPIRE || 3600) * 1000;
+// empty is never: the list is only fetched when there's none yet, or with "update the list now"
+const CACHE_EXPIRY_MS = TOPIC_MAPPING_EXPIRE === '' ? Infinity : (TOPIC_MAPPING_EXPIRE || 3600) * 1000;
 const CACHE_KEY = "topicMappingCache";
 const CACHE_TIME_KEY = "topicMappingLastFetchTime";
 

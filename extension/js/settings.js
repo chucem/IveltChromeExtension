@@ -67,20 +67,23 @@ function startListeners(){
 // The notification check is off by default (an empty backgroundSyncNotifMinutes). Its checkbox
 // turns it on and off, and turning it on starts it at every 5 minutes
 const NOTIFICATION_CHECK_START = '5';
+// the same for updating the list of commentary topics, an empty cachedTopicMappingExpire is never
+const TOPIC_MAPPING_UPDATE_START = '3600';
 
-function initNotificationCheck(savedMinutes){
-	const checkbox = document.getElementById('notificationCheck');
-	const minutes = document.getElementById('backgroundSyncNotifMinutes');
+// A checkbox for a setting that's a time, where an empty time is off
+function initTimedCheckbox(checkboxId, prefName, savedValue, startValue){
+	const checkbox = document.getElementById(checkboxId);
+	const time = document.getElementById(prefName);
 
-	checkbox.checked = !!savedMinutes;
+	checkbox.checked = !!savedValue;
 	// while it's off the list shows what turning it on would start with
-	if(!savedMinutes)
-		minutes.value = NOTIFICATION_CHECK_START;
+	if(!savedValue)
+		time.value = startValue;
 
 	checkbox.addEventListener('change', () => {
 		if(checkbox.checked)
-			minutes.value = NOTIFICATION_CHECK_START;
-		const newSetting = { backgroundSyncNotifMinutes: checkbox.checked ? minutes.value : '' };
+			time.value = startValue;
+		const newSetting = { [prefName]: checkbox.checked ? time.value : '' };
 		commitNewSetting(newSetting);
 		postSettingChange(newSetting);
 	});
@@ -115,6 +118,10 @@ function postSettingChange(items){
 
 	if(items.hasOwnProperty('backgroundSyncNotifMinutes')){
 		document.getElementById('backgroundSyncNotifMinutes').disabled = !items.backgroundSyncNotifMinutes;
+	}
+
+	if(items.hasOwnProperty('cachedTopicMappingExpire')){
+		document.getElementById('cachedTopicMappingExpire').disabled = !items.cachedTopicMappingExpire;
 	}
 
 	if(items.hasOwnProperty('driveUpload') || items.hasOwnProperty('dropboxUpload')){
@@ -187,7 +194,8 @@ function initSettings() {
 				element.value = items[prefName];
 		});
 
-		initNotificationCheck(items.backgroundSyncNotifMinutes);
+		initTimedCheckbox('notificationCheck', 'backgroundSyncNotifMinutes', items.backgroundSyncNotifMinutes, NOTIFICATION_CHECK_START);
+		initTimedCheckbox('topicMappingUpdate', 'cachedTopicMappingExpire', items.cachedTopicMappingExpire, TOPIC_MAPPING_UPDATE_START);
 		postSettingChange(items);
 
 		initThemePicker(items.theme, items.customTheme);

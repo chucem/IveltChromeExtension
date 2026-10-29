@@ -254,12 +254,12 @@
           <label for='popupSameTab' class='label'>די לינקס אינעם פאפ-אפ עפענען זיך אינעם זעלבן טעב, ווען ער איז שוין אויף אייוועלט</label>
         </div>
         <div class='row' >
-          <label for='cachedTopicMappingExpire' class='label'>אפדעיט די ליסטע פון קאמענטארן אשכולות יעדע</label>
-          <select id='cachedTopicMappingExpire' class='option'>
+          <input type='checkbox' id='topicMappingUpdate' />
+          <label for='topicMappingUpdate' class='label'>אפדעיט די ליסטע פון קאמענטארן אשכולות יעדע</label>
+          <select id='cachedTopicMappingExpire' class='option' aria-label='ווי אפט צו אפדעיטן די ליסטע פון קאמענטארן אשכולות'>
             <option value="3600">שעה</option>
             <option value="86400">טאג</option>
             <option value="604800">וואך</option>
-            <option value="">קיינמאל</option>
           </select>
           <div>
             <a style="font-size: 0.8em;" id='forceUpdateTopicMapCache' class='button'>אפדעיט די ליסטע יעצט</a>
