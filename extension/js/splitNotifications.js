@@ -51,12 +51,7 @@ function splitNotifications() {
         ul.innerHTML = '';
         items.forEach(item => ul.appendChild(item));
         // phpBB sizes the dropdown to what's in it, so an empty one was just a sliver
-        if (!items.length) {
-          const empty = document.createElement('li');
-          empty.className = 'no_notifications';
-          empty.textContent = 'נישטא קיין נאטיפיקאציעס';
-          ul.appendChild(empty);
-        }
+        if (!items.length) ul.appendChild(createEmptyRow());
       }
 
       // Update footer link
@@ -67,6 +62,14 @@ function splitNotifications() {
       }
 
       return dropdown;
+    }
+
+    // Only the newest notifications come with the page, so an empty bell may still have older ones
+    function createEmptyRow() {
+      const empty = document.createElement('li');
+      empty.className = 'no_notifications';
+      empty.textContent = 'נישטא קיין לעצטיגע נאטיפיקאציעס';
+      return empty;
     }
 
     function createNotificationBell(type, label, count, items, iconClass) {
@@ -176,6 +179,14 @@ function splitNotifications() {
       });
     }
 
+    // The original bell keeps whatever isn't in the others (mostly replies in subscribed topics), so
+    // its dropdown says so, next to phpBB's own settings and mark-all links
+    const originalHeader = originalLI.querySelector('.dropdown-extended .header');
+    const headerText = originalHeader && [...originalHeader.childNodes].find(n => n.nodeType === Node.TEXT_NODE && n.textContent.trim());
+    if (headerText) headerText.textContent = 'אנדערע נאטיפיקאציעס';
+    const originalUL = originalLI.querySelector('.dropdown-extended ul');
+    if (originalUL && !originalUL.children.length) originalUL.appendChild(createEmptyRow());
+
     // The PM icon opens the private messages, the footer goes to the inbox
     if (pmLink) {
       const pmLI = pmLink.parentElement;
@@ -189,18 +200,56 @@ function splitNotifications() {
       handleMarkRead(dropdown, null);
     }
 
-    // Update original badge count
+    // Update original badge count. The forum only sends the newest notifications with the page, so
+    // older unread ones aren't in any of the bells: the original bell counts only the unread ones it
+    // has, and a grey "+N" next to it, a plain link to the notifications page, counts the rest
     const originalBadge = originalLI.querySelector('strong.badge');
     if (originalBadge) {
       const currentCount = parseInt(originalBadge.textContent.trim(), 10);
-      const adjusted = currentCount - citirtCount - badanktCount - dermantCount - pmCount;
-      const newCount = adjusted > 0 ? adjusted : 0;
+      const newCount = allItems.filter(li => li.isConnected && originalLI.contains(li) && isUnread(li)).length;
+      const missing = currentCount - citirtCount - badanktCount - dermantCount - pmCount - newCount;
+
+      if (missing > 0 && parent) {
+        const moreLI = document.createElement('li');
+        moreLI.className = 'rightside';
+        moreLI.id = 'more_unread_notifications';
+        const link = document.createElement('a');
+        link.href = './ucp.php?i=ucp_notifications';
+        link.title = missing === 1
+          ? 'נאך 1 אומגעליינטע נאטיפיקאציע וואס איז נישט אין די גלעקלעך, דריק צו זען אלע'
+          : `נאך ${missing} אומגעליינטע נאטיפיקאציעס וואס זענען נישט אין די גלעקלעך, דריק צו זען אלע`;
+        const badge = document.createElement('strong');
+        badge.className = 'badge';
+        badge.style.backgroundColor = '#8a8a8a';
+        // otherwise the right-to-left header shows it as "5+"
+        badge.dir = 'ltr';
+        badge.textContent = `+${missing}`;
+        link.appendChild(badge);
+        moreLI.appendChild(link);
+        originalLI.after(moreLI);
+      }
 
       if (newCount > 0) {
         originalBadge.textContent = newCount;
       } else {
         originalBadge.remove();
       }
+    }
+
+    // All of them in one item of the header, on one light background (see css/appcss.css), so they
+    // read as one group apart from the forum's other menus and never wrap apart on a phone
+    const group = [pmLink?.parentElement, badanktLI, dermantLI, citirtLI, originalLI,
+      document.getElementById('more_unread_notifications')].filter(Boolean);
+    if (parent) {
+      const groupLI = document.createElement('li');
+      groupLI.className = 'rightside notif-group';
+      // like the forum's own bell and PM icon, so phpBB doesn't move it out of the header when the
+      // header is too narrow for everything (on a phone)
+      groupLI.setAttribute('data-skip-responsive', 'true');
+      const groupUL = document.createElement('ul');
+      groupLI.appendChild(groupUL);
+      group[0].before(groupLI);
+      group.forEach(li => groupUL.appendChild(li));
     }
 }
 
