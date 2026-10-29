@@ -194,6 +194,13 @@ input[type='checkbox']:checked + label:before {
     content: '\f14a';
     color: var(--ui-link);
 }
+/* an option that only works with another one turned on */
+input[type='checkbox']:disabled + label,
+input[type='checkbox']:disabled + label:before {
+    color: var(--ui-muted);
+    cursor: default;
+    opacity: 0.6;
+}
 /* A labelled field lines up with the text of the checkbox above it */
 .row.row-field {
     padding-right: 30px;
