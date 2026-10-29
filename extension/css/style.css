@@ -176,6 +176,8 @@ input[type='checkbox'] {
 }
 input[type='checkbox'] + label {
     position: relative;
+    /* a long label wraps under its own text, not under the checkbox */
+    display: inline-block;
     padding-right: 30px;
     cursor: pointer;
 }
