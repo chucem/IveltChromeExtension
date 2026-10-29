@@ -177,6 +177,8 @@ function themeVars(theme){
 		warn: theme.dark ? '#E3B341' : '#7A4F01',
 		...c
 	};
+	// the notification count badge: the error red, toned down toward the page on dark themes (white text stays readable)
+	all.badge = theme.dark ? mix(all.error, c.bg, 72) : all.error;
 
 	const vars = {};
 	Object.keys(all).forEach(key => {

@@ -154,7 +154,7 @@
 :root[data-ivh-theme] .button:hover,
 :root[data-ivh-theme] .button:focus,
 :root[data-ivh-theme] a.button1:hover, :root[data-ivh-theme] input.button1:hover,
-:root[data-ivh-theme] a.button2:hover, :root[data-ivh-theme] input.button2:hover { background-color: var(--t-button-hover); background-image: none; border-color: var(--t-accent); color: var(--t-link); }
+:root[data-ivh-theme] a.button2:hover, :root[data-ivh-theme] input.button2:hover { background-color: var(--t-button-hover); background-image: none; border-color: var(--t-accent); color: var(--t-link); text-shadow: none; }
 :root[data-ivh-theme] .button .icon,
 :root[data-ivh-theme] .button-secondary { color: var(--t-muted); }
 :root[data-ivh-theme] .button:hover .icon,
@@ -177,9 +177,11 @@
 :root[data-ivh-theme] .dropdown-extended ul li { border-color: var(--t-border); }
 :root[data-ivh-theme] .dropdown-extended ul li:hover { background-color: var(--t-hover); color: var(--t-strong); }
 :root[data-ivh-theme] .dropdown-extended .header,
-:root[data-ivh-theme] .dropdown-extended .footer { background-color: var(--t-dropdown); background-image: none; border-color: var(--t-border); box-shadow: none; color: var(--t-strong); }
+:root[data-ivh-theme] .dropdown-extended .footer { background-color: var(--t-dropdown); background-image: none; border-color: var(--t-border); box-shadow: none; color: var(--t-strong); text-shadow: none; }
 :root[data-ivh-theme] .dropdown-extended a.mark_read { background-color: var(--t-dropdown); }
 :root[data-ivh-theme] .notification_list p.notification-time { color: var(--t-muted); }
+/* the notification and private message counts (the forum's bright crimson) */
+:root[data-ivh-theme] .badge { background-color: var(--t-badge); }
 :root[data-ivh-theme] .phpbb_alert { background-color: var(--t-dropdown); border-color: var(--t-border); }
 
 /* Jumpbox */
@@ -232,7 +234,6 @@
 :root[data-ivh-theme] .abbc3_buttons_row { background-color: var(--t-row3); background-image: none; border-color: var(--t-border); }
 :root[data-ivh-theme] #abbc3_buttons select { background-color: var(--t-input-bg); border-color: var(--t-input-border); color: var(--t-strong); }
 :root[data-ivh-theme] .adsm_block { background-color: var(--t-panel); }
-
 /* Site specific boxes */
 :root[data-ivh-theme] .rules { background-color: color-mix(in srgb, var(--t-error) 15%, var(--t-row1)); color: var(--t-text); }
 /* the off-topic BBCode sets its colors inline */
