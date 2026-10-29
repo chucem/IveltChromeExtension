@@ -31,19 +31,39 @@ function checkLoginState() {
 
 getUserId('https://www.ivelt.com', 'phpbb3_sw7kk_u');
 
+const FORUM_HOSTS = /(^|\.)(ivelt\.com|yiddishworld\.com|198\.153\.76\.147)$/;
+
+function isForumUrl(url) {
+    try {
+        return FORUM_HOSTS.test(new URL(url).hostname);
+    } catch (e) {
+        return false;
+    }
+}
+
+function openForumLink(url) {
+    chrome.storage.local.get(['popupSameTab'], function (items) {
+        chrome.tabs.query({active: true, currentWindow: true}, function (tabs) {
+            const tab = tabs[0];
+            if (items.popupSameTab && tab && tab.url && isForumUrl(tab.url))
+                chrome.tabs.update(tab.id, {url: url});
+            else
+                chrome.tabs.create({url: url});
+            window.close();
+        });
+    });
+}
+
 function open_home_page() {
-    chrome.tabs.create({url: 'https://www.ivelt.com/forum/'});
-    window.close();
+    openForumLink('https://www.ivelt.com/forum/');
 }
 
 function open_pm_inbox() {
-    chrome.tabs.create({url: 'https://www.ivelt.com/forum/ucp.php?i=pm&folder=inbox'});
-    window.close();
+    openForumLink('https://www.ivelt.com/forum/ucp.php?i=pm&folder=inbox');
 }
 
 function open_active_topics() {
-    chrome.tabs.create({url: 'https://www.ivelt.com/forum/search.php?search_id=active_topics'});
-    window.close();
+    openForumLink('https://www.ivelt.com/forum/search.php?search_id=active_topics');
 }
 
 function quick_sign_in() {
@@ -133,3 +153,8 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 document.addEventListener('DOMContentLoaded', initThemeSwatches);
+
+document.addEventListener('DOMContentLoaded', function () {
+    const manifest = chrome.runtime.getManifest();
+    document.getElementById('popup_version').textContent = 'v' + (manifest.version_name || manifest.version);
+});

@@ -69,11 +69,14 @@ function enchancePage() {
   if (url.pathname === "/forum/viewtopic.php"){
     // Duplicate link for "Unread Post" to bottom of page.
     const paginations = document.getElementsByClassName("pagination");
-    paginations[1].outerHTML = paginations[0].outerHTML;
+    if (paginations.length > 1) {
+      paginations[1].outerHTML = paginations[0].outerHTML;
+    }
   }
 
-  if (url.pathname === "/forum/ucp.php" && params.get('i') === 'ucp_notifications'){
-    const pagination = document.querySelector(".action-bar.bar-top .pagination");
+  const pagination = url.pathname === "/forum/ucp.php" && params.get('i') === 'ucp_notifications'
+    && document.querySelector(".action-bar.bar-top .pagination");
+  if (pagination){
 
     const link = document.createElement("a");
     // add listened
@@ -111,6 +114,13 @@ function showCopiedTip(anchor) {
   tip.style.top = `${rect.top + window.scrollY - 28}px`;
   tip.style.left = `${rect.left + window.scrollX + rect.width / 2}px`;
   document.body.appendChild(tip);
+
+  // Keep it on screen: centered over a link at the screen's edge (on a phone the link is at the right edge) it sticks out
+  const margin = 6;
+  const tipRect = tip.getBoundingClientRect();
+  const viewWidth = document.documentElement.clientWidth;
+  const shift = Math.min(0, viewWidth - margin - tipRect.right) || Math.max(0, margin - tipRect.left);
+  tip.style.left = `${parseFloat(tip.style.left) + shift}px`;
 
   setTimeout(() => tip.classList.add('ext-copied-tip-hide'), 1200);
   setTimeout(() => tip.remove(), 1600);

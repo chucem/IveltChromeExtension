@@ -1,5 +1,32 @@
+/*
+ * The settings page follows the color theme picked for the forum: js/theme.js sets the
+ * --t-* variables from js/themes.data.js, without a theme the fallbacks give the normal look.
+ * They're resolved here once, on :root, so the theme previews (which set their own --t-*
+ * variables to draw themselves) don't change the colors of the page around them.
+ */
+:root {
+    --ui-bg: var(--t-bg, #F5F7FA);
+    --ui-surface: var(--t-surface, #fff);
+    --ui-text: var(--t-text, #444);
+    --ui-muted: var(--t-muted, #888);
+    --ui-link: var(--t-link, #3477db);
+    --ui-heading: var(--t-link, #0A8ED0);
+    --ui-accent: var(--t-accent, #0A8ED0);
+    --ui-accent-dark: var(--t-accent-dark, #0A8ED0);
+    --ui-header: var(--t-accent, #12A3EB);
+    --ui-on-header: var(--t-on-accent, #fff);
+    --ui-border: var(--t-border, #e7e7e7);
+    --ui-panel: var(--t-row2, #eff0f1);
+    --ui-panel-border: var(--t-border, #d5d6d7);
+    --ui-input-bg: var(--t-input-bg, #fff);
+    --ui-input-border: var(--t-input-border, #ccc);
+    --ui-input-text: var(--t-strong, #444);
+    --ui-error: var(--t-error, #a50e0e);
+    --ui-selection: var(--t-highlight, #fff567);
+    color-scheme: var(--t-scheme, light);
+}
 ::selection {
-  background: #fff567
+  background: var(--ui-selection);
 }
 html, body {
     margin: 0;
@@ -14,10 +41,10 @@ html {
     box-sizing: inherit;
 }
 body {
-    color: #444;
+    color: var(--ui-text);
     font-size: 1.5rem;
     line-height: 1.5em;
-    background: #fafafa;
+    background: var(--ui-bg);
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji','Segoe UI Symbol';
     direction: rtl;
 }
@@ -37,7 +64,7 @@ p {
     margin: 0 0 15px;
 }
 a {
-    color: #3477db;
+    color: var(--ui-link);
     cursor: pointer;
     text-decoration: none;
 }
@@ -45,7 +72,7 @@ a:hover {
     text-decoration: underline;
 }
 a.active {
-    color: #444;
+    color: var(--ui-text);
     cursor: default;
     pointer-events: none;
 }
@@ -53,13 +80,13 @@ hr {
     height: 1px;
     margin: 23px 0;
     border-width: 0;
-    border-top: 1px solid #e7e7e7;
+    border-top: 1px solid var(--ui-border);
 }
 .hidden {
     display: none;
 }
 .warning {
-    color: #a50e0e;
+    color: var(--ui-error);
 }
 .row {
     margin: 0 0 24px;
@@ -73,14 +100,15 @@ hr {
     top: 0;
     left: 50%;
     opacity: 0;
-    background: #eee;
+    background: var(--ui-panel);
+    color: var(--ui-text);
     font-weight: 500;
     text-align: center;
     padding: 5px 25px 7px 25px;
     transform: translateX(-50%);
-    border-left: 2px solid #999;
-    border-right: 2px solid #999;
-    border-bottom: 2px solid #999;
+    border-left: 2px solid var(--ui-input-border);
+    border-right: 2px solid var(--ui-input-border);
+    border-bottom: 2px solid var(--ui-input-border);
     border-bottom-left-radius: 4px;
     border-bottom-right-radius: 4px;
     transition: opacity 0.75s linear;
@@ -99,9 +127,22 @@ hr {
     margin: 0 0 50px;
     font-size: 20px;
 }
+.version {
+    margin-top: -12px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--ui-muted);
+}
+/* version, where it's installed from, and whether there's a newer one, on one line */
+.version-part:empty {
+    display: none;
+}
+.version-part::before {
+    content: ' · ';
+}
 .credits {
     grid-area: m;
-    border-right: 1px solid #ddd;
+    border-right: 1px solid var(--ui-border);
     padding-right: 15px;
     align-self: start;
 }
@@ -135,6 +176,8 @@ input[type='checkbox'] {
 }
 input[type='checkbox'] + label {
     position: relative;
+    /* a long label wraps under its own text, not under the checkbox */
+    display: inline-block;
     padding-right: 30px;
     cursor: pointer;
 }
@@ -145,13 +188,20 @@ input[type='checkbox'] + label:before {
     font-family: 'checkbox';
     text-decoration: none;
     content: '\f096';
-    color: #888;
+    color: var(--ui-muted);
     font-size: 24px;
     cursor: pointer;
 }
 input[type='checkbox']:checked + label:before {
     content: '\f14a';
-    color: #3477db;
+    color: var(--ui-link);
+}
+/* an option that only works with another one turned on */
+input[type='checkbox']:disabled + label,
+input[type='checkbox']:disabled + label:before {
+    color: var(--ui-muted);
+    cursor: default;
+    opacity: 0.6;
 }
 /* A labelled field lines up with the text of the checkbox above it */
 .row.row-field {
@@ -166,27 +216,34 @@ input[type='checkbox']:checked + label:before {
     max-width: 280px;
     height: 32px;
     padding: 4px 10px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--ui-input-border);
     border-radius: 4px;
-    background: #fff;
-    color: #444;
+    background: var(--ui-input-bg);
+    color: var(--ui-input-text);
     font: inherit;
     font-size: 15px;
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 .text-input:focus {
     outline: none;
-    border-color: #3477db;
-    box-shadow: 0 0 0 3px rgba(52, 119, 219, 0.15);
+    border-color: var(--ui-link);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--ui-link) 15%, transparent);
 }
 .text-input:disabled {
-    background: #f0f0f0;
-    color: #999;
+    background: var(--ui-panel);
+    color: var(--ui-muted);
 }
 select {
     min-height: 1em;
     height: 1.3em;
     padding-inline-start: 20px;
+}
+/* the browser's own look is kept unless a theme is picked */
+:root[data-ivh-theme] select {
+    border: 1px solid var(--ui-input-border);
+    border-radius: 3px;
+    background: var(--ui-input-bg);
+    color: var(--ui-input-text);
 }
 #notify.fade {
     opacity: 1;
@@ -195,8 +252,8 @@ select {
     display: inline-block;
     padding: 3px 5px;
     border-radius: 6px;
-    border: 1px solid #d5d6d7;
-    background-color: #eff0f1;
+    border: 1px solid var(--ui-panel-border);
+    background-color: var(--ui-panel);
     font-size: 0.7em;
     line-height: 1;
 }
@@ -220,10 +277,10 @@ select {
   .settings-group h3 {
     font-size: 15px;
     font-weight: 600;
-    color: #0A8ED0;
+    color: var(--ui-heading);
     margin: 0 0 18px;
     padding-bottom: 4px;
-    border-bottom: 1px solid #e7e7e7;
+    border-bottom: 1px solid var(--ui-border);
   }
   .aaa .row + h2 {
     margin-top: 30px;

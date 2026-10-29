@@ -1,6 +1,7 @@
 const TOPIC_MAPPING_EXPIRE = document.getElementById("iveltHelperSettings").getAttribute("data-cached-topic-mapping-expire");
 const COPY_ATTACHMENTS = document.getElementById("iveltHelperSettings").getAttribute("data-copy-attachments");
-const CACHE_EXPIRY_MS = (TOPIC_MAPPING_EXPIRE || 3600) * 1000;
+// empty is never: the list is only fetched when there's none yet, or with "update the list now"
+const CACHE_EXPIRY_MS = TOPIC_MAPPING_EXPIRE === '' ? Infinity : (TOPIC_MAPPING_EXPIRE || 3600) * 1000;
 const CACHE_KEY = "topicMappingCache";
 const CACHE_TIME_KEY = "topicMappingLastFetchTime";
 
@@ -125,6 +126,7 @@ async function addBtn() {
         }
         let pingOnClick = `ping_user(${strippedId})`
         addSimpleButton(btn, null, 'fa-at', 'דערמאן תגובה', 'דערמאן תגובה', pingOnClick)
+        addPMQuoteButton(btn, id)
         if (contentElement.innerHTML.includes("blockquote")) {
             addQuoteLastButton(btn, isPosting);
         }
@@ -191,6 +193,23 @@ function addCopyQuoteButton(btn, postID, imageData){
             '${JSON.stringify(imageData)}')`:
             `copyQuoteParse("${postID}")`
     )
+}
+
+// A private message to the writer with the post quoted: the link from the profile's contact menu
+// (פארבינד זיך), which a phone doesn't show. Only on a phone, see css/appcss.css
+function addPMQuoteButton(btn, postID) {
+    let pmLink = getPMHref(postID);
+    if (!pmLink) {
+        return;
+    }
+
+    let button = createButton(pmLink.getAttribute('href'), 'fa-envelope', 'שיק א פריוואטע מעסעדזש מיט א ציטאט פון דער תגובה', 'פריוואטע מעסעדזש מיט א ציטאט');
+    button.li.classList.add('ih-pm-quote');
+
+    let quoteLi = getQuoteElm(btn)?.parentElement;
+    if (quoteLi) {
+        quoteLi.parentNode.insertBefore(button.li, quoteLi.nextSibling)
+    }
 }
 
 function addQuoteLastButton(btn, isPosting) {
@@ -393,22 +412,7 @@ function iveltNotify(message){
     let fadeTarget = document.querySelector('#ivelt-notify');
     if (!fadeTarget) {
         fadeTarget = document.createElement('div');
-        fadeTarget.id = 'ivelt-notify';
-        fadeTarget.style.position = "fixed";
-        fadeTarget.style.top = "30%";
-        fadeTarget.style.left = "50%";
-        fadeTarget.style.zIndex = "9999"; // Keep this on top
-        fadeTarget.style.background = "#eee";
-        fadeTarget.style.textAlign = "center";
-        fadeTarget.style.padding = "5px 25px 7px 25px";
-        fadeTarget.style.transform = "translateX(-50%)";
-        fadeTarget.style.borderLeft = "2px solid #999";
-        fadeTarget.style.borderRight = "2px solid #999";
-        fadeTarget.style.borderBottom = "2px solid #999";
-        fadeTarget.style.borderBottomLeftRadius = "4px";
-        fadeTarget.style.borderBottomRightRadius = "4px";
-        fadeTarget.style.transition = "opacity 0.75s linear";
-        fadeTarget.style.fontSize = "1rem";
+        fadeTarget.id = 'ivelt-notify'; // styled in css/appcss.css
 
         const container = document.querySelector('#page-body')
         container.insertBefore(fadeTarget, container.firstChild);
@@ -425,6 +429,18 @@ function iveltNotify(message){
 // topic mapping via google sheet by טעכניש גערעדט
 //https://docs.google.com/spreadsheets/d/1bziJ_h6bIRBXFSBJHT3aBsb13-QrEnrSjjy_-IS3FFw/edit?gid=1771705226#gid=1771705226
 
+
+// the forum's CSP blocks this page from reaching Google Sheets, so the extension fetches the sheet (see js/contentScript.js)
+function requestTopicMappingCsv() {
+    return new Promise((resolve, reject) => {
+        window.addEventListener('message', function onResult(e) {
+            if (e.source !== window || !e.data || e.data.type !== 'ivelt-helper-topic-mapping-result') return;
+            window.removeEventListener('message', onResult);
+            e.data.error ? reject(new Error(e.data.error)) : resolve(e.data.text);
+        });
+        window.postMessage({ type: 'ivelt-helper-topic-mapping' }, location.origin);
+    });
+}
 
 async function fetchTopicMapping() {
     const now = Date.now();
@@ -444,13 +460,7 @@ if (!forceRefresh && cachedData && lastFetchTime && now - lastFetchTime < CACHE_
 // Otherwise, fetch new data from Google Sheets
     try {
         console.log('fetching topic mappings form google sheet');
-        const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vS8-2oWC0g995y_fNyR4scrXBEimeYpI5Hm0TPqt1IyvVqEdVUDKYw2n7Z6A2d1DDj3Ef6ofpwe2s3T/pub?gid=986512672&single=true&output=csv";
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Failed to fetch CSV data: ${response.statusText}`);
-        }
-
-        const csvText = await response.text();
+        const csvText = await requestTopicMappingCsv();
         const mappings = {};
 
         const rows = csvText.split("\n");

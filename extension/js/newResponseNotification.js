@@ -1,20 +1,23 @@
 (function () {
     if (window.location.pathname !== '/forum/viewtopic.php') return ;
 
-    let currentCount = document
-    .querySelector("div.pagination")
-    .innerHTML.match(/(\d+) תגובות/)[1];
-  let currentPostCount =
-    document.getElementsByClassName("post has-profile").length;
-  let lastPost =
-    document.getElementsByClassName("post has-profile")[currentPostCount - 1];
+  // not every viewtopic page is a topic, e.g. Cloudflare's challenge page or an error
+  let pagination = document.querySelector("div.pagination");
+  let countMatch = pagination && pagination.innerHTML.match(/(\d+) תגובות/);
+  let topicLink = document.querySelector("h2.topic-title > a");
+  let forumLink = document.getElementsByClassName("left-box arrow-right")[0];
+  let settings = document.getElementById("iveltHelperSettings");
+  let posts = document.getElementsByClassName("post has-profile");
+  if (!countMatch || !topicLink || !forumLink || !settings || !posts.length) return;
 
-  var topicURL = document.querySelector("h2.topic-title > a").href;
+  let currentCount = countMatch[1];
+  let lastPost = posts[posts.length - 1];
+
+  var topicURL = topicLink.href;
   var topicURLSearch = topicURL.substr(topicURL.indexOf("?"));
   var urlParams = new URLSearchParams(topicURLSearch);
   var topicId = urlParams.get("t");
-  var forumURL = document.getElementsByClassName("left-box arrow-right")[0]
-    .href;
+  var forumURL = forumLink.href;
 
   function isLastPage() {
     return document.getElementsByClassName("next").length == 0;
@@ -23,13 +26,8 @@
   let title = document.title;
   // setting was unchecked by the user
 
-  let backgroundSync =
-    document
-      .getElementById("iveltHelperSettings")
-      .getAttribute("data-background-sync") === "true";
-  let backgroundSyncPosts = document
-    .getElementById("iveltHelperSettings")
-    .getAttribute("data-background-sync-posts");
+  let backgroundSync = settings.getAttribute("data-background-sync") === "true";
+  let backgroundSyncPosts = settings.getAttribute("data-background-sync-posts");
   if (!backgroundSync || !backgroundSyncPosts) return;
 
   let interval = parseInt(backgroundSyncPosts);
@@ -85,9 +83,9 @@
 
               lastPost.insertAdjacentHTML(
                 "afterend",
-                `<h3 id="ivelt-new-response-notification" style="margin:4px auto;text-align:center;background:#cadceb;padding:7px 5px 5px 5px;border:none;border-radius:7px;user-select:none;">
+                `<h3 id="ivelt-new-response-notification">
                                 נייע תגובות זענען צוגעקומען
-                                <a class="button" style="width:150px;margin:5px auto;display:block;" href="/forum/viewtopic.php?t=${topicId}&view=unread#unread">רילאוד</a>
+                                <a class="button" href="/forum/viewtopic.php?t=${topicId}&view=unread#unread">רילאוד</a>
                             </h3>`
               );
               notificationElement = document.getElementById("ivelt-new-response-notification");

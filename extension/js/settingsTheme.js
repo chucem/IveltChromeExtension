@@ -53,8 +53,10 @@ function selectTheme(id){
 	themeEditor.themeId = id;
 
 	// first time: start the custom theme from the theme that was in use
-	if(id === 'custom' && !themeEditor.custom)
+	if(id === 'custom' && !themeEditor.custom){
 		themeEditor.custom = copyBaseColors(themePresets.find(preset => preset.id === themeEditor.lastPresetId) || themePresets[0]);
+		setPreviewColors(customThemeCard(), themeEditor.custom);
+	}
 
 	if(id !== 'custom')
 		themeEditor.lastPresetId = id;
@@ -127,7 +129,7 @@ function updateThemeEditor(){
 }
 
 function customThemeChanged(){
-	setPreviewColors(document.querySelector('.theme-card input[value="custom"]').closest('.theme-card'), themeEditor.custom);
+	setPreviewColors(customThemeCard(), themeEditor.custom);
 	updateThemeEditor();
 
 	// color pickers fire on every drag step, the forum tabs follow along once it settles
@@ -135,6 +137,10 @@ function customThemeChanged(){
 	themeEditor.saveTimeout = setTimeout(() => {
 		chrome.storage.local.set({ customTheme: themeEditor.custom });
 	}, 250);
+}
+
+function customThemeCard(){
+	return document.querySelector('.theme-card input[value="custom"]').closest('.theme-card');
 }
 
 function customThemeJson(){
@@ -171,6 +177,10 @@ function initThemesToggle(enabled){
 	checkbox.addEventListener('change', () => {
 		commitNewSetting({ themesEnabled: checkbox.checked });
 		showThemesTab(checkbox.checked);
+
+		// turning it on is usually followed by picking a theme
+		if(checkbox.checked)
+			location.hash = 'colors';
 	});
 }
 
