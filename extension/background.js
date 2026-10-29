@@ -182,12 +182,16 @@ async function moveToNewCheckTiming(reason){
   await chrome.storage.local.set({ [CHECK_TIMING_MIGRATED]: true });
 }
 
-// After an update, the next forum page shows what's new in this version (js/whatsNew.js).
+// After an update, the next forum page shows what's new since the version the user had
+// (js/whatsNew.js), so skipping a version (say 2.6.0 straight to 2.7.1) still shows 2.7.0's.
 // Only when the version changed: reloading the same version (while developing) doesn't count
-function markWhatsNew(details){
+async function markWhatsNew(details){
   const version = chrome.runtime.getManifest().version;
   if(details.reason === 'update' && details.previousVersion !== version){
-    chrome.storage.local.set({ whatsNewVersion: version });
+    // a pop-up not closed yet keeps the version it started from, so nothing in between is lost
+    const { whatsNewVersion, whatsNewFrom } = await chrome.storage.local.get(['whatsNewVersion', 'whatsNewFrom']);
+    const from = whatsNewVersion ? whatsNewFrom : details.previousVersion;
+    await chrome.storage.local.set({ whatsNewVersion: version, ...(from ? { whatsNewFrom: from } : {}) });
     // a "remind me later" from the last version's pop-up doesn't hold back this one
     chrome.storage.local.remove('whatsNewLaterUntil');
   }
