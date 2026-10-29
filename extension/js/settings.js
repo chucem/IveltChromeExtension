@@ -131,7 +131,7 @@ function postSettingChange(items){
 
 	// on unless turned off
 	if(items.hasOwnProperty('quoteSelection')){
-		document.getElementById('quoteJumpToReply').disabled = items.quoteSelection === false;
+		document.getElementById('quoteJumpToReply').closest('.row').classList.toggle('hidden', items.quoteSelection === false);
 	}
 
 	if(items.hasOwnProperty('debugMode')){
