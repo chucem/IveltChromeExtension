@@ -1,9 +1,14 @@
 // What's new in each version, shown once in a pop-up on the forum after the extension updates
-// (js/whatsNew.js). Add an entry for each release, keyed by the manifest's "version"; a version
-// with no entry shows no pop-up. Something that has a setting is written as an option
+// (js/whatsNew.js). Add an entry for each release, keyed by the manifest's "version". The pop-up
+// shows every entry since the version the user had, so keep the old ones; an update with no
+// entry since then shows no pop-up. Something that has a setting is written as an option
 // ("אן אפציע צו...").
 
 const whatsNewReleases = {
+	'2.7.1': {
+		fixes: [
+		]
+	},
 	'2.7.0': {
 		features: [
 			'אן אפציע אז א קליק אויף אן אשכול מיט נייע תגובות זאל עס עפענען ביי דער ערשטער אומגעליינטער תגובה',
