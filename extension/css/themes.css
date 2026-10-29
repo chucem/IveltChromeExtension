@@ -138,6 +138,9 @@
 :root[data-ivh-theme] .inputbox:hover,
 :root[data-ivh-theme] .inputbox:focus,
 :root[data-ivh-theme] textarea:focus { border-color: var(--t-accent); }
+/* the browser's grey hint text is too dim on dark inputs */
+:root[data-ivh-theme] .inputbox::placeholder,
+:root[data-ivh-theme] textarea::placeholder { color: var(--t-muted); opacity: 1; }
 :root[data-ivh-theme] label,
 :root[data-ivh-theme] dd label,
 :root[data-ivh-theme] .message-box textarea { color: var(--t-text); }
