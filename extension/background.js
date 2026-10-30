@@ -29,6 +29,7 @@ const defualtPreferences = {
   driveButtonPlace: 'attachments',
   dropboxUpload: true,
   cloudUploadInPms: true,
+  cloudDropVideos: true,
   driveFolderName: 'iVelt Helper',
   openAttachmentsTab: true,
   copyPostLink: true,
@@ -95,6 +96,17 @@ async function addDomainRedirect() {
   }).catch((e) => console.error('Domain redirect rule failed:', e));
 }
 
+// The settings page's "update now" link restarts the extension to put in an update the browser
+// already downloaded, which closes that page. The new version opens it again, so it shows the new
+// version. Only within a minute of the click: a restart that didn't update leaves it for nothing
+async function reopenSettingsAfterUpdate(reason) {
+  const { reopenSettingsUntil } = await chrome.storage.local.get('reopenSettingsUntil');
+  if (!reopenSettingsUntil) return;
+  await chrome.storage.local.remove('reopenSettingsUntil');
+  if (reason === 'update' && Date.now() < reopenSettingsUntil)
+    chrome.runtime.openOptionsPage();
+}
+
 chrome.runtime.onInstalled.addListener(async (details) => {
 
   await addDomainRedirect();
@@ -104,6 +116,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
 
   await moveToNewCheckTiming(details.reason);
   markWhatsNew(details);
+  reopenSettingsAfterUpdate(details.reason);
 
   if (details.reason === "update" || details.reason === "install") {
     // Get current settings in local storage
@@ -182,12 +195,16 @@ async function moveToNewCheckTiming(reason){
   await chrome.storage.local.set({ [CHECK_TIMING_MIGRATED]: true });
 }
 
-// After an update, the next forum page shows what's new in this version (js/whatsNew.js).
+// After an update, the next forum page shows what's new since the version the user had
+// (js/whatsNew.js), so skipping a version (say 2.6.0 straight to 2.7.1) still shows 2.7.0's.
 // Only when the version changed: reloading the same version (while developing) doesn't count
-function markWhatsNew(details){
+async function markWhatsNew(details){
   const version = chrome.runtime.getManifest().version;
   if(details.reason === 'update' && details.previousVersion !== version){
-    chrome.storage.local.set({ whatsNewVersion: version });
+    // a pop-up not closed yet keeps the version it started from, so nothing in between is lost
+    const { whatsNewVersion, whatsNewFrom } = await chrome.storage.local.get(['whatsNewVersion', 'whatsNewFrom']);
+    const from = whatsNewVersion ? whatsNewFrom : details.previousVersion;
+    await chrome.storage.local.set({ whatsNewVersion: version, ...(from ? { whatsNewFrom: from } : {}) });
     // a "remind me later" from the last version's pop-up doesn't hold back this one
     chrome.storage.local.remove('whatsNewLaterUntil');
   }

@@ -112,13 +112,17 @@
 
 /* Quotes, code and attachments */
 /* nested quotes alternate between two shades at every level, so each one stands out from the one around it */
-:root[data-ivh-theme] blockquote { background-color: var(--t-quote-bg); border-color: var(--t-quote-border); }
+:root[data-ivh-theme] blockquote { --ivh-quote-bg: var(--t-quote-bg); background-color: var(--ivh-quote-bg); border-color: var(--t-quote-border); }
 :root[data-ivh-theme] blockquote blockquote,
 :root[data-ivh-theme] blockquote blockquote blockquote blockquote,
-:root[data-ivh-theme] blockquote blockquote blockquote blockquote blockquote blockquote { background-color: var(--t-quote-bg2); }
+:root[data-ivh-theme] blockquote blockquote blockquote blockquote blockquote blockquote { --ivh-quote-bg: var(--t-quote-bg2); }
 :root[data-ivh-theme] blockquote blockquote blockquote,
 :root[data-ivh-theme] blockquote blockquote blockquote blockquote blockquote,
-:root[data-ivh-theme] blockquote blockquote blockquote blockquote blockquote blockquote blockquote { background-color: var(--t-quote-bg); }
+:root[data-ivh-theme] blockquote blockquote blockquote blockquote blockquote blockquote blockquote { --ivh-quote-bg: var(--t-quote-bg); }
+/* the forum's "ווייז מער..." fade on a long quote: its script can't read the theme's colors (it only knows rgb() and #hex),
+   so it leaves no fade at all; draw it here in the color of the quote it's in */
+:root[data-ivh-theme] .imcger-quote-shadow { background-image: linear-gradient(transparent, color-mix(in srgb, var(--ivh-quote-bg) 80%, transparent) 70%, var(--ivh-quote-bg)) !important; }
+:root[data-ivh-theme] .imcger-quote-button { background-color: var(--ivh-quote-bg); }
 :root[data-ivh-theme] .codebox { background-color: var(--t-code-bg); border-color: var(--t-border); }
 :root[data-ivh-theme] .codebox p { border-bottom-color: var(--t-border); }
 :root[data-ivh-theme] .codebox code { color: var(--t-code-text); }
@@ -300,3 +304,7 @@
 :root[data-ivh-theme] #ivd-wrap .ivd-status.ivd-ok { color: var(--t-success); }
 :root[data-ivh-theme] #ivd-wrap .ivd-status.ivd-warn { color: var(--t-warn); }
 :root[data-ivh-theme] #ivd-wrap .ivd-status.ivd-error { color: var(--t-error); }
+:root[data-ivh-theme] #ivd-wrap.ivd-dragover #ivd-button,
+:root[data-ivh-theme] #ivd-wrap.ivd-dragover .ivd-popup,
+:root[data-ivh-theme] #ivd-wrap.ivd-dragover .ivd-btn.ivd-primary { outline-color: var(--t-accent); }
+:root[data-ivh-theme] #ivd-wrap.ivd-dragover .ivd-popup { background-color: var(--t-row1); }

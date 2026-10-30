@@ -181,8 +181,11 @@ function getQuoteElm(btn){
 }
 
 function addUnderlineForQuoteBtn(btn) {
+    // posts the user can't quote (a locked topic) have no quote button
     let sourceURL = getQuoteElm(btn);
-    sourceURL.style.background = '#ebeadd';
+    if (sourceURL) {
+        sourceURL.style.background = '#ebeadd';
+    }
 }
 
 function addCopyQuoteButton(btn, postID, imageData){

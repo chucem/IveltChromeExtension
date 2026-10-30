@@ -1,7 +1,8 @@
 // What's new pop-up
 //
-// After the extension updates, the next forum page shows a pop-up with what's new in this
-// version (js/whatsNew.data.js). When the update turned off this user's checks for new replies
+// After the extension updates, the next forum page shows a pop-up with what's new since the
+// version the user had (js/whatsNew.data.js): a version skipped on the way, like 2.7.0 when
+// going from 2.6.0 straight to 2.7.1, gets its own section under this one's. When the update turned off this user's checks for new replies
 // and notifications (see moveToNewCheckTiming in background.js), it says so first, with a button
 // to the settings. It stays until its close button is pressed; that closes it in the other tabs
 // too, and it doesn't come back. "Remind me later" hides it everywhere for a day.
@@ -11,7 +12,7 @@
 (function () {
     'use strict';
 
-    const KEYS = ['whatsNewVersion', 'whatsNewCheckTiming', 'whatsNewLaterUntil'];
+    const KEYS = ['whatsNewVersion', 'whatsNewFrom', 'whatsNewCheckTiming', 'whatsNewLaterUntil'];
     const LATER_MS = 24 * 60 * 60 * 1000;
 
     let overlay = null;
@@ -23,12 +24,12 @@
             const version = items.whatsNewVersion;
             if (!version || Date.now() < (items.whatsNewLaterUntil || 0)) return;
 
-            const release = whatsNewReleases[version];
-            if (!release && !items.whatsNewCheckTiming) {
+            const releases = releasesSince(items.whatsNewFrom, version);
+            if (!releases.length && !items.whatsNewCheckTiming) {
                 chrome.storage.local.remove(KEYS);
                 return;
             }
-            show(version, release, items.whatsNewCheckTiming);
+            show(version, releases, items.whatsNewCheckTiming);
         });
 
         // closed, or put off for later, in another tab
@@ -40,7 +41,26 @@
         });
     }
 
-    function show(version, release, checkTiming) {
+    // The versions after "from" up to this one that have an entry, newest first. Without "from"
+    // (an update before it was kept) only this version
+    function releasesSince(from, version) {
+        return Object.keys(whatsNewReleases)
+            .filter((v) => from ? compareVersions(v, from) > 0 && compareVersions(v, version) <= 0 : v === version)
+            .sort((a, b) => compareVersions(b, a))
+            .map((v) => ({ version: v, ...whatsNewReleases[v] }));
+    }
+
+    function compareVersions(a, b) {
+        const pa = a.split('.').map(Number);
+        const pb = b.split('.').map(Number);
+        for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+            const diff = (pa[i] || 0) - (pb[i] || 0);
+            if (diff) return diff;
+        }
+        return 0;
+    }
+
+    function show(version, releases, checkTiming) {
         overlay = element('div', 'ih-whats-new');
         const dialog = element('div', 'ih-whats-new-dialog');
         dialog.setAttribute('role', 'dialog');
@@ -62,19 +82,14 @@
             dialog.appendChild(notice);
         }
 
-        if (release && release.features && release.features.length) {
-            dialog.appendChild(element('h3', null, 'נייע זאכן'));
-            const list = element('ul', 'ih-whats-new-list');
-            release.features.forEach((text) => list.appendChild(element('li', null, text)));
-            dialog.appendChild(list);
-        }
-
-        if (release && release.fixes && release.fixes.length) {
-            dialog.appendChild(element('h3', null, 'תיקונים'));
-            const list = element('ul', 'ih-whats-new-list');
-            release.fixes.forEach((text) => list.appendChild(element('li', null, text)));
-            dialog.appendChild(list);
-        }
+        // with more than one version, each one is headed by its number
+        releases.forEach((release) => {
+            if (releases.length > 1) {
+                dialog.appendChild(element('h3', 'ih-whats-new-release', 'ווערסיע ' + release.version));
+            }
+            addList(dialog, 'נייע זאכן', release.features);
+            addList(dialog, 'תיקונים', release.fixes);
+        });
 
         // closing is the main button, the way out of the pop-up
         const buttons = element('div', 'ih-whats-new-buttons');
@@ -89,6 +104,14 @@
         document.body.appendChild(overlay);
         // without scrolling to the buttons, the top (the notice) is what matters most
         buttons.querySelector('button').focus({ preventScroll: true });
+    }
+
+    function addList(dialog, heading, items) {
+        if (!items || !items.length) return;
+        dialog.appendChild(element('h3', null, heading));
+        const list = element('ul', 'ih-whats-new-list');
+        items.forEach((text) => list.appendChild(element('li', null, text)));
+        dialog.appendChild(list);
     }
 
     function hide() {

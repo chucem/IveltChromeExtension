@@ -46,6 +46,18 @@
     color: var(--t-strong, #105289);
     font-size: 15px;
 }
+/* when versions were skipped, each one's section starts with its number, set apart by a line */
+.ih-whats-new-dialog h3.ih-whats-new-release {
+    margin-top: 20px;
+    padding-top: 12px;
+    border-top: 1px solid color-mix(in srgb, var(--t-muted, #6A7A90) 30%, transparent);
+    font-size: 17px;
+}
+.ih-whats-new-dialog h3.ih-whats-new-release:first-of-type {
+    margin-top: 6px;
+    padding-top: 0;
+    border-top: 0;
+}
 
 /* the notice that the checks were turned off: warm, so it's read first */
 .ih-whats-new-notice {

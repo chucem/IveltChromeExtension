@@ -19,7 +19,7 @@
 
     // The post's quote button while it's marked: { link, icon, label, iconClass, labelText, title }
     let marked = null;
-    // What the marked button would quote: { content, text }
+    // The post content the marked button would quote from: { content }
     let pending = null;
     let doneUntil = 0;
     // Where the user left the cursor in the reply box, once they clicked or typed in it: a quote goes
@@ -60,7 +60,7 @@
             if (!marked || !pending || !marked.link.contains(event.target)) return;
             event.preventDefault();
             event.stopImmediatePropagation();
-            const end = addQuote(pending.content, pending.text);
+            const end = addQuote(pending.content, selectedText(pending.content));
             showDone();
             window.getSelection().removeAllRanges();
             if (jumpToReply) goToReply(end);
@@ -86,7 +86,30 @@
 
         if (marked && marked.link !== link) unmark();
         if (!marked) mark(link);
-        pending = { content, text };
+        pending = { content };
+    }
+
+    // The selected words, only from the post the selection was started in: a selection dragged on
+    // past the post (into the signature, the next post…, or up into the one before) is cut back to
+    // the post first. Taken from the selection itself, which has the line breaks as they show
+    function selectedText(content) {
+        const selection = window.getSelection();
+        const range = selection.getRangeAt(0);
+        const startsIn = content.contains(range.startContainer), endsIn = content.contains(range.endContainer);
+        if (!startsIn || !endsIn) {
+            const clipped = range.cloneRange();
+            if (!startsIn) {
+                // from the top of the post, but after the quotes it starts with
+                clipped.setStart(content, 0);
+                const quotes = [...content.querySelectorAll(':scope > blockquote')]
+                    .filter((quote) => clipped.comparePoint(quote, quote.childNodes.length) === 0);
+                if (quotes.length) clipped.setStartAfter(quotes[quotes.length - 1]);
+            }
+            if (!endsIn) clipped.setEnd(content, content.childNodes.length);
+            selection.removeAllRanges();
+            selection.addRange(clipped);
+        }
+        return selection.toString().trim();
     }
 
     // The forum's own ציטיר button of the post (not the extension's "ציטיר לעצטע", which has "last")
@@ -138,8 +161,9 @@
         }, DONE_MS);
     }
 
+    // The post the selection was started in (its anchor, which is the end when dragged upwards)
     function getQuotableContent(selection) {
-        const start = selection.getRangeAt(0).startContainer;
+        const start = selection.anchorNode;
         const element = start.nodeType === Node.ELEMENT_NODE ? start : start.parentElement;
         if (element.closest('blockquote') || element.closest('#preview')) return null;
         return element.closest('.postbody .content');
@@ -167,29 +191,26 @@
         const attributes = [`user_id=${userId}`, `time=${time}`, `post_id=${postId}`].filter((a) => !a.endsWith('='));
         const quote = `[quote="${username}" ${attributes.join(' ')}]\n${text}\n[/quote]`;
 
+        // Where the cursor was in the text, or else after the quotes already on top. On a line of its
+        // own with an empty line after it, as the forum's own quote button leaves it, and the cursor
+        // goes on the line after that
         const textarea = getTextarea();
-        let at, insert;
-        if (caret !== null) {
-            // On a line of its own, where the cursor was in the text
-            at = Math.min(caret, textarea.value.length);
-            const before = textarea.value.slice(0, at);
-            const after = textarea.value.slice(at);
-            insert = (before && !before.endsWith('\n') ? '\n' : '') + quote + (after && !after.startsWith('\n') ? '\n' : '');
-        } else {
-            at = endOfQuotesOnTop(textarea.value);
-            insert = at > 0 ? '\n' + quote : quote + '\n';
-        }
-        textarea.setRangeText(insert, at, at, 'end');
-        if (caret !== null) caret = at + insert.length;
+        const at = caret !== null ? Math.min(caret, textarea.value.length) : endOfQuotesOnTop(textarea.value);
+        const before = textarea.value.slice(0, at);
+        const after = textarea.value.slice(at);
+        const lead = before && !before.endsWith('\n') ? '\n' : '';
+        const trail = '\n\n'.slice(after.match(/^\n{0,2}/)[0].length);
+        textarea.setRangeText(lead + quote + trail, at, at, 'end');
+        const cursor = at + lead.length + quote.length + 2;
+        if (caret !== null) caret = cursor;
         textarea.dispatchEvent(new Event('input', { bubbles: true }));
-        return at + insert.length;
+        return cursor;
     }
 
-    // Down to the reply box, ready to type right after the quote that was just added
+    // Down to the reply box, ready to type under the quote that was just added
     // (the "quoteJumpToReply" setting)
-    function goToReply(end) {
+    function goToReply(at) {
         const textarea = getTextarea();
-        const at = textarea.value[end] === '\n' ? end + 1 : end;
         textarea.focus({ preventScroll: true });
         textarea.setSelectionRange(at, at);
         caret = at;
