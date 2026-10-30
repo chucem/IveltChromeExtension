@@ -111,3 +111,33 @@
     transition: opacity 0.75s linear;
     font-size: 1rem;
 }
+
+/* The split notification bells (and the PM icon and the "+N" next to them) in one item of the
+   header, on one light background apart from the forum's other menus, and kept on one line so they
+   don't wrap apart on a phone (js/splitNotifications.js) */
+.nav-main > li.notif-group {
+    margin: 0 7px !important;
+    padding: 0 !important;
+}
+.nav-main .notif-group > ul {
+    display: flex;
+    /* in the order they had when each one floated left on its own (the header is right-to-left) */
+    flex-direction: row-reverse;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-radius: 6px;
+    background: color-mix(in srgb, currentColor 8%, transparent);
+}
+.nav-main .notif-group > ul > li {
+    float: none !important;
+    flex-shrink: 0;
+    margin: 0 !important;
+    padding: 1px 6px 0;
+    white-space: nowrap;
+    list-style: none;
+}
+/* the grey "+N": as tall as the other bells, its badge on the same line as their red ones */
+#more_unread_notifications { padding: 1px 6px 0 4px; }
+#more_unread_notifications > a { display: block; height: 21px; padding-top: 3px; }
+#more_unread_notifications .badge { top: 0; margin: 0; }
