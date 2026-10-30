@@ -39,7 +39,7 @@ Extra buttons next to the regular quote button on every post:
 ### Notifications
 * Toolbar badge with your unread notification count, and optional browser notifications, even when אייוועלט isn't open.
 * Alert when new replies arrive in the topic you're reading, with a reload button.
-* Separate notification bells for quotes, thanks and mentions (ציטירט / באדאנקט / דערמאנט).
+* Separate notification bells for quotes, thanks and mentions (ציטירט / באדאנקט / דערמאנט), grouped together, with a grey "+N" for older unread notifications that aren't in the bells.
 * Button to hide read notifications on the notifications page.
 * Confirmation before "mark all as read", so it isn't clicked by accident.
 * A mention (@name) in a post links to that user's profile.
@@ -50,7 +50,7 @@ Extra buttons next to the regular quote button on every post:
 * **Image Resizer** on the post editor: images that are too big for an attachment are shrunk automatically, whether they are picked, dropped or pasted.
 * **Paste images** straight into a post (like in Gmail): the image is attached and placed inline where you pasted it. This is a separate setting, so pasting can be on with the resizer off.
 * Pack a whole folder into a single ZIP attachment (drop it on the editor, or use the **Folder → ZIP** button).
-* **Google Drive / Dropbox upload**: shows which account it will use, then uploads files to a folder in your own Google Drive (or `Apps/iVelt Helper` in your Dropbox), makes them viewable by anyone with the link, and inserts the link into the post. It works in private messages too. Dropbox is a separate setting.
+* **Google Drive / Dropbox upload**: shows which account it will use, then uploads files to a folder in your own Google Drive (or `Apps/iVelt Helper` in your Dropbox), makes them viewable by anyone with the link, and inserts the link into the post. It works in private messages too. Files can be dragged straight onto the Google Drive / Dropbox button, and optionally a video dragged into the post goes there too (in a private message, pictures as well). Dropbox is a separate setting.
 * **Undo and redo** while writing (<kbd>Ctrl</kbd>+<kbd>Z</kbd> / <kbd>Ctrl</kbd>+<kbd>Y</kbd>), also after the BBCode buttons, with two buttons at the top of the editor (can be turned off).
 * The editor opens on the **Attachments** tab instead of **Options**, so adding a file is one click (can be turned off).
 
