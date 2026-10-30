@@ -41,6 +41,7 @@ const SYNCED_SETTINGS = [
   'driveUpload',
   'dropboxUpload',
   'cloudUploadInPms',
+  'cloudDropVideos',
   'driveButtonPlace',
   'driveFolderName',
   'printShowLikes',
