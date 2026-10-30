@@ -29,6 +29,7 @@ const defualtPreferences = {
   driveButtonPlace: 'attachments',
   dropboxUpload: true,
   cloudUploadInPms: true,
+  cloudDropVideos: true,
   driveFolderName: 'iVelt Helper',
   openAttachmentsTab: true,
   copyPostLink: true,
