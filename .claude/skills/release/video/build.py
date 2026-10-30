@@ -22,7 +22,8 @@ def caption(i, text):
             f"x=(w-text_w)/2:y=h-text_h-44:box=1:boxcolor=0x10203A@0.92:boxborderw=18")
 
 T, OUT = sys.argv[1], os.path.abspath(sys.argv[2])
-# (screenshot id suffix, seconds on screen, kind); 'desk:N' crops a desktop frame from x=N
+# (screenshot id suffix, seconds on screen, kind); 'desk:N' crops a desktop frame from x=N.
+# This is 2.7.0's video. For the next one, replace the list with the new frames, in order.
 frames = [
     ('llbq8y', 3.5, 'desk'),   # title
     ('1l6cgb', 4.5, 'desk'),   # select words
