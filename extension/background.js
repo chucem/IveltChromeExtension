@@ -96,6 +96,17 @@ async function addDomainRedirect() {
   }).catch((e) => console.error('Domain redirect rule failed:', e));
 }
 
+// The settings page's "update now" link restarts the extension to put in an update the browser
+// already downloaded, which closes that page. The new version opens it again, so it shows the new
+// version. Only within a minute of the click: a restart that didn't update leaves it for nothing
+async function reopenSettingsAfterUpdate(reason) {
+  const { reopenSettingsUntil } = await chrome.storage.local.get('reopenSettingsUntil');
+  if (!reopenSettingsUntil) return;
+  await chrome.storage.local.remove('reopenSettingsUntil');
+  if (reason === 'update' && Date.now() < reopenSettingsUntil)
+    chrome.runtime.openOptionsPage();
+}
+
 chrome.runtime.onInstalled.addListener(async (details) => {
 
   await addDomainRedirect();
@@ -105,6 +116,7 @@ chrome.runtime.onInstalled.addListener(async (details) => {
 
   await moveToNewCheckTiming(details.reason);
   markWhatsNew(details);
+  reopenSettingsAfterUpdate(details.reason);
 
   if (details.reason === "update" || details.reason === "install") {
     // Get current settings in local storage
