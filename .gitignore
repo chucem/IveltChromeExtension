@@ -10,3 +10,6 @@ store-assets/*.mp4
 .claude/settings.local.json
 .claude/worktrees/
 .claude/screenshots-*/
+
+# Raw page captures and test files from store-assets/source/render.py
+store-assets/source/out/
