@@ -167,29 +167,26 @@
         const attributes = [`user_id=${userId}`, `time=${time}`, `post_id=${postId}`].filter((a) => !a.endsWith('='));
         const quote = `[quote="${username}" ${attributes.join(' ')}]\n${text}\n[/quote]`;
 
+        // Where the cursor was in the text, or else after the quotes already on top. On a line of its
+        // own with an empty line after it, as the forum's own quote button leaves it, and the cursor
+        // goes on the line after that
         const textarea = getTextarea();
-        let at, insert;
-        if (caret !== null) {
-            // On a line of its own, where the cursor was in the text
-            at = Math.min(caret, textarea.value.length);
-            const before = textarea.value.slice(0, at);
-            const after = textarea.value.slice(at);
-            insert = (before && !before.endsWith('\n') ? '\n' : '') + quote + (after && !after.startsWith('\n') ? '\n' : '');
-        } else {
-            at = endOfQuotesOnTop(textarea.value);
-            insert = at > 0 ? '\n' + quote : quote + '\n';
-        }
-        textarea.setRangeText(insert, at, at, 'end');
-        if (caret !== null) caret = at + insert.length;
+        const at = caret !== null ? Math.min(caret, textarea.value.length) : endOfQuotesOnTop(textarea.value);
+        const before = textarea.value.slice(0, at);
+        const after = textarea.value.slice(at);
+        const lead = before && !before.endsWith('\n') ? '\n' : '';
+        const trail = '\n\n'.slice(after.match(/^\n{0,2}/)[0].length);
+        textarea.setRangeText(lead + quote + trail, at, at, 'end');
+        const cursor = at + lead.length + quote.length + 2;
+        if (caret !== null) caret = cursor;
         textarea.dispatchEvent(new Event('input', { bubbles: true }));
-        return at + insert.length;
+        return cursor;
     }
 
-    // Down to the reply box, ready to type right after the quote that was just added
+    // Down to the reply box, ready to type under the quote that was just added
     // (the "quoteJumpToReply" setting)
-    function goToReply(end) {
+    function goToReply(at) {
         const textarea = getTextarea();
-        const at = textarea.value[end] === '\n' ? end + 1 : end;
         textarea.focus({ preventScroll: true });
         textarea.setSelectionRange(at, at);
         caret = at;
