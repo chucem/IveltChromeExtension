@@ -363,11 +363,14 @@ async function showInstallSource(){
 		action.textContent = 'נעמט עס אראפ';
 	}
 	else {
-		// the browser has it already, a reload puts it in
+		// the browser has it already, a reload puts it in. That closes this page, and the new
+		// version opens it again (reopenSettingsAfterUpdate in background.js)
 		action.href = '#';
 		action.textContent = 'אפדעיט יעצט';
-		action.addEventListener('click', e => {
+		action.title = 'לייגט אריין די נייע ווערסיע. די בלאט מאכט זיך צו און עפנט זיך ווידער מיט דער נייער ווערסיע';
+		action.addEventListener('click', async e => {
 			e.preventDefault();
+			await chrome.storage.local.set({ reopenSettingsUntil: Date.now() + 60 * 1000 });
 			chrome.runtime.reload();
 		});
 	}
