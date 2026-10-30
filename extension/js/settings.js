@@ -290,7 +290,8 @@ function compareVersions(a, b){
 }
 
 // The stores check through the browser, which also downloads the update.
-// GitHub: the newest release, test builds (prereleases) only for someone already on one
+// GitHub: the newest release, test builds (prereleases) only for someone already on one.
+// Gives { update, checkedAt }: checkedAt only when the answer is from an earlier check
 async function checkForUpdate(source, installed){
 	if(source === 'github'){
 		const response = await fetch('https://api.github.com/repos/chucem/ivelt-helper/releases?per_page=20');
@@ -301,14 +302,23 @@ async function checkForUpdate(source, installed){
 			.filter(release => !release.draft && (onPrerelease || !release.prerelease))
 			.sort((a, b) => compareVersions(b.tag_name, a.tag_name))[0];
 		if(newest && compareVersions(newest.tag_name, installed) > 0)
-			return { version: newest.tag_name.replace(/^v/, ''), link: newest.html_url };
-		return null;
+			return { update: { version: newest.tag_name.replace(/^v/, ''), link: newest.html_url } };
+		return { update: null };
 	}
 
+	// After each check Chrome answers "throttled" for a while, longer each time, until it restarts.
+	// So the last real answer is kept for then, in session storage, which also empties on a restart
+	// (and when the extension updates)
 	const { status, version } = await chrome.runtime.requestUpdateCheck();
-	if(status === 'throttled')
-		throw new Error(status);
-	return status === 'update_available' ? { version } : null;
+	if(status === 'throttled'){
+		const { lastUpdateCheck } = await chrome.storage.session.get('lastUpdateCheck');
+		if(!lastUpdateCheck)
+			throw new Error(status);
+		return lastUpdateCheck;
+	}
+	const answer = { update: status === 'update_available' ? { version } : null };
+	await chrome.storage.session.set({ lastUpdateCheck: { ...answer, checkedAt: Date.now() } });
+	return answer;
 }
 
 async function showInstallSource(){
@@ -327,14 +337,17 @@ async function showInstallSource(){
 	sourceLine.append('אינסטאלירט פון ', sourceLink);
 
 	statusLine.textContent = 'מ\'קוקט צי ס\'איז דא א נייע ווערסיע…';
-	let update;
+	let update, checkedAt;
 	try {
-		update = await checkForUpdate(source, manifest.version_name || manifest.version);
+		({ update, checkedAt } = await checkForUpdate(source, manifest.version_name || manifest.version));
 	}
 	catch(e){
 		statusLine.textContent = 'מ\'קען יעצט נישט נאכקוקן פאר א נייע ווערסיע';
 		return;
 	}
+
+	// when it was checked, in the tooltip: an answer can be from an earlier check
+	statusLine.title = 'לעצט נאכגעקוקט ' + new Date(checkedAt || Date.now()).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 
 	if(!update){
 		statusLine.textContent = 'דאס איז די לעצטע ווערסיע';
