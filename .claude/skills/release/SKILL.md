@@ -48,17 +48,24 @@ In `store-assets/`, used by both stores:
 - `promo-tile-440x280.png`: **440×280**, 24-bit PNG **with no alpha channel** (the Chrome Web
   Store rejects one with alpha).
 
-Take the screenshots, and record the video, in the forum's **testing topic**:
-https://ivelt.com/forum/viewtopic.php?p=6990092. It's there for trying things out, so posting,
-liking and quoting there is fine.
+They're rendered from the code by `store-assets/source/render.py` (see the README there): the
+real extension on demo forum pages, in the blue frame. The **Store assets** Action re-renders
+them on every push to `dev` and commits the ones that changed, so they're normally up to date
+already. Check that the last run on `dev` passed (`gh run list --workflow store-assets.yml
+--limit 1`) and look at the images.
 
-Refresh the screenshots whose feature looks different now, and add one for a big new feature
-(up to 5 on the Chrome Web Store, 10 on Edge, so pick the best 5 for Chrome). They can be taken
-on the user's own forum account, with real topics and posts. Writing a **new** private message
-is fine (to show a feature of the PM editor, without sending it). **Never show or read an
-existing private message**: not the inbox, not the PM list or dropdown, not a PM's text. Don't
-read the page text on PM pages either: only query the elements you need. Say in the commit
-which screenshots changed and why.
+For a big new feature, add a shot to `store-assets/source/shots.json` (up to 5 on the Chrome
+Web Store, 10 on Edge, so pick the best 5 for Chrome), and change a shot's text when its
+feature changed. Render locally to check (`python store-assets/source/render.py <name>`).
+Never edit the PNGs by hand: the next run would undo it.
+
+Record the video in the forum's **testing topic**:
+https://ivelt.com/forum/viewtopic.php?p=6990092. It's there for trying things out, so posting,
+liking and quoting there is fine. It can be on the user's own forum account, with real topics
+and posts. Writing a **new** private message is fine (to show a feature of the PM editor,
+without sending it). **Never show or read an existing private message**: not the inbox, not
+the PM list or dropdown, not a PM's text. Don't read the page text on PM pages either: only
+query the elements you need.
 
 ### A video of what changed
 A short video for users that shows what's new, so they don't have to read a list to find it:
