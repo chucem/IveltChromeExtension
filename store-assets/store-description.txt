@@ -15,7 +15,7 @@
 ★ נאטיפיקאציעס
 • א נומער אויפן אייקאן מיט וויפיל אומגעליינטע נאטיפיקאציעס עס זענען דא, און בראוזער נאטיפיקאציעס, אפילו ווען אייוועלט איז נישט אפן.
 • א מעלדונג ווען נייע תגובות קומען צו אינעם אשכול וואס מען ליינט.
-• באזונדערע נאטיפיקאציע גלעקלעך פאר ציטירט, באדאנקט און דערמאנט.
+• באזונדערע נאטיפיקאציע גלעקלעך פאר ציטירט, באדאנקט און דערמאנט, מיט א גרויען "+N" פאר עלטערע אומגעליינטע.
 • א @דערמאנונג אין א תגובה איז א לינק צום באנוצער'ס פראפייל.
 
 ★ שרייבן א תגובה
@@ -23,7 +23,7 @@
 • צוריקדרייען (Ctrl+Z) און ווידער טון (Ctrl+Y) ביים שרייבן.
 • בילדער פארקלענערער: פארקלענערט בילדער אז זיי זאלן אריינפאסן אין די גרייס פון אן עטעטשמענט, און מאכט א גאנצן פאלדער אין איין ZIP.
 • פעיסט א בילד גלייך אין די תגובה.
-• לייגט ארויף פיילס אויף אייער אייגענעם Google Drive אדער Dropbox, און לייגט אריין דעם לינק אין דער תגובה, אויך אין א פריוואטע מעסעדזש.
+• לייגט ארויף פיילס אויף אייער אייגענעם Google Drive אדער Dropbox, און לייגט אריין דעם לינק אין דער תגובה, אויך אין א פריוואטע מעסעדזש. מען קען זיי שלעפן גלייך אויפן קנעפל, און אויב מען וויל גייט א ווידיא וואס מען שלעפט אריין אין דער תגובה אויך אהין.
 • ווארנט איידער מען פארלאזט א בלאט מיט א נישט-געשיקטע תגובה.
 
 ★ קיבאורד שארטקאטס
@@ -63,7 +63,7 @@ Most features can be turned on or off in the extension's settings, and they stay
 ★ Notifications
 • Unread count on the toolbar icon, and browser notifications, even when אייוועלט isn't open.
 • An alert when new replies arrive in the topic you're reading.
-• Separate notification bells for quotes, likes and mentions.
+• Separate notification bells for quotes, likes and mentions, with a grey "+N" for older unread ones.
 • An @mention in a post links to that user's profile.
 
 ★ Writing a post
@@ -71,7 +71,7 @@ Most features can be turned on or off in the extension's settings, and they stay
 • Undo (Ctrl+Z) and redo (Ctrl+Y) while writing.
 • Image resizer: shrinks images to fit the attachment size, and packs a whole folder into one ZIP.
 • Paste an image straight into a post.
-• Upload files to your own Google Drive or Dropbox and insert the link in the post, in private messages too.
+• Upload files to your own Google Drive or Dropbox and insert the link in the post, in private messages too. Drag files straight onto the button, and optionally a video dragged into the post goes there too.
 • A warning before leaving a page with an unsent post.
 
 ★ Keyboard shortcuts
