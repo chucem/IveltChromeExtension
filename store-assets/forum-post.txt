@@ -31,6 +31,6 @@
 נייע: [url=https://chromewebstore.google.com/detail/ivelt-helper-v2/ahidenbhdkloaingggdcijofobjboopi]Chrome Web Store[/url] | [url=https://microsoftedge.microsoft.com/addons/detail/ivelt-helper-v2/hnklcnfpeamfiflmpnmjphigmbjoeknc]Edge Add-ons[/url] | [url=https://github.com/chucem/ivelt-helper/releases/tag/v2.7.0]GitHub[/url]
 
 [b]א יישר כח[/b] פאר די וואס האבן מיטגעהאלפן אין דעם ווערסיע:
-[smention u=KNAPER_FORUM_ID]KNAPER_FORUM_NAME[/smention] [smention u=ZUGNISHTOIS_FORUM_ID]ZUGNISHTOIS_FORUM_NAME[/smention]
+[smention u=24528]כ'זאג נישט אויס[/smention] [smention u=5372]קנאפער ידען[/smention]
 
 פראבלעמען אדער געדאנקען? שרייבט דא אינעם אשכול, אדער אויף [url=https://github.com/chucem/ivelt-helper/issues]GitHub[/url].
