@@ -190,5 +190,25 @@
     "title": "אייוועלט *העלפער*",
     "subtitle": "iVelt Helper",
     "chips": ["שארטקאטס", "נאטיפיקאציעס", "ציטיר קנעפלעך"]
+  },
+  {
+    "name": "marquee",
+    "file": "promo-marquee-1400x560.png",
+    "size": [1400, 560],
+    "title": "אייוועלט, *גיכער* און בעסער",
+    "subtitle": "Shortcuts, smarter notifications and handy post tools for אייוועלט",
+    "features": [
+      { "icon": "bell", "yi": "נאטיפיקאציעס לויט סארט", "en": "Notifications, sorted by type" },
+      { "icon": "quote-left", "yi": "מער קנעפלעך ביי יעדע תגובה", "en": "Extra buttons on every post" },
+      { "icon": "paint-brush", "yi": "קאליר טעמעס", "en": "Color themes" }
+    ],
+    "url": "ivelt.com/forum/viewtopic.php?t=46302",
+    "window": { "x": 64, "y": 48, "w": 800, "h": 464 },
+    "stage": {
+      "page": "viewtopic.php?t=46302"
+    },
+    "callouts": [
+      { "selector": ".notif-group", "pad": 6, "zoom": 1.45, "x": 36, "y": 440 }
+    ]
   }
 ]

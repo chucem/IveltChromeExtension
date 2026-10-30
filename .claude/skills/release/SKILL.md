@@ -47,6 +47,8 @@ In `store-assets/`, used by both stores:
 - `screenshot-N-<name>.png`: **1280×800**, 24-bit PNG.
 - `promo-tile-440x280.png`: **440×280**, 24-bit PNG **with no alpha channel** (the Chrome Web
   Store rejects one with alpha).
+- `promo-marquee-1400x560.png`: the Chrome Web Store's marquee promo tile, **1400×560**, also
+  with no alpha.
 
 They're rendered from the code by `store-assets/source/render.py` (see the README there): the
 real extension on demo forum pages, in the blue frame. The **Store assets** Action re-renders

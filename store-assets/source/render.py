@@ -1,4 +1,4 @@
-# Renders the store screenshots and the promo tile in store-assets/ from the current code.
+# Renders the store screenshots and the promo tiles in store-assets/ from the current code.
 #
 # Chromium runs the real extension (extension/) on demo forum pages: the forum's own markup and
 # styles (site/, from snapshot.py) with the made-up users and posts in demo.json, served for

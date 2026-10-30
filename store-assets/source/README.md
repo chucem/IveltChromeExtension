@@ -1,6 +1,6 @@
 # Store images, made from the code
 
-The screenshots and the promo tile in `store-assets/` are rendered, not edited by hand. A
+The screenshots and the promo tiles in `store-assets/` are rendered, not edited by hand. A
 GitHub Action (`.github/workflows/store-assets.yml`) renders them again on every push to `dev`
 that changes `extension/` or this folder, and commits the ones that changed.
 
@@ -35,8 +35,8 @@ If Playwright's Chromium won't start (on Windows it can fail with "side-by-side 
 incorrect"), use Edge: `RENDER_CHANNEL=msedge python store-assets/source/render.py`. The
 Action's images (Linux fonts) are the ones that count; a local run is for checking.
 
-Chrome Web Store: up to 5 screenshots, 1280×800; Edge Add-ons: up to 10. The promo tile is
-440×280, saved without alpha, as the Chrome Web Store requires.
+Chrome Web Store: up to 5 screenshots, 1280×800; Edge Add-ons: up to 10. The promo tiles,
+440×280 and the 1400×560 marquee, are saved without alpha, as the Chrome Web Store requires.
 
 ## When the forum's own look changes
 
